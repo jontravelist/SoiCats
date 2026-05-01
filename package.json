@@ -1,0 +1,18 @@
+{
+  "name": "soi-cats",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "mobile":         "npm --workspace apps/mobile run start",
+    "mobile:ios":     "npm --workspace apps/mobile run ios",
+    "mobile:android": "npm --workspace apps/mobile run android",
+    "typecheck":      "npm --workspace apps/mobile run typecheck",
+    "supabase:start": "supabase start",
+    "supabase:reset": "supabase db reset",
+    "supabase:types": "supabase gen types typescript --local > packages/shared/database.types.ts"
+  }
+}

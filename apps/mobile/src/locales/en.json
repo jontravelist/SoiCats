@@ -1,0 +1,143 @@
+{
+  "app": {
+    "name": "Soi Cats",
+    "tagline": "Every cat in your neighbourhood, named."
+  },
+  "tabs": {
+    "feed": "Feed",
+    "map": "Map",
+    "post": "Post",
+    "stickers": "Stickers",
+    "profile": "Profile"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signInWithApple": "Continue with Apple",
+    "signInWithGoogle": "Continue with Google",
+    "signInWithEmail": "Continue with email",
+    "email": "Email",
+    "password": "Password",
+    "sendingMagicLink": "Sending magic link…",
+    "magicLinkSent": "Check your inbox for a sign-in link.",
+    "skipForNow": "Browse without signing in",
+    "termsHint": "By continuing you agree to the Terms and Privacy Policy."
+  },
+  "feed": {
+    "tabs": { "nearby": "Nearby", "following": "Following" },
+    "newAbove": "{{count}} new photo",
+    "newAbove_other": "{{count}} new photos",
+    "empty": "No cats spotted nearby yet. Be the first.",
+    "emptyFollowing": "Favourite a cat to see their photos here.",
+    "distance_m": "{{m}} m away",
+    "distance_km": "{{km}} km away",
+    "timeAgo": "{{time}} ago"
+  },
+  "post": {
+    "title": "Add a photo",
+    "openCamera": "Take photo",
+    "openLibrary": "Choose from library",
+    "locating": "Locating you…",
+    "lowAccuracy": "GPS is weak. Step into the open or set the location on the map.",
+    "whichCat": "Which cat is this?",
+    "newCat": "New cat",
+    "notSure": "Not sure",
+    "captionPlaceholder": "Say something (optional)",
+    "post": "Post",
+    "posting": "Posting…",
+    "duplicateInterstitial": "Wait — could this be one of these?",
+    "stillNew": "Still a new cat"
+  },
+  "newCat": {
+    "title": "Name this cat",
+    "namePlaceholder": "e.g. Mango",
+    "patternLabel": "Pattern",
+    "colorLabel": "Primary colour",
+    "ageLabel": "Approximate age",
+    "featuresLabel": "Distinguishing features (optional)",
+    "save": "Save"
+  },
+  "patterns": {
+    "tabby": "Tabby",
+    "tortie": "Tortie",
+    "calico": "Calico",
+    "tuxedo": "Tuxedo",
+    "solid_black": "Solid black",
+    "solid_white": "Solid white",
+    "ginger": "Ginger",
+    "grey": "Grey",
+    "pointed": "Pointed"
+  },
+  "ages": {
+    "kitten": "Kitten",
+    "young": "Young",
+    "adult": "Adult",
+    "senior": "Senior"
+  },
+  "cat": {
+    "discoveredBy": "Discovered by {{handle}} on {{date}}",
+    "lastSeen": "Last seen {{time}}",
+    "stats": {
+      "photos": "{{count}} photo",
+      "photos_other": "{{count}} photos",
+      "photographers": "{{count}} photographer",
+      "photographers_other": "{{count}} photographers"
+    },
+    "welfare": {
+      "tnr": {
+        "unknown": "TNR status unknown",
+        "intact": "Intact",
+        "ear_tipped": "Ear-tipped",
+        "sterilised": "Sterilised"
+      },
+      "vaccination": {
+        "unknown": "Vaccination unknown",
+        "partial": "Partially vaccinated",
+        "fully_vaccinated": "Fully vaccinated"
+      },
+      "verifiedBy": "verified by {{clinic}}"
+    },
+    "actions": {
+      "favourite": "Favourite",
+      "unfavourite": "Favourited",
+      "directions": "Directions to last sighting",
+      "flag": "Report welfare issue"
+    }
+  },
+  "flag": {
+    "title": "Report a welfare issue",
+    "type": { "injured": "Injured", "missing": "Missing", "deceased": "Deceased" },
+    "descriptionPlaceholder": "What did you see?",
+    "submit": "Submit"
+  },
+  "stickers": {
+    "title": "Stickers",
+    "progress": "{{points}} / {{next}} points to {{packName}}",
+    "unlockedAll": "You've unlocked every pack. Cat Whisperer status confirmed.",
+    "unlocked": "Unlocked",
+    "locked": "Locked",
+    "tierUnlockedTitle": "New stickers unlocked",
+    "tierUnlockedBody": "You hit {{points}} points and earned {{packName}}.",
+    "share": "Share",
+    "saveToLibrary": "Save to camera roll",
+    "savedToLibrary": "Saved to your camera roll",
+    "by": "by {{artist}}"
+  },
+  "profile": {
+    "points": "{{count}} point",
+    "points_other": "{{count}} points",
+    "edit": "Edit profile",
+    "myCats": "My cats",
+    "myPhotos": "My photos",
+    "settings": "Settings",
+    "signOut": "Sign out",
+    "applyFeeder": "Apply to be a Verified Feeder"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "retry": "Retry",
+    "loading": "Loading…",
+    "error": "Something went wrong"
+  }
+}

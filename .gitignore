@@ -1,0 +1,14 @@
+node_modules/
+.expo/
+.expo-shared/
+dist/
+build/
+*.log
+.env
+.env.local
+.DS_Store
+
+# Supabase local stack
+supabase/.branches/
+supabase/.temp/
+supabase/.env
