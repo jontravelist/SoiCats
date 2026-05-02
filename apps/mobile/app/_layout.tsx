@@ -21,7 +21,7 @@ export default function RootLayout() {
         <StatusBar style="dark" />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="auth" options={{ presentation: "modal" }} />
+          <Stack.Screen name="auth/index" options={{ presentation: "modal" }} />
           <Stack.Screen name="cat/[id]" options={{ headerShown: true, title: "" }} />
           <Stack.Screen name="sighting/[id]" options={{ headerShown: true, title: "" }} />
           <Stack.Screen name="post/identify" options={{ headerShown: true, title: "Which cat?" }} />
