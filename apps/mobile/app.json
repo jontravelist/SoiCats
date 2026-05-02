@@ -5,14 +5,8 @@
     "scheme": "soicats",
     "version": "0.1.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#FFF8EE"
-    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "co.soicats.app",
@@ -28,10 +22,6 @@
     },
     "android": {
       "package": "co.soicats.app",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFF8EE"
-      },
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
