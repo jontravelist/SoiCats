@@ -11,6 +11,9 @@ export interface PendingUpload {
   lat?: number;
   lng?: number;
   accuracy?: number | null;
+  // Where the location came from. "photo" = EXIF GPS embedded by the camera,
+  // "device" = the user's current GPS reading. Drives the "📍 Using..." badge.
+  locationSource?: "photo" | "device";
 }
 
 interface UploadState {

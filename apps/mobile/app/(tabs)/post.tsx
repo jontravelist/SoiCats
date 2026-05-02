@@ -9,6 +9,7 @@ import { Button } from "@/components/Button";
 import { useAuthStore } from "@/stores/auth";
 import { useUploadStore } from "@/stores/upload";
 import { preparePhoto, uploadSightingPhoto } from "@/lib/photo";
+import { extractGpsFromExif } from "@/lib/exif";
 import { useLocation } from "@/hooks/useLocation";
 import { colors, spacing, typography } from "@/lib/theme";
 
@@ -35,20 +36,33 @@ export default function PostTab() {
   const start = async (mode: "camera" | "library") => {
     setBusy(true);
     try {
+      // Ask for EXIF so we can read GPS off library photos that already have it.
       const result = mode === "camera"
-        ? await ImagePicker.launchCameraAsync({ quality: 0.9, exif: false })
-        : await ImagePicker.launchImageLibraryAsync({ quality: 0.9, exif: false, mediaTypes: ImagePicker.MediaTypeOptions.Images });
+        ? await ImagePicker.launchCameraAsync({ quality: 0.9, exif: true })
+        : await ImagePicker.launchImageLibraryAsync({ quality: 0.9, exif: true, mediaTypes: ImagePicker.MediaTypeOptions.Images });
 
       if (result.canceled) return;
       const asset = result.assets[0];
+
+      // Prefer the photo's own GPS metadata (e.g. a library photo of a cat
+      // taken at the right place yesterday). Fall back to the user's current
+      // GPS for camera shots and for library photos with no embedded location.
+      const exifGps = extractGpsFromExif(asset.exif as Record<string, unknown> | undefined);
+      const haveExif = !!exifGps;
+      const lat = exifGps?.lat ?? coords?.latitude;
+      const lng = exifGps?.lng ?? coords?.longitude;
+
       const prepared = await preparePhoto(asset.uri);
 
       setPending({
         localUri: prepared.uri,
         uploading: true,
-        lat: coords?.latitude,
-        lng: coords?.longitude,
-        accuracy: coords?.accuracy ?? null,
+        lat,
+        lng,
+        // EXIF doesn't carry an accuracy field, so we leave it null when using
+        // photo-embedded coords. The 50m accuracy gate doesn't apply in that case.
+        accuracy: haveExif ? null : (coords?.accuracy ?? null),
+        locationSource: haveExif ? "photo" : "device",
       });
 
       // Push to cat-picker immediately. Upload runs in the background and the

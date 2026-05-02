@@ -83,6 +83,14 @@ export default function IdentifyScreen() {
     <Screen scroll>
       <Image source={pending.localUri} style={styles.photo} contentFit="cover" />
 
+      <View style={styles.locBadge}>
+        <Text style={styles.locBadgeText}>
+          {pending.locationSource === "photo"
+            ? "📍 Using location from photo"
+            : "📍 Using your current location"}
+        </Text>
+      </View>
+
       {pending.uploading ? (
         <View style={styles.uploadingRow}>
           <ActivityIndicator />
@@ -138,6 +146,17 @@ export default function IdentifyScreen() {
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   photo: { width: "100%", aspectRatio: 1, backgroundColor: colors.border },
+  locBadge: {
+    alignSelf: "flex-start",
+    margin: spacing(3),
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  locBadgeText: { ...typography.small, color: colors.textDim },
   uploadingRow: { flexDirection: "row", alignItems: "center", gap: spacing(2), padding: spacing(3) },
   uploadingText: { ...typography.body, color: colors.textDim },
   h2: { ...typography.h2, padding: spacing(3) },
