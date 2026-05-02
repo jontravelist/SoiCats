@@ -12,7 +12,6 @@ export const SUGGESTED_CAT_NAMES = [
   "Lek",
   "Daeng",
   "Tao",
-  "Mali",
   "Bua",
   "Ploy",
   "Khanom",
