@@ -44,6 +44,18 @@ export default function MapTab() {
     );
   };
 
+  // Fit every loaded cat marker on screen at once. Useful when most cats
+  // are off the current viewport — common when a user travels.
+  const fitAllCats = () => {
+    if (!cats || cats.length === 0) return;
+    const points = cats.map((c) => ({ latitude: c.centroid_lat, longitude: c.centroid_lng }));
+    if (coords) points.push({ latitude: coords.latitude, longitude: coords.longitude });
+    mapRef.current?.fitToCoordinates(points, {
+      edgePadding: { top: 80, left: 40, right: 40, bottom: 80 },
+      animated: true,
+    });
+  };
+
   return (
     <Screen>
       <MapView
@@ -65,9 +77,13 @@ export default function MapTab() {
         ))}
       </MapView>
 
-      <View style={styles.attribution}>
-        <Text style={styles.attrText}>{(cats ?? []).length} cats nearby</Text>
-      </View>
+      <Pressable
+        onPress={fitAllCats}
+        style={({ pressed }) => [styles.attribution, pressed && { opacity: 0.85 }]}
+        accessibilityHint="Zoom out to fit every cat on screen"
+      >
+        <Text style={styles.attrText}>{(cats ?? []).length} cats · tap to fit all</Text>
+      </Pressable>
 
       {coords ? (
         <Pressable
