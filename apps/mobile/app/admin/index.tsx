@@ -6,7 +6,7 @@ import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
 import { useAuthStore } from "@/stores/auth";
 import { useProfile } from "@/hooks/useProfile";
-import { fetchOpenMergeRequests } from "@/lib/api";
+import { fetchOpenFeederApplications, fetchOpenMergeRequests } from "@/lib/api";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
 // Admin landing — only renders for app_admin users. Lists categories of
@@ -20,6 +20,11 @@ export default function AdminHome() {
   const mergesQ = useQuery({
     queryKey: ["admin-open-merges"],
     queryFn: fetchOpenMergeRequests,
+    enabled: profile.data?.role === "app_admin",
+  });
+  const feedersQ = useQuery({
+    queryKey: ["admin-open-feeder-applications"],
+    queryFn: fetchOpenFeederApplications,
     enabled: profile.data?.role === "app_admin",
   });
 
@@ -37,19 +42,25 @@ export default function AdminHome() {
   }
 
   const mergeCount = mergesQ.data?.length ?? 0;
+  const feederCount = feedersQ.data?.length ?? 0;
 
   return (
     <Screen scroll>
       <View style={styles.container}>
         <Text style={styles.h1}>Admin</Text>
         <Text style={styles.body}>
-          Review user-submitted requests. Each action below is permanent — read carefully.
+          Review user-submitted requests. Each action is permanent — read carefully.
         </Text>
 
         <Button
           label={`Merge requests${mergeCount > 0 ? `  ·  ${mergeCount} open` : ""}`}
           variant={mergeCount > 0 ? "primary" : "secondary"}
           onPress={() => router.push("/admin/merges")}
+        />
+        <Button
+          label={`Feeder applications${feederCount > 0 ? `  ·  ${feederCount} open` : ""}`}
+          variant={feederCount > 0 ? "primary" : "secondary"}
+          onPress={() => router.push("/admin/feeders")}
         />
       </View>
     </Screen>

@@ -177,6 +177,89 @@ export async function requestCatMerge(input: { sourceCatId: string; targetCatId:
   if (error) throw error;
 }
 
+// Verified Feeder applications.
+export async function submitFeederApplication(input: { area: string; bio: string }) {
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) throw new Error("Not signed in");
+  const { error } = await supabase.from("feeder_applications").insert({
+    user_id: user.user.id,
+    area: input.area,
+    bio: input.bio,
+  });
+  if (error) throw error;
+}
+
+export async function fetchMyFeederApplication() {
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) return null;
+  const { data, error } = await supabase
+    .from("feeder_applications")
+    .select("*")
+    .eq("user_id", user.user.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchOpenFeederApplications() {
+  const { data, error } = await supabase
+    .from("feeder_applications")
+    .select(`
+      id, area, bio, created_at,
+      applicant:user_id(id, handle, display_name, avatar_url, points)
+    `)
+    .eq("status", "open")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function approveFeederApplication(applicationId: string) {
+  const { error } = await supabase.rpc("approve_feeder_application", { application_id: applicationId });
+  if (error) throw error;
+}
+
+export async function rejectFeederApplication(applicationId: string, why?: string) {
+  const { error } = await supabase.rpc("reject_feeder_application", {
+    application_id: applicationId,
+    why: why ?? null,
+  });
+  if (error) throw error;
+}
+
+// Feed-log helpers (verified feeders only — RLS enforces the role check).
+export async function logFeed(input: { catId: string; notes?: string | null; photoUrl?: string | null; lat?: number; lng?: number }) {
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) throw new Error("Not signed in");
+  const row: Record<string, unknown> = {
+    cat_id: input.catId,
+    feeder_id: user.user.id,
+    notes: input.notes ?? null,
+    photo_url: input.photoUrl ?? null,
+  };
+  if (input.lat != null && input.lng != null) {
+    row.location = `SRID=4326;POINT(${input.lng} ${input.lat})`;
+  }
+  const { error } = await supabase.from("feed_logs").insert(row as never);
+  if (error) throw error;
+}
+
+export async function fetchRecentFeedsForCat(catId: string, limit = 10) {
+  const { data, error } = await supabase
+    .from("feed_logs")
+    .select(`
+      id, fed_at, notes, photo_url,
+      feeder:feeder_id(handle, display_name, avatar_url)
+    `)
+    .eq("cat_id", catId)
+    .order("fed_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data ?? [];
+}
+
 // Admin queue: open merge requests with both cats hydrated for display.
 export async function fetchOpenMergeRequests() {
   const { data, error } = await supabase

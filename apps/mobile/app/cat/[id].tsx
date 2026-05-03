@@ -7,7 +7,8 @@ import MapView, { Marker } from "react-native-maps";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
-import { fetchCat, fetchCatSightingLocations, fetchCatSightings, fetchLatestFlagForCat, toggleFavourite } from "@/lib/api";
+import { fetchCat, fetchCatSightingLocations, fetchCatSightings, fetchLatestFlagForCat, fetchRecentFeedsForCat, toggleFavourite } from "@/lib/api";
+import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth";
 import { useTimeAgo } from "@/hooks/useTimeAgo";
@@ -37,6 +38,13 @@ export default function CatProfile() {
     queryFn: () => fetchLatestFlagForCat(id!),
     enabled: !!id,
   });
+  const feedsQ = useQuery({
+    queryKey: ["recent-feeds", id],
+    queryFn: () => fetchRecentFeedsForCat(id!),
+    enabled: !!id,
+  });
+  const profile = useProfile();
+  const isFeeder = profile.data?.role === "feeder" || profile.data?.role === "app_admin";
   const favQ = useQuery({
     queryKey: ["fav", id, session?.user.id],
     queryFn: async () => {
@@ -157,11 +165,33 @@ export default function CatProfile() {
           {session && session.user.id === cat.discovered_by_user_id ? (
             <Button label="Edit cat" variant="ghost" onPress={() => router.push(`/edit-cat/${id}`)} />
           ) : null}
+          {isFeeder && cat.status !== "deceased" ? (
+            <Button label="🍚 Log feed" variant="accent" onPress={() => router.push(`/log-feed/${id}`)} />
+          ) : null}
           {session ? (
             <Button label="Mark as duplicate" variant="ghost" onPress={() => router.push(`/merge/${id}`)} />
           ) : null}
         </View>
       </View>
+
+      {(feedsQ.data ?? []).length > 0 ? (
+        <View style={styles.feedsWrap}>
+          <Text style={styles.sectionLabel}>Recent feeds</Text>
+          {(feedsQ.data ?? []).map((row) => {
+            const feeder = (row as { feeder?: { handle?: string | null } | null }).feeder;
+            return (
+              <View key={row.id} style={styles.feedRow}>
+                <Text style={styles.feedEmoji}>🍚</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.feedHandle}>@{feeder?.handle ?? "feeder"}</Text>
+                  <Text style={styles.feedTime}>{timeAgo(row.fed_at)}</Text>
+                  {row.notes ? <Text style={styles.feedNotes}>{row.notes}</Text> : null}
+                </View>
+              </View>
+            );
+          })}
+        </View>
+      ) : null}
 
       {pins.length > 0 ? (
         <View style={styles.territoryWrap}>
@@ -267,6 +297,18 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   miniMap: { width: "100%", height: "100%" },
+  feedsWrap: { paddingHorizontal: spacing(4), marginTop: spacing(2), marginBottom: spacing(3), gap: spacing(2) },
+  feedRow: {
+    flexDirection: "row",
+    gap: spacing(3),
+    padding: spacing(3),
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+  },
+  feedEmoji: { fontSize: 24 },
+  feedHandle: { ...typography.h3, color: colors.text },
+  feedTime: { ...typography.small, color: colors.textDim, marginTop: 2 },
+  feedNotes: { ...typography.body, color: colors.text, marginTop: 4 },
   grid: { paddingHorizontal: 2 },
   gridCell: { flex: 1 / 3, aspectRatio: 1, margin: 1 },
   gridImage: { width: "100%", height: "100%", backgroundColor: colors.border },

@@ -332,6 +332,14 @@ export interface Database {
         Args: { request_id: string; _reason?: string | null };
         Returns: void;
       };
+      approve_feeder_application: {
+        Args: { application_id: string };
+        Returns: void;
+      };
+      reject_feeder_application: {
+        Args: { application_id: string; why?: string | null };
+        Returns: void;
+      };
     };
     Enums: {
       user_role: "user" | "feeder" | "clinic_admin" | "app_admin";
