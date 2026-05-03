@@ -63,7 +63,7 @@ export default function PostTab() {
       // Ask for EXIF so we can read GPS off library photos that already have it.
       const result = mode === "camera"
         ? await ImagePicker.launchCameraAsync({ quality: 0.9, exif: true })
-        : await ImagePicker.launchImageLibraryAsync({ quality: 0.9, exif: true, mediaTypes: ImagePicker.MediaTypeOptions.Images });
+        : await ImagePicker.launchImageLibraryAsync({ quality: 0.9, exif: true, mediaTypes: ["images"] });
 
       if (result.canceled) return;
       const asset = result.assets[0];

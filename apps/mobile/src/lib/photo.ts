@@ -1,5 +1,5 @@
 import * as ImageManipulator from "expo-image-manipulator";
-import * as FileSystem from "expo-file-system";
+import { File } from "expo-file-system";
 import { supabase } from "@/lib/supabase";
 
 const MAX_EDGE = 2048;
@@ -22,18 +22,14 @@ export async function preparePhoto(uri: string): Promise<{ uri: string }> {
 // Upload a prepared photo to the sighting-photos bucket. Returns the public URL.
 // Path convention: <userId>/<timestamp>-<random>.jpg — required by storage RLS.
 //
-// Reading via fetch+blob silently uploads zero bytes in React Native.
-// Read the file as base64 via expo-file-system, decode to a Uint8Array, then
-// hand that to supabase-storage. This is the standard RN-safe pattern.
+// Reading via fetch+blob silently uploads zero bytes in React Native, so we
+// read the file as raw bytes via the new expo-file-system File API and hand
+// the Uint8Array directly to supabase-storage.
 export async function uploadSightingPhoto(localUri: string, userId: string): Promise<string> {
   const filename = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
 
-  const base64 = await FileSystem.readAsStringAsync(localUri, {
-    encoding: FileSystem.EncodingType.Base64,
-  });
-  const binary = globalThis.atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  const file = new File(localUri);
+  const bytes = file.bytes();
 
   const { error } = await supabase.storage
     .from("sighting-photos")
