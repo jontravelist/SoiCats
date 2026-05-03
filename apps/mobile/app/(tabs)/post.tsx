@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Linking, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
@@ -12,6 +12,28 @@ import { preparePhoto, uploadSightingPhoto } from "@/lib/photo";
 import { extractGpsFromExif } from "@/lib/exif";
 import { useLocation } from "@/hooks/useLocation";
 import { colors, spacing, typography } from "@/lib/theme";
+
+// Asks for camera or photo-library permission and, if denied, surfaces a
+// clear modal with a button that jumps straight to the iOS Settings app.
+// Default expo-image-picker behaviour is a confusing CodedError, which is
+// what users see if they tapped Don't Allow on a previous prompt.
+async function ensurePermission(mode: "camera" | "library"): Promise<boolean> {
+  const req = mode === "camera"
+    ? await ImagePicker.requestCameraPermissionsAsync()
+    : await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (req.granted) return true;
+
+  const what = mode === "camera" ? "Camera" : "Photos";
+  Alert.alert(
+    `${what} permission needed`,
+    `Soi Cats needs ${what} access to add photos. Open Settings → Expo Go and turn ${what} on.`,
+    [
+      { text: "Cancel", style: "cancel" },
+      { text: "Open Settings", onPress: () => Linking.openSettings() },
+    ],
+  );
+  return false;
+}
 
 // Post tab acts as a launcher for the camera or library.
 // Auth is gated here: anonymous users see a sign-in prompt instead.
@@ -36,6 +58,8 @@ export default function PostTab() {
   const start = async (mode: "camera" | "library") => {
     setBusy(true);
     try {
+      if (!(await ensurePermission(mode))) return;
+
       // Ask for EXIF so we can read GPS off library photos that already have it.
       const result = mode === "camera"
         ? await ImagePicker.launchCameraAsync({ quality: 0.9, exif: true })
@@ -72,7 +96,7 @@ export default function PostTab() {
       const url = await uploadSightingPhoto(prepared.uri, session.user.id);
       useUploadStore.getState().patch({ remoteUrl: url, uploading: false });
     } catch (e) {
-      console.error(e);
+      Alert.alert("Could not add photo", e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(false);
     }
