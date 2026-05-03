@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Image } from "expo-image";
-import { useLocalSearchParams } from "expo-router";
-import { useTranslation } from "react-i18next";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
@@ -15,7 +14,7 @@ import { colors, spacing, typography } from "@/lib/theme";
 
 export default function SightingDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { t } = useTranslation();
+  const router = useRouter();
   const session = useAuthStore((s) => s.session);
   const timeAgo = useTimeAgo();
   const qc = useQueryClient();
@@ -77,7 +76,15 @@ export default function SightingDetail() {
     <Screen scroll>
       <Image source={s.photo_url} style={styles.photo} contentFit="cover" />
       <View style={styles.body}>
-        <Text style={styles.cat}>{s.cats?.name ?? "—"}</Text>
+        <Pressable
+          onPress={() => s.cat_id && router.push(`/cat/${s.cat_id}`)}
+          style={({ pressed }) => [pressed && s.cat_id && { opacity: 0.7 }]}
+        >
+          <Text style={styles.cat}>
+            {s.cats?.name ?? "—"}
+            {s.cat_id ? <Text style={styles.linkArrow}>  ›</Text> : null}
+          </Text>
+        </Pressable>
         <Text style={styles.meta}>
           @{s.users?.handle ?? "anon"} · {timeAgo(s.created_at)}
         </Text>
@@ -125,6 +132,7 @@ const styles = StyleSheet.create({
   photo: { width: "100%", aspectRatio: 1, backgroundColor: colors.border },
   body: { padding: spacing(4) },
   cat: { ...typography.h2 },
+  linkArrow: { color: colors.primary, fontWeight: "900" },
   meta: { ...typography.small, color: colors.textDim, marginTop: 4 },
   caption: { ...typography.body, marginTop: spacing(2) },
   actions: { marginTop: spacing(3) },
