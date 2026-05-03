@@ -11,7 +11,7 @@ import { useLocation } from "@/hooks/useLocation";
 import { useAuthStore } from "@/stores/auth";
 import { colors, spacing, typography } from "@/lib/theme";
 
-type Tab = "nearby" | "following";
+type Tab = "nearby" | "favourites";
 
 export default function FeedTab() {
   const { t } = useTranslation();
@@ -25,14 +25,14 @@ export default function FeedTab() {
     enabled: tab === "nearby" && !!coords,
   });
 
-  const followingQ = useQuery({
-    queryKey: ["following-feed", session?.user.id],
+  const favouritesQ = useQuery({
+    queryKey: ["favourites-feed", session?.user.id],
     queryFn: () => fetchFollowingFeed(),
-    enabled: tab === "following" && !!session,
+    enabled: tab === "favourites" && !!session,
   });
 
-  const items = tab === "nearby" ? nearbyQ.data ?? [] : followingQ.data ?? [];
-  const loading = tab === "nearby" ? nearbyQ.isLoading || locLoading : followingQ.isLoading;
+  const items = tab === "nearby" ? nearbyQ.data ?? [] : favouritesQ.data ?? [];
+  const loading = tab === "nearby" ? nearbyQ.isLoading || locLoading : favouritesQ.isLoading;
 
   return (
     <Screen>
@@ -43,7 +43,7 @@ export default function FeedTab() {
       </View>
       <View style={styles.tabs}>
         <TabButton label={t("feed.tabs.nearby")} active={tab === "nearby"} onPress={() => setTab("nearby")} />
-        <TabButton label={t("feed.tabs.following")} active={tab === "following"} onPress={() => setTab("following")} />
+        <TabButton label={t("feed.tabs.favourites")} active={tab === "favourites"} onPress={() => setTab("favourites")} />
       </View>
 
       {loading ? (
@@ -51,7 +51,7 @@ export default function FeedTab() {
       ) : items.length === 0 ? (
         <View style={styles.center}>
           <Text style={styles.empty}>
-            {tab === "nearby" ? t("feed.empty") : t("feed.emptyFollowing")}
+            {tab === "nearby" ? t("feed.empty") : t("feed.emptyFavourites")}
           </Text>
         </View>
       ) : (
@@ -72,8 +72,8 @@ export default function FeedTab() {
               commentCount={item.comment_count}
             />
           )}
-          onRefresh={tab === "nearby" ? () => nearbyQ.refetch() : () => followingQ.refetch()}
-          refreshing={tab === "nearby" ? nearbyQ.isRefetching : followingQ.isRefetching}
+          onRefresh={tab === "nearby" ? () => nearbyQ.refetch() : () => favouritesQ.refetch()}
+          refreshing={tab === "nearby" ? nearbyQ.isRefetching : favouritesQ.isRefetching}
         />
       )}
     </Screen>

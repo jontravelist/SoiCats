@@ -24,11 +24,11 @@
     "termsHint": "By continuing you agree to the Terms and Privacy Policy."
   },
   "feed": {
-    "tabs": { "nearby": "Nearby", "following": "Following" },
+    "tabs": { "nearby": "Nearby", "favourites": "Favourites" },
     "newAbove": "{{count}} new photo",
     "newAbove_other": "{{count}} new photos",
     "empty": "No cats spotted nearby yet. Be the first.",
-    "emptyFollowing": "Favourite a cat to see their photos here.",
+    "emptyFavourites": "Favourite a cat to see their photos here.",
     "distance_m": "{{m}} m away",
     "distance_km": "{{km}} km away",
     "timeAgo": "{{time}} ago"
