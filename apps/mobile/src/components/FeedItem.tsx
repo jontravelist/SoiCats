@@ -28,9 +28,12 @@ export function FeedItem(props: FeedItemProps) {
     <View style={styles.container}>
       <Pressable
         onPress={() => props.catId && router.push(`/cat/${props.catId}`)}
-        style={styles.header}
+        style={({ pressed }) => [styles.header, pressed && props.catId && { opacity: 0.7 }]}
       >
-        <Text style={styles.catName}>{props.catName ?? "Unknown cat"}</Text>
+        <Text style={styles.catName}>
+          {props.catName ?? "Unknown cat"}
+          {props.catId ? <Text style={styles.linkArrow}>  ›</Text> : null}
+        </Text>
         <Text style={styles.meta}>
           @{props.photographerHandle ?? "anon"}
           {props.distanceM != null ? ` · ${formatDistance(props.distanceM, t)}` : ""}
@@ -60,6 +63,7 @@ const styles = StyleSheet.create({
   },
   header: { padding: spacing(3) },
   catName: { ...typography.h2, color: colors.text },
+  linkArrow: { color: colors.primary, fontWeight: "900" },
   meta: { ...typography.small, color: colors.textDim, marginTop: 2 },
   photo: { width: "100%", aspectRatio: 1, backgroundColor: colors.surfaceAlt },
   row: { flexDirection: "row", paddingHorizontal: spacing(3), paddingVertical: spacing(2), gap: spacing(4) },
