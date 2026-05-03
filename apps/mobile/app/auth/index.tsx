@@ -98,13 +98,13 @@ export default function AuthScreen() {
               />
             ) : null}
             <Pressable onPress={() => goForm("sign_up")} style={({ pressed }) => [styles.cta, styles.ctaPrimary, pressed && styles.pressed]}>
-              <Text style={styles.ctaLabel}>Get started</Text>
+              <Text style={styles.ctaLabel}>Create account</Text>
             </Pressable>
             <Pressable onPress={() => goForm("sign_in")} style={({ pressed }) => [styles.cta, styles.ctaSecondary, pressed && styles.pressed]}>
-              <Text style={styles.ctaLabel}>Log in</Text>
+              <Text style={styles.ctaLabel}>Sign in</Text>
             </Pressable>
             <Pressable onPress={() => router.back()}>
-              <Text style={styles.skip}>Browse without an account</Text>
+              <Text style={styles.browse}>Browse without an account</Text>
             </Pressable>
           </View>
         ) : (
@@ -196,5 +196,8 @@ const styles = StyleSheet.create({
   },
   swap: { ...typography.body, color: colors.primary, fontWeight: "700", textAlign: "center", marginTop: spacing(3), padding: spacing(2) },
   skip: { ...typography.body, color: colors.text, opacity: 0.7, textAlign: "center", marginTop: spacing(1), padding: spacing(2) },
+  // Smaller, more subtle than the two big CTAs above so the hierarchy reads
+  // 'create account > sign in > browse'.
+  browse: { ...typography.small, color: colors.textDim, textAlign: "center", marginTop: spacing(3), padding: spacing(2), textDecorationLine: "underline" },
   terms: { ...typography.small, color: colors.text, opacity: 0.5, textAlign: "center", marginTop: spacing(4) },
 });
