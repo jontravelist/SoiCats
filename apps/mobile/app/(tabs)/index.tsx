@@ -3,21 +3,31 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 
+import { useRouter } from "expo-router";
+
 import { Screen } from "@/components/Screen";
 import { SignInPill } from "@/components/SignInPill";
 import { FeedItem } from "@/components/FeedItem";
-import { fetchNearbyFeed, fetchFollowingFeed } from "@/lib/api";
+import { fetchNearbyFeed, fetchFollowingFeed, fetchPendingIdentificationCount } from "@/lib/api";
 import { useLocation } from "@/hooks/useLocation";
 import { useAuthStore } from "@/stores/auth";
-import { colors, spacing, typography } from "@/lib/theme";
+import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
 type Tab = "nearby" | "favourites";
 
 export default function FeedTab() {
   const { t } = useTranslation();
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>("nearby");
   const session = useAuthStore((s) => s.session);
   const { coords, loading: locLoading } = useLocation();
+
+  const pendingCountQ = useQuery({
+    queryKey: ["pending-id-count", coords?.latitude, coords?.longitude],
+    queryFn: () => fetchPendingIdentificationCount(coords?.latitude, coords?.longitude),
+    enabled: !!session,
+  });
+  const pendingCount = pendingCountQ.data ?? 0;
 
   const nearbyQ = useQuery({
     queryKey: ["nearby-feed", coords?.latitude, coords?.longitude],
@@ -41,6 +51,19 @@ export default function FeedTab() {
         <Text style={styles.brand}>{t("app.name")}</Text>
         <Text style={styles.tagline}>{t("app.tagline")}</Text>
       </View>
+
+      {pendingCount > 0 ? (
+        <Pressable onPress={() => router.push("/identify")} style={styles.helpCard}>
+          <Text style={styles.helpEmoji}>🤝</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.helpTitle}>
+              {pendingCount} {pendingCount === 1 ? "photo needs" : "photos need"} identifying
+            </Text>
+            <Text style={styles.helpBody}>Tap to help name them →</Text>
+          </View>
+        </Pressable>
+      ) : null}
+
       <View style={styles.tabs}>
         <TabButton label={t("feed.tabs.nearby")} active={tab === "nearby"} onPress={() => setTab("nearby")} />
         <TabButton label={t("feed.tabs.favourites")} active={tab === "favourites"} onPress={() => setTab("favourites")} />
@@ -99,4 +122,18 @@ const styles = StyleSheet.create({
   tabLabelActive: { color: "#fff", fontWeight: "700" },
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
   empty: { ...typography.body, color: colors.textDim, textAlign: "center" },
+  helpCard: {
+    marginHorizontal: spacing(4),
+    marginVertical: spacing(2),
+    padding: spacing(4),
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing(3),
+    backgroundColor: colors.accent,
+    borderRadius: radius.lg,
+    ...shadow.card,
+  },
+  helpEmoji: { fontSize: 32 },
+  helpTitle: { ...typography.h3, color: "#fff" },
+  helpBody: { ...typography.small, color: "#fff", opacity: 0.9, marginTop: 2 },
 });

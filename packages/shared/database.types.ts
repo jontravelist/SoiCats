@@ -253,6 +253,27 @@ export interface Database {
         Args: { photographer: string; target_cat: string; exclude_id: string; radius_m: number; since: string };
         Returns: boolean;
       };
+      pending_identifications: {
+        Args: { lng?: number | null; lat?: number | null; radius_m?: number; max_rows?: number };
+        Returns: {
+          sighting_id: string;
+          photo_url: string;
+          caption: string | null;
+          created_at: string;
+          distance_m: number | null;
+          photographer_handle: string | null;
+          sighting_lng: number;
+          sighting_lat: number;
+        }[];
+      };
+      pending_identification_count: {
+        Args: { lng?: number | null; lat?: number | null; radius_m?: number };
+        Returns: number;
+      };
+      maybe_resolve_identification: {
+        Args: { target_sighting: string };
+        Returns: void;
+      };
     };
     Enums: {
       user_role: "user" | "feeder" | "clinic_admin" | "app_admin";

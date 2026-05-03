@@ -50,6 +50,7 @@ export default function RootLayout() {
           <Stack.Screen name="post/new-cat" options={{ headerShown: true, title: "New cat" }} />
           <Stack.Screen name="profile/edit" options={{ headerShown: true, title: "Edit profile" }} />
           <Stack.Screen name="profile/my-posts" options={{ headerShown: true, title: "My posts" }} />
+          <Stack.Screen name="identify/index" options={{ headerShown: true, title: "Help identify" }} />
           <Stack.Screen name="stickers/index" options={{ headerShown: true, title: "Stickers" }} />
           <Stack.Screen name="sticker/[id]" options={{ presentation: "modal" }} />
         </Stack>

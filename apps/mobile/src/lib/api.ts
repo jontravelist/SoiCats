@@ -255,6 +255,46 @@ export async function fetchComments(sightingId: string) {
   return data ?? [];
 }
 
+export async function fetchPendingIdentifications(lat?: number, lng?: number) {
+  const { data, error } = await supabase.rpc("pending_identifications", {
+    lat: lat ?? null,
+    lng: lng ?? null,
+    radius_m: 50_000,
+    max_rows: 30,
+  });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function fetchPendingIdentificationCount(lat?: number, lng?: number): Promise<number> {
+  const { data, error } = await supabase.rpc("pending_identification_count", {
+    lat: lat ?? null,
+    lng: lng ?? null,
+    radius_m: 50_000,
+  });
+  if (error) throw error;
+  return (data as unknown as number) ?? 0;
+}
+
+// Cast a vote on a pending sighting. Either propose an existing cat or vote
+// 'this is a new cat'. The trigger on identification_votes auto-resolves
+// when thresholds are met.
+export async function castIdentificationVote(input: {
+  sightingId: string;
+  proposedCatId?: string | null;
+  proposedNew?: boolean;
+}) {
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) throw new Error("Not signed in");
+  const { error } = await supabase.from("identification_votes").insert({
+    sighting_id: input.sightingId,
+    voter_id: user.user.id,
+    proposed_cat_id: input.proposedCatId ?? null,
+    proposed_new: input.proposedNew ?? false,
+  });
+  if (error) throw error;
+}
+
 // Sightings posted by the calling user, including pending_id ones in the
 // community-ID queue. Newest first.
 export async function fetchMyPosts() {
