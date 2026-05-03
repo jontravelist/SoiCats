@@ -78,6 +78,13 @@ export default function CatProfile() {
           <Stat label={`${cat.pattern} · ${cat.primary_color}`} />
         </View>
 
+        {cat.distinguishing_features ? (
+          <View style={styles.featureCard}>
+            <Text style={styles.featureLabel}>✨ Distinguishing features</Text>
+            <Text style={styles.featureText}>{cat.distinguishing_features}</Text>
+          </View>
+        ) : null}
+
         <View style={styles.welfare}>
           <Text style={styles.welfareItem}>
             {t(`cat.welfare.tnr.${cat.tnr_status}`)}
@@ -138,6 +145,14 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: "row", gap: spacing(2), marginTop: spacing(3) },
   stat: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: radius.sm, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   statText: { ...typography.small },
+  featureCard: {
+    marginTop: spacing(3),
+    padding: spacing(3),
+    borderRadius: radius.lg,
+    backgroundColor: colors.accentSoft,
+  },
+  featureLabel: { ...typography.label, color: colors.text, marginBottom: 4 },
+  featureText: { ...typography.body, color: colors.text },
   welfare: { marginTop: spacing(3), gap: 4 },
   welfareItem: { ...typography.body, color: colors.textDim },
   actions: { marginTop: spacing(4), gap: spacing(2) },

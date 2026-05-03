@@ -27,11 +27,23 @@ export async function fetchNearbyCats(
 export async function fetchAllCats(limit = 200) {
   const { data, error } = await supabase
     .from("cats")
-    .select("id, name, name_th, primary_color, pattern, status, last_seen_at")
+    .select("id, name, name_th, primary_color, pattern, status, last_seen_at, distinguishing_features")
     .order("name", { ascending: true })
     .limit(limit);
   if (error) throw error;
   return data ?? [];
+}
+
+// The nearby_cats RPC doesn't return distinguishing_features (would require
+// a migration). Batch-fetch it for a list of IDs and return a lookup map.
+export async function fetchFeaturesByCatId(catIds: string[]): Promise<Record<string, string | null>> {
+  if (catIds.length === 0) return {};
+  const { data, error } = await supabase
+    .from("cats")
+    .select("id, distinguishing_features")
+    .in("id", catIds);
+  if (error) throw error;
+  return Object.fromEntries((data ?? []).map((r) => [r.id, r.distinguishing_features]));
 }
 
 export async function fetchNearbyFeed(
