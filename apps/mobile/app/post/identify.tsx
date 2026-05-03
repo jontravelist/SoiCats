@@ -91,7 +91,17 @@ export default function IdentifyScreen() {
         await awardPoints(sighting.id);
       }
       useUploadStore.getState().setPending(null);
-      router.replace(catId ? `/cat/${catId}` : "/(tabs)");
+      if (catId) {
+        router.replace(`/cat/${catId}`);
+      } else {
+        // 'Not sure' path: photo goes into the community ID queue. Tell the
+        // user where it went so it doesn't feel like the photo vanished.
+        router.replace("/profile/my-posts");
+        Alert.alert(
+          "Sent for community ID",
+          "Your photo is in the help-identify queue. You'll find it under My posts on the Profile tab.",
+        );
+      }
     } catch (e) {
       Alert.alert(t("common.error"), e instanceof Error ? e.message : String(e));
     } finally {
@@ -131,6 +141,14 @@ export default function IdentifyScreen() {
 
       {nearbyQ.isLoading ? (
         <ActivityIndicator />
+      ) : (nearbyQ.data ?? []).length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyTitle}>No cats spotted here yet</Text>
+          <Text style={styles.emptyBody}>
+            Be the first — tap "New cat" below to give them a name. Or "Not sure"
+            to send the photo to the community ID queue.
+          </Text>
+        </View>
       ) : (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardRow}>
           {(nearbyQ.data ?? []).map((c) => (

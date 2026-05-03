@@ -95,6 +95,7 @@ export default function ProfileTab() {
       </Pressable>
 
       <View style={styles.section}>
+        <Button label="My posts" variant="secondary" onPress={() => router.push("/profile/my-posts")} />
         <Button label={t("profile.edit")} variant="secondary" onPress={() => router.push("/profile/edit")} />
         <Button label={t("profile.signOut")} variant="ghost" onPress={() => void signOut()} />
       </View>

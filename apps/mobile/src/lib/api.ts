@@ -255,6 +255,21 @@ export async function fetchComments(sightingId: string) {
   return data ?? [];
 }
 
+// Sightings posted by the calling user, including pending_id ones in the
+// community-ID queue. Newest first.
+export async function fetchMyPosts() {
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) return [];
+  const { data, error } = await supabase
+    .from("sightings")
+    .select("id, photo_url, caption, status, created_at, cat_id, cats(name)")
+    .eq("photographer_id", user.user.id)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function fetchCurrentUserProfile() {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) return null;
