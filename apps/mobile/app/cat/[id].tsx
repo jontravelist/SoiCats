@@ -1,12 +1,13 @@
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Linking, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import MapView, { Marker } from "react-native-maps";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
-import { fetchCat, fetchCatSightings, fetchLatestFlagForCat, toggleFavourite } from "@/lib/api";
+import { fetchCat, fetchCatSightingLocations, fetchCatSightings, fetchLatestFlagForCat, toggleFavourite } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth";
 import { useTimeAgo } from "@/hooks/useTimeAgo";
@@ -24,6 +25,11 @@ export default function CatProfile() {
   const sightingsQ = useQuery({
     queryKey: ["cat-sightings", id],
     queryFn: () => fetchCatSightings(id!),
+    enabled: !!id,
+  });
+  const pinsQ = useQuery({
+    queryKey: ["cat-pins", id],
+    queryFn: () => fetchCatSightingLocations(id!),
     enabled: !!id,
   });
   const flagQ = useQuery({
@@ -55,7 +61,23 @@ export default function CatProfile() {
   }
   const cat = catQ.data;
   const sightings = sightingsQ.data ?? [];
+  const pins = pinsQ.data ?? [];
   const hero = sightings[0]?.photo_url;
+  const lastPin = pins[0];
+
+  // Open native maps app with directions to the cat's last sighting.
+  // iOS handles maps:// links natively (Apple Maps); Google handles geo:.
+  const openDirections = () => {
+    if (!lastPin) return;
+    const label = encodeURIComponent(cat.name);
+    const url = Platform.OS === "ios"
+      ? `maps://?daddr=${lastPin.lat},${lastPin.lng}&q=${label}`
+      : `geo:${lastPin.lat},${lastPin.lng}?q=${lastPin.lat},${lastPin.lng}(${label})`;
+    Linking.openURL(url).catch(() =>
+      // Fallback: Google Maps web URL works on every device.
+      Linking.openURL(`https://maps.google.com/?q=${lastPin.lat},${lastPin.lng}`),
+    );
+  };
 
   return (
     <Screen scroll>
@@ -122,6 +144,9 @@ export default function CatProfile() {
             onPress={() => session ? favMut.mutate() : router.push("/auth")}
             variant={favQ.data ? "secondary" : "primary"}
           />
+          {lastPin ? (
+            <Button label="Directions to last sighting" variant="secondary" onPress={openDirections} />
+          ) : null}
           {cat.status !== "deceased" ? (
             <Button
               label="Report welfare issue"
@@ -131,6 +156,36 @@ export default function CatProfile() {
           ) : null}
         </View>
       </View>
+
+      {pins.length > 0 ? (
+        <View style={styles.territoryWrap}>
+          <Text style={styles.sectionLabel}>Last {pins.length} {pins.length === 1 ? "sighting" : "sightings"}</Text>
+          <Pressable
+            onPress={() => router.push("/(tabs)/map")}
+            style={styles.miniMapWrap}
+            accessibilityHint="Tap to open the full map"
+          >
+            <MapView
+              style={styles.miniMap}
+              pointerEvents="none"
+              initialRegion={{
+                latitude: lastPin!.lat,
+                longitude: lastPin!.lng,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+            >
+              {pins.map((p) => (
+                <Marker
+                  key={p.sighting_id}
+                  coordinate={{ latitude: p.lat, longitude: p.lng }}
+                  pinColor={colors.primary}
+                />
+              ))}
+            </MapView>
+          </Pressable>
+        </View>
+      ) : null}
 
       <FlatList
         data={sightings}
@@ -198,6 +253,14 @@ const styles = StyleSheet.create({
   flagBannerLabel: { ...typography.h3, color: "#fff" },
   flagBannerText: { ...typography.body, color: "#fff", marginTop: 4, opacity: 0.95 },
   actions: { marginTop: spacing(4), gap: spacing(2) },
+  territoryWrap: { paddingHorizontal: spacing(4), marginTop: spacing(2), marginBottom: spacing(3) },
+  sectionLabel: { ...typography.label, color: colors.textDim, marginBottom: spacing(2) },
+  miniMapWrap: {
+    height: 180,
+    borderRadius: radius.lg,
+    overflow: "hidden",
+  },
+  miniMap: { width: "100%", height: "100%" },
   grid: { paddingHorizontal: 2 },
   gridCell: { flex: 1 / 3, aspectRatio: 1, margin: 1 },
   gridImage: { width: "100%", height: "100%", backgroundColor: colors.border },

@@ -6,6 +6,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 
 import { queryClient } from "@/lib/queryClient";
 import { useAuthStore } from "@/stores/auth";
+import { registerForPush } from "@/lib/push";
 import { colors } from "@/lib/theme";
 import "@/lib/i18n";
 
@@ -29,6 +30,14 @@ export default function RootLayout() {
     if (!session) router.push("/auth");
   }, [loading, session, router]);
 
+  // Whenever the user signs in (or app starts with an existing session),
+  // make sure their Expo push token is recorded. No-ops in Expo Go without
+  // an EAS projectId, on simulators, or when permission is denied.
+  useEffect(() => {
+    if (!session) return;
+    void registerForPush(session.user.id);
+  }, [session?.user.id]);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
@@ -50,6 +59,7 @@ export default function RootLayout() {
           <Stack.Screen name="post/new-cat" options={{ headerShown: true, title: "New cat" }} />
           <Stack.Screen name="profile/edit" options={{ headerShown: true, title: "Edit profile" }} />
           <Stack.Screen name="profile/my-posts" options={{ headerShown: true, title: "My posts" }} />
+          <Stack.Screen name="profile/notifications" options={{ headerShown: true, title: "Notifications" }} />
           <Stack.Screen name="identify/index" options={{ headerShown: true, title: "Help identify" }} />
           <Stack.Screen name="flag/[catId]" options={{ headerShown: true, title: "Report welfare issue" }} />
           <Stack.Screen name="stickers/index" options={{ headerShown: true, title: "Stickers" }} />

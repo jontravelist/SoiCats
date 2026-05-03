@@ -117,6 +117,16 @@ export async function fetchCatSightings(catId: string) {
   return data ?? [];
 }
 
+// Last 10 confirmed sighting locations for the territory map on cat profile.
+// Returns plain lng/lat columns so we don't have to parse PostGIS geography.
+export async function fetchCatSightingLocations(catId: string) {
+  const { data, error } = await supabase.rpc("cat_recent_sighting_pins", {
+    target_cat: catId,
+  });
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function createCat(input: {
   name: string;
   primary_color: string;
@@ -174,6 +184,33 @@ export async function createSighting(input: {
     .select("id, photo_url")
     .single();
   if (error) throw error;
+
+  // Notify everyone who's favourited this cat (other than the photographer).
+  if (input.cat_id) {
+    const { data: cat } = await supabase
+      .from("cats")
+      .select("name")
+      .eq("id", input.cat_id)
+      .single();
+    const { data: favs } = await supabase
+      .from("user_favourite_cats")
+      .select("user_id")
+      .eq("cat_id", input.cat_id);
+    const recipients = (favs ?? [])
+      .map((f) => f.user_id)
+      .filter((id) => id !== user.user.id);
+    if (recipients.length > 0 && cat) {
+      const { sendPush } = await import("./push");
+      void sendPush({
+        userIds: recipients,
+        title: `${cat.name} was just spotted`,
+        body: "Tap to see the new photo.",
+        category: "favourite_cat_photo",
+        data: { cat_id: input.cat_id, sighting_id: data.id },
+      });
+    }
+  }
+
   return data;
 }
 
@@ -243,6 +280,24 @@ export async function postComment(sightingId: string, body: string) {
     body,
   });
   if (error) throw error;
+
+  // Best-effort push to the photo owner.
+  const { data: sighting } = await supabase
+    .from("sightings")
+    .select("photographer_id, cats(name), users:photographer_id(handle)")
+    .eq("id", sightingId)
+    .single();
+  if (sighting && sighting.photographer_id !== user.user.id) {
+    const catName = (sighting as { cats?: { name?: string } | null }).cats?.name ?? "your photo";
+    const { sendPush } = await import("./push");
+    void sendPush({
+      userIds: [sighting.photographer_id],
+      title: "New comment",
+      body: `Someone commented on your photo of ${catName}.`,
+      category: "comment_on_my_photo",
+      data: { sighting_id: sightingId },
+    });
+  }
 }
 
 export async function fetchComments(sightingId: string) {

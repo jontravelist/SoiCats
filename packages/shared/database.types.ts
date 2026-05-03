@@ -314,6 +314,16 @@ export interface Database {
           created_at: string;
         }[];
       };
+      cat_recent_sighting_pins: {
+        Args: { target_cat: string; max_rows?: number };
+        Returns: {
+          sighting_id: string;
+          lng: number;
+          lat: number;
+          created_at: string;
+          photo_url: string;
+        }[];
+      };
     };
     Enums: {
       user_role: "user" | "feeder" | "clinic_admin" | "app_admin";
