@@ -37,6 +37,10 @@ export default function FeedTab() {
   return (
     <Screen>
       <SignInPill />
+      <View style={styles.header}>
+        <Text style={styles.brand}>{t("app.name")}</Text>
+        <Text style={styles.tagline}>{t("app.tagline")}</Text>
+      </View>
       <View style={styles.tabs}>
         <TabButton label={t("feed.tabs.nearby")} active={tab === "nearby"} onPress={() => setTab("nearby")} />
         <TabButton label={t("feed.tabs.following")} active={tab === "following"} onPress={() => setTab("following")} />
@@ -85,11 +89,14 @@ function TabButton({ label, active, onPress }: { label: string; active: boolean;
 }
 
 const styles = StyleSheet.create({
-  tabs: { flexDirection: "row", padding: spacing(3), gap: spacing(2) },
-  tabBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 999, borderWidth: 1, borderColor: colors.border },
-  tabBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  tabLabel: { ...typography.body, color: colors.text },
-  tabLabelActive: { color: "#fff", fontWeight: "600" },
+  header: { paddingHorizontal: spacing(6), paddingTop: spacing(2), paddingBottom: spacing(1) },
+  brand: { fontSize: 36, fontWeight: "900", color: colors.text, letterSpacing: -1 },
+  tagline: { ...typography.body, color: colors.textDim, marginTop: 4 },
+  tabs: { flexDirection: "row", paddingHorizontal: spacing(4), paddingVertical: spacing(2), gap: spacing(2) },
+  tabBtn: { paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999, backgroundColor: colors.surface },
+  tabBtnActive: { backgroundColor: colors.primary },
+  tabLabel: { ...typography.body, color: colors.text, fontWeight: "600" },
+  tabLabelActive: { color: "#fff", fontWeight: "700" },
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24 },
   empty: { ...typography.body, color: colors.textDim, textAlign: "center" },
 });

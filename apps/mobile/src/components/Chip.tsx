@@ -16,14 +16,12 @@ export function Chip({
 
 const styles = StyleSheet.create({
   chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: radius.pill,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
   },
-  selected: { backgroundColor: colors.primary, borderColor: colors.primary },
-  label: { ...typography.small, color: colors.text },
-  labelSelected: { color: "#fff", fontWeight: "600" },
+  selected: { backgroundColor: colors.primary },
+  label: { ...typography.body, color: colors.text, fontWeight: "600" },
+  labelSelected: { color: "#fff", fontWeight: "700" },
 });

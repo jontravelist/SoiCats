@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { colors, radius, typography } from "@/lib/theme";
+import { colors, radius, shadow, typography } from "@/lib/theme";
 
 interface Props {
   name: string;
@@ -29,12 +29,19 @@ export function CatCard({ name, thumbnailUrl, subtitle, onPress, selected }: Pro
 }
 
 const styles = StyleSheet.create({
-  card: { width: 110, marginRight: 10 },
-  selected: { transform: [{ scale: 1.02 }] },
-  thumbWrap: { width: 110, height: 110, borderRadius: radius.lg, overflow: "hidden", backgroundColor: colors.border },
+  card: { width: 116, marginRight: 12 },
+  selected: { transform: [{ scale: 1.04 }] },
+  thumbWrap: {
+    width: 116,
+    height: 116,
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    backgroundColor: colors.surface,
+    ...shadow.card,
+  },
   thumb: { width: "100%", height: "100%" },
-  placeholder: { alignItems: "center", justifyContent: "center" },
-  placeholderText: { fontSize: 36 },
-  name: { ...typography.body, fontWeight: "600", marginTop: 6 },
+  placeholder: { alignItems: "center", justifyContent: "center", backgroundColor: colors.accentSoft },
+  placeholderText: { fontSize: 44 },
+  name: { ...typography.body, fontWeight: "700", color: colors.text, marginTop: 8 },
   subtitle: { ...typography.small, color: colors.textDim },
 });

@@ -146,18 +146,13 @@ export default function AuthScreen() {
   );
 }
 
-const MINT = "#D7EFE8";
-const HEADLINE = "#1F4D3F";
-const BLUE_BTN = "#3D6BD6";
-const GREEN_BTN = "#5CB85C";
-
 const styles = StyleSheet.create({
-  bg: { flex: 1, backgroundColor: MINT },
+  bg: { flex: 1, backgroundColor: colors.bg },
   scroll: { flexGrow: 1, padding: spacing(6), justifyContent: "space-between" },
 
   hero: { alignItems: "center", marginTop: spacing(8) },
-  title: { fontSize: 56, fontWeight: "900", color: HEADLINE, letterSpacing: -1 },
-  tagline: { ...typography.body, color: HEADLINE, opacity: 0.7, marginTop: spacing(2), textAlign: "center" },
+  title: { fontSize: 56, fontWeight: "900", color: colors.text, letterSpacing: -1 },
+  tagline: { ...typography.body, color: colors.text, opacity: 0.7, marginTop: spacing(2), textAlign: "center" },
 
   mascots: { height: 240, width: "100%", alignItems: "center", justifyContent: "center", marginTop: spacing(4), position: "relative" },
   cat: { fontSize: 110, position: "absolute" },
@@ -173,14 +168,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     ...shadow.card,
   },
-  ctaPrimary:   { backgroundColor: GREEN_BTN },
-  ctaSecondary: { backgroundColor: BLUE_BTN },
+  ctaPrimary:   { backgroundColor: colors.primary },
+  ctaSecondary: { backgroundColor: colors.secondary },
   ctaLabel: { color: "#fff", fontSize: 18, fontWeight: "700" },
   pressed: { transform: [{ scale: 0.98 }] },
   appleBtn: { width: "100%", height: 60 },
 
   form: { marginTop: spacing(6), gap: spacing(2) },
-  label: { ...typography.label, color: HEADLINE, marginTop: spacing(2) },
+  label: { ...typography.label, color: colors.text, marginTop: spacing(2) },
   input: {
     minHeight: 56,
     paddingHorizontal: 16,
@@ -189,6 +184,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
   },
-  skip: { ...typography.body, color: HEADLINE, opacity: 0.7, textAlign: "center", marginTop: spacing(3), padding: spacing(2) },
-  terms: { ...typography.small, color: HEADLINE, opacity: 0.5, textAlign: "center", marginTop: spacing(4) },
+  skip: { ...typography.body, color: colors.text, opacity: 0.7, textAlign: "center", marginTop: spacing(3), padding: spacing(2) },
+  terms: { ...typography.small, color: colors.text, opacity: 0.5, textAlign: "center", marginTop: spacing(4) },
 });
