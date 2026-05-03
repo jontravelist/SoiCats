@@ -23,9 +23,13 @@ export default function MapTab() {
     ? { lat: coords.latitude, lng: coords.longitude }
     : { lat: DEFAULT.latitude, lng: DEFAULT.longitude };
 
+  // Earth circumference is ~40,000 km, so this radius effectively means
+  // 'all cats anywhere'. At MVP scale we have hundreds, not millions, so
+  // pulling them all is fine — and it means seeded Bangkok cats show on
+  // the map even when you're testing from Europe.
   const { data: cats } = useQuery({
     queryKey: ["map-cats-radius", origin.lat, origin.lng],
-    queryFn: () => fetchCatsInRadius(origin.lat, origin.lng, 50_000, 500),
+    queryFn: () => fetchCatsInRadius(origin.lat, origin.lng, 20_000_000, 1000),
   });
 
   const region = coords
