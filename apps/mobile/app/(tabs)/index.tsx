@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
+import { SignInPill } from "@/components/SignInPill";
 import { FeedItem } from "@/components/FeedItem";
 import { fetchNearbyFeed, fetchFollowingFeed } from "@/lib/api";
 import { useLocation } from "@/hooks/useLocation";
@@ -35,6 +36,7 @@ export default function FeedTab() {
 
   return (
     <Screen>
+      <SignInPill />
       <View style={styles.tabs}>
         <TabButton label={t("feed.tabs.nearby")} active={tab === "nearby"} onPress={() => setTab("nearby")} />
         <TabButton label={t("feed.tabs.following")} active={tab === "following"} onPress={() => setTab("following")} />

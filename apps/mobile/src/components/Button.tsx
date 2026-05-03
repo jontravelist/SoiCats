@@ -1,5 +1,5 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, ViewStyle } from "react-native";
-import { colors, radius, typography } from "@/lib/theme";
+import { colors, radius, shadow, typography } from "@/lib/theme";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 
@@ -21,6 +21,7 @@ export function Button({ label, onPress, variant = "primary", loading, disabled,
       style={({ pressed }) => [
         styles.base,
         styles[variant],
+        variant === "primary" && shadow.button,
         isDisabled && styles.disabled,
         pressed && !isDisabled && styles.pressed,
         style,
@@ -37,19 +38,19 @@ export function Button({ label, onPress, variant = "primary", loading, disabled,
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 48,
-    paddingHorizontal: 20,
-    borderRadius: radius.md,
+    minHeight: 56,
+    paddingHorizontal: 24,
+    borderRadius: radius.pill,
     alignItems: "center",
     justifyContent: "center",
   },
   primary:   { backgroundColor: colors.primary },
-  secondary: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  secondary: { backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.border },
   ghost:     { backgroundColor: "transparent" },
   danger:    { backgroundColor: colors.danger },
-  pressed:   { opacity: 0.85 },
+  pressed:   { transform: [{ scale: 0.97 }] },
   disabled:  { opacity: 0.5 },
-  label: { ...typography.body, fontWeight: "600" },
+  label: { ...typography.body, fontWeight: "700" },
   label_primary:   { color: "#fff" },
   label_secondary: { color: colors.text },
   label_ghost:     { color: colors.primaryDark },

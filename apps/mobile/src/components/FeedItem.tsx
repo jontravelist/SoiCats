@@ -2,7 +2,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { colors, radius, typography, spacing } from "@/lib/theme";
+import { colors, radius, shadow, typography, spacing } from "@/lib/theme";
 import { formatDistance } from "@/lib/location";
 import { useTimeAgo } from "@/hooks/useTimeAgo";
 
@@ -52,12 +52,11 @@ export function FeedItem(props: FeedItemProps) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    marginHorizontal: spacing(3),
+    borderRadius: radius.xl,
+    marginHorizontal: spacing(4),
     marginVertical: spacing(2),
     overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.border,
+    ...shadow.card,
   },
   header: { padding: spacing(3) },
   catName: { ...typography.h2 },
