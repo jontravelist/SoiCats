@@ -17,7 +17,10 @@ i18n.use(initReactI18next).init({
   lng: deviceLocale in resources ? deviceLocale : "en",
   fallbackLng: "en",
   interpolation: { escapeValue: false },
-  compatibilityJSON: "v4",
+  // v3 plural keys (`_other`, `_plural`) work in Hermes without an
+  // Intl.PluralRules polyfill. v4 needs the polyfill or it warns and
+  // silently downgrades anyway, which is the noisy console message.
+  compatibilityJSON: "v3",
 });
 
 export default i18n;
