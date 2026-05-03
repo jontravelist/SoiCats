@@ -223,6 +223,13 @@ export async function fetchCurrentUserProfile() {
     .select("*")
     .eq("id", user.user.id)
     .single();
+  // PGRST116 = "no rows" — happens after a `supabase db reset` if a stale
+  // auth token still lives in AsyncStorage. Sign out so the welcome screen
+  // can take over instead of the Profile tab spinning forever.
+  if (error?.code === "PGRST116") {
+    await supabase.auth.signOut();
+    return null;
+  }
   if (error) throw error;
   return data;
 }
