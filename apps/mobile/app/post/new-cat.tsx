@@ -40,7 +40,10 @@ export default function NewCatScreen() {
   }
 
   const trySave = async () => {
-    if (!session) return;
+    if (!session) {
+      router.push("/auth");
+      return;
+    }
     if (!name.trim() || !pattern || !color) {
       Alert.alert(t("common.error"), "Name, pattern and colour are required");
       return;
@@ -59,7 +62,11 @@ export default function NewCatScreen() {
   };
 
   const save = async () => {
-    if (!session || !pending?.remoteUrl || !pending.lat || !pending.lng) return;
+    if (!session) {
+      router.push("/auth");
+      return;
+    }
+    if (!pending?.remoteUrl || !pending.lat || !pending.lng) return;
     setBusy(true);
     try {
       const cat = await createCat({

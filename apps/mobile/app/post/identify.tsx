@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -14,6 +14,7 @@ import {
   createSighting,
   fetchNearbyCats,
 } from "@/lib/api";
+import { uploadSightingPhoto } from "@/lib/photo";
 import { useUploadStore } from "@/stores/upload";
 import { useAuthStore } from "@/stores/auth";
 import { colors, spacing, typography } from "@/lib/theme";
@@ -35,6 +36,20 @@ export default function IdentifyScreen() {
     enabled: !!pending?.lat && !!pending?.lng,
   });
 
+  // If the user picked a photo while signed out, the upload was skipped.
+  // As soon as they sign in (likely from the banner below), kick it off.
+  useEffect(() => {
+    if (!session || !pending) return;
+    if (pending.remoteUrl || pending.uploading) return;
+    useUploadStore.getState().patch({ uploading: true });
+    uploadSightingPhoto(pending.localUri, session.user.id)
+      .then((url) => useUploadStore.getState().patch({ remoteUrl: url, uploading: false }))
+      .catch((e) => {
+        useUploadStore.getState().patch({ uploading: false });
+        Alert.alert("Upload failed", e instanceof Error ? e.message : String(e));
+      });
+  }, [session, pending?.localUri, pending?.remoteUrl, pending?.uploading]);
+
   if (!pending) {
     return (
       <Screen style={styles.center}>
@@ -45,7 +60,12 @@ export default function IdentifyScreen() {
   }
 
   const submitWithCat = async (catId: string | null, status: "confirmed" | "pending_id") => {
-    if (!session) return;
+    if (!session) {
+      // Don't drop the photo. Push to /auth — Zustand keeps `pending` in
+      // memory and the user lands back on this exact screen after sign-in.
+      router.push("/auth");
+      return;
+    }
     if (pending.uploading || !pending.remoteUrl) {
       Alert.alert(t("common.loading"));
       return;
@@ -82,6 +102,15 @@ export default function IdentifyScreen() {
   return (
     <Screen scroll>
       <Image source={pending.localUri} style={styles.photo} contentFit="cover" />
+
+      {!session ? (
+        <View style={styles.signInBanner}>
+          <Text style={styles.signInBannerText}>
+            Sign in to post this photo. Your selection is kept.
+          </Text>
+          <Button label="Sign in" onPress={() => router.push("/auth")} />
+        </View>
+      ) : null}
 
       <View style={styles.locBadge}>
         <Text style={styles.locBadgeText}>
@@ -157,6 +186,14 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   locBadgeText: { ...typography.small, color: colors.textDim },
+  signInBanner: {
+    margin: spacing(3),
+    padding: spacing(3),
+    borderRadius: 10,
+    backgroundColor: "#FFEFD7",
+    gap: spacing(2),
+  },
+  signInBannerText: { ...typography.body, color: colors.text },
   uploadingRow: { flexDirection: "row", alignItems: "center", gap: spacing(2), padding: spacing(3) },
   uploadingText: { ...typography.body, color: colors.textDim },
   h2: { ...typography.h2, padding: spacing(3) },

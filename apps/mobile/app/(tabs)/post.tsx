@@ -40,20 +40,14 @@ async function ensurePermission(mode: "camera" | "library"): Promise<boolean> {
 export default function PostTab() {
   const { t } = useTranslation();
   const router = useRouter();
+  // Deliberately not gating on auth here. Letting people pick a photo
+  // first (and reach the cat-picker) makes sign-in feel like a small
+  // step rather than a wall. The actual post requires auth — that
+  // prompt sits on the next screen so the photo isn't lost.
   const session = useAuthStore((s) => s.session);
   const { coords, error: locError } = useLocation();
   const setPending = useUploadStore((s) => s.setPending);
   const [busy, setBusy] = useState(false);
-
-  if (!session) {
-    return (
-      <Screen style={styles.center}>
-        <Text style={styles.title}>{t("auth.signIn")}</Text>
-        <Text style={styles.tagline}>{t("app.tagline")}</Text>
-        <Button label={t("auth.signIn")} onPress={() => router.push("/auth")} />
-      </Screen>
-    );
-  }
 
   const start = async (mode: "camera" | "library") => {
     setBusy(true);
@@ -93,8 +87,15 @@ export default function PostTab() {
       // picker waits for `remoteUrl` before submitting.
       router.push("/post/identify");
 
-      const url = await uploadSightingPhoto(prepared.uri, session.user.id);
-      useUploadStore.getState().patch({ remoteUrl: url, uploading: false });
+      // The upload itself only works if signed in (storage RLS). If they're
+      // not signed in we skip it; the cat-picker shows a sign-in banner and
+      // re-attempts the upload after auth via the same store-based flow.
+      if (session) {
+        const url = await uploadSightingPhoto(prepared.uri, session.user.id);
+        useUploadStore.getState().patch({ remoteUrl: url, uploading: false });
+      } else {
+        useUploadStore.getState().patch({ uploading: false });
+      }
     } catch (e) {
       Alert.alert("Could not add photo", e instanceof Error ? e.message : String(e));
     } finally {
