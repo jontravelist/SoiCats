@@ -73,18 +73,34 @@ export default function AuthScreen() {
       style={styles.bg}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
+        showsVerticalScrollIndicator={false}
+      >
 
-        <View style={styles.hero}>
-          <Text style={styles.title}>{t("app.name")}</Text>
-          <Text style={styles.tagline}>Every cat in your neighbourhood, named.</Text>
+        {/* Hero shrinks dramatically when the form is showing so the inputs
+            never end up behind the keyboard. */}
+        {step === "welcome" ? (
+          <View style={styles.hero}>
+            <Text style={styles.title}>{t("app.name")}</Text>
+            <Text style={styles.tagline}>Every cat in your neighbourhood, named.</Text>
 
-          <View style={styles.mascots}>
-            <Text style={[styles.cat, styles.cat1]}>🐈</Text>
-            <Text style={[styles.cat, styles.cat2]}>🐱</Text>
-            <Text style={[styles.cat, styles.cat3]}>🐈‍⬛</Text>
+            <View style={styles.mascots}>
+              <Text style={[styles.cat, styles.cat1]}>🐈</Text>
+              <Text style={[styles.cat, styles.cat2]}>🐱</Text>
+              <Text style={[styles.cat, styles.cat3]}>🐈‍⬛</Text>
+            </View>
           </View>
-        </View>
+        ) : (
+          <View style={styles.heroCompact}>
+            <Text style={styles.titleCompact}>{t("app.name")}</Text>
+            <Text style={styles.tagline}>
+              {mode === "sign_up" ? "Create your account" : "Welcome back"}
+            </Text>
+          </View>
+        )}
 
         {step === "welcome" ? (
           <View style={styles.actions}>
@@ -163,6 +179,8 @@ const styles = StyleSheet.create({
   hero: { alignItems: "center", marginTop: spacing(8) },
   title: { fontSize: 56, fontWeight: "900", color: colors.text, letterSpacing: -1 },
   tagline: { ...typography.body, color: colors.text, opacity: 0.7, marginTop: spacing(2), textAlign: "center" },
+  heroCompact: { alignItems: "center", marginTop: spacing(2) },
+  titleCompact: { fontSize: 36, fontWeight: "900", color: colors.text, letterSpacing: -1 },
 
   mascots: { height: 240, width: "100%", alignItems: "center", justifyContent: "center", marginTop: spacing(4), position: "relative" },
   cat: { fontSize: 110, position: "absolute" },
@@ -184,7 +202,7 @@ const styles = StyleSheet.create({
   pressed: { transform: [{ scale: 0.98 }] },
   appleBtn: { width: "100%", height: 60 },
 
-  form: { marginTop: spacing(6), gap: spacing(2) },
+  form: { marginTop: spacing(4), gap: spacing(2) },
   label: { ...typography.label, color: colors.text, marginTop: spacing(2) },
   input: {
     minHeight: 56,
