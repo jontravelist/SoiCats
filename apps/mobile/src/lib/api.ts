@@ -255,6 +255,16 @@ export async function fetchComments(sightingId: string) {
   return data ?? [];
 }
 
+// Returns cats with their centroid lng/lat so the Map tab can pin markers
+// at the correct location instead of clustering them at the user's spot.
+export async function fetchCatsInRadius(lat: number, lng: number, radius_m = 50_000, max_rows = 500) {
+  const { data, error } = await supabase.rpc("cats_in_radius", {
+    lat, lng, radius_m, max_rows,
+  });
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function fetchPendingIdentifications(lat?: number, lng?: number) {
   const { data, error } = await supabase.rpc("pending_identifications", {
     lat: lat ?? null,

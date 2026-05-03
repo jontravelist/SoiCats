@@ -6,21 +6,26 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
 import { useLocation } from "@/hooks/useLocation";
-import { fetchNearbyCats } from "@/lib/api";
+import { fetchCatsInRadius } from "@/lib/api";
 import { colors, radius, shadow, typography } from "@/lib/theme";
 
 // Bangkok default centre (Asok / Sukhumvit) when no GPS yet.
-const DEFAULT = { latitude: 13.7384, longitude: 100.5697, latitudeDelta: 0.02, longitudeDelta: 0.02 };
+const DEFAULT = { latitude: 13.7384, longitude: 100.5697, latitudeDelta: 0.04, longitudeDelta: 0.04 };
 
 export default function MapTab() {
   const router = useRouter();
   const { coords } = useLocation();
   const mapRef = useRef<MapView>(null);
 
+  // Pull cats with real centroid lng/lat across a wide radius. Falls back to
+  // the Bangkok default when GPS isn't available.
+  const origin = coords
+    ? { lat: coords.latitude, lng: coords.longitude }
+    : { lat: DEFAULT.latitude, lng: DEFAULT.longitude };
+
   const { data: cats } = useQuery({
-    queryKey: ["map-cats", coords?.latitude, coords?.longitude],
-    queryFn: () => fetchNearbyCats(coords!.latitude, coords!.longitude, 1500),
-    enabled: !!coords,
+    queryKey: ["map-cats-radius", origin.lat, origin.lng],
+    queryFn: () => fetchCatsInRadius(origin.lat, origin.lng, 50_000, 500),
   });
 
   const region = coords
@@ -44,21 +49,16 @@ export default function MapTab() {
         showsUserLocation
         showsMyLocationButton={false}
       >
-        {(cats ?? []).map((c) => {
-          // TODO: nearby_cats RPC needs to return centroid lng/lat. For now we
-          // pin them at the user's location which is wrong but keeps the marker
-          // count visible. Will be fixed when the RPC is extended.
-          if (!coords) return null;
-          return (
-            <Marker
-              key={c.id}
-              coordinate={{ latitude: coords.latitude, longitude: coords.longitude }}
-              title={c.name}
-              description={c.pattern}
-              onCalloutPress={() => router.push(`/cat/${c.id}`)}
-            />
-          );
-        })}
+        {(cats ?? []).map((c) => (
+          <Marker
+            key={c.id}
+            coordinate={{ latitude: c.centroid_lat, longitude: c.centroid_lng }}
+            title={c.name}
+            description={`${c.primary_color} · ${c.pattern}`}
+            pinColor={c.status === "injured" || c.status === "missing" ? colors.danger : colors.primary}
+            onCalloutPress={() => router.push(`/cat/${c.id}`)}
+          />
+        ))}
       </MapView>
 
       <View style={styles.attribution}>

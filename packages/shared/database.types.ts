@@ -274,6 +274,21 @@ export interface Database {
         Args: { target_sighting: string };
         Returns: void;
       };
+      cats_in_radius: {
+        Args: { lat: number; lng: number; radius_m?: number; max_rows?: number };
+        Returns: {
+          id: string;
+          name: string;
+          primary_color: string;
+          pattern: string;
+          status: Database["public"]["Enums"]["cat_status"];
+          distance_m: number;
+          last_seen_at: string;
+          thumbnail_url: string | null;
+          centroid_lng: number;
+          centroid_lat: number;
+        }[];
+      };
     };
     Enums: {
       user_role: "user" | "feeder" | "clinic_admin" | "app_admin";
