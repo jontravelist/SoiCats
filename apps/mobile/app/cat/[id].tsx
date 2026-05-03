@@ -154,6 +154,12 @@ export default function CatProfile() {
               onPress={() => session ? router.push(`/flag/${id}`) : router.push("/auth")}
             />
           ) : null}
+          {session && session.user.id === cat.discovered_by_user_id ? (
+            <Button label="Edit cat" variant="ghost" onPress={() => router.push(`/edit-cat/${id}`)} />
+          ) : null}
+          {session ? (
+            <Button label="Mark as duplicate" variant="ghost" onPress={() => router.push(`/merge/${id}`)} />
+          ) : null}
         </View>
       </View>
 

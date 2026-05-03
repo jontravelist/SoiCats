@@ -127,6 +127,56 @@ export async function fetchCatSightingLocations(catId: string) {
   return data ?? [];
 }
 
+// Discoverer-only edits to a cat. RLS already restricts updates to fields
+// that aren't welfare-related (those go through clinic_updates).
+export async function updateCat(catId: string, patch: {
+  name?: string;
+  name_th?: string | null;
+  distinguishing_features?: string | null;
+  age_guess?: string | null;
+  sex?: string | null;
+}) {
+  const update: Record<string, unknown> = {};
+  if (patch.name !== undefined) update.name = patch.name;
+  if (patch.name_th !== undefined) update.name_th = patch.name_th;
+  if (patch.distinguishing_features !== undefined) update.distinguishing_features = patch.distinguishing_features;
+  if (patch.age_guess !== undefined) update.age_guess = patch.age_guess;
+  if (patch.sex !== undefined) update.sex = patch.sex;
+  const { error } = await supabase.from("cats").update(update).eq("id", catId);
+  if (error) throw error;
+}
+
+// Search the cats table by name (case-insensitive, anywhere). For the merge
+// target picker — keeps payload tiny, no thumbnails.
+export async function searchCatsByName(query: string, excludeId?: string, limit = 20) {
+  if (!query.trim()) return [];
+  let q = supabase
+    .from("cats")
+    .select("id, name, primary_color, pattern")
+    .ilike("name", `%${query.trim()}%`)
+    .order("name")
+    .limit(limit);
+  if (excludeId) q = q.neq("id", excludeId);
+  const { data, error } = await q;
+  if (error) throw error;
+  return data ?? [];
+}
+
+// Submit a duplicate-merge request. Admin reviews in Studio; on approval the
+// SQL function reassigns every related row from source to target and deletes
+// the source cat.
+export async function requestCatMerge(input: { sourceCatId: string; targetCatId: string; reason: string }) {
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) throw new Error("Not signed in");
+  const { error } = await supabase.from("cat_merge_requests").insert({
+    source_cat_id: input.sourceCatId,
+    target_cat_id: input.targetCatId,
+    requested_by: user.user.id,
+    reason: input.reason,
+  });
+  if (error) throw error;
+}
+
 export async function createCat(input: {
   name: string;
   primary_color: string;

@@ -62,6 +62,8 @@ export default function RootLayout() {
           <Stack.Screen name="profile/notifications" options={{ headerShown: true, title: "Notifications" }} />
           <Stack.Screen name="identify/index" options={{ headerShown: true, title: "Help identify" }} />
           <Stack.Screen name="flag/[catId]" options={{ headerShown: true, title: "Report welfare issue" }} />
+          <Stack.Screen name="edit-cat/[id]" options={{ headerShown: true, title: "Edit cat" }} />
+          <Stack.Screen name="merge/[catId]" options={{ headerShown: true, title: "Mark as duplicate" }} />
           <Stack.Screen name="stickers/index" options={{ headerShown: true, title: "Stickers" }} />
           <Stack.Screen name="sticker/[id]" options={{ presentation: "modal" }} />
         </Stack>
