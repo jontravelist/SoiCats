@@ -28,8 +28,12 @@ export async function preparePhoto(uri: string): Promise<{ uri: string }> {
 export async function uploadSightingPhoto(localUri: string, userId: string): Promise<string> {
   const filename = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
 
+  // expo-file-system v19's File.bytes() is async — uploading a non-awaited
+  // Promise to supabase-storage silently writes garbage and produces an
+  // empty/un-loadable image.
   const file = new File(localUri);
-  const bytes = file.bytes();
+  const arrayBuffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
 
   const { error } = await supabase.storage
     .from("sighting-photos")
