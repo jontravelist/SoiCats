@@ -54,17 +54,17 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="stickers"
+        name="cats"
         options={{
-          title: t("tabs.stickers"),
-          tabBarIcon: ({ focused }) => <TabIcon symbol="✨" focused={focused} />,
+          title: "Cats",
+          tabBarIcon: ({ focused }) => <TabIcon symbol="🐈" focused={focused} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: t("tabs.profile"),
-          tabBarIcon: ({ focused }) => <TabIcon symbol="🐈" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon symbol="👤" focused={focused} />,
         }}
       />
     </Tabs>

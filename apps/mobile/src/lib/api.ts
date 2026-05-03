@@ -12,10 +12,24 @@ export async function fetchNearbyCats(
   lat: number,
   lng: number,
   radius_m = env.NEARBY_CAT_RADIUS_M,
+  max_rows = 8,
 ): Promise<NearbyCat[]> {
   const { data, error } = await supabase.rpc("nearby_cats", {
-    lat, lng, radius_m, max_rows: 8,
+    lat, lng, radius_m, max_rows,
   });
+  if (error) throw error;
+  return data ?? [];
+}
+
+// Returns up to `limit` cats with no distance filter (i.e. everywhere),
+// ordered by name. Used by the Cats browse tab as a fallback when we
+// don't have a GPS reading.
+export async function fetchAllCats(limit = 200) {
+  const { data, error } = await supabase
+    .from("cats")
+    .select("id, name, name_th, primary_color, pattern, status, last_seen_at")
+    .order("name", { ascending: true })
+    .limit(limit);
   if (error) throw error;
   return data ?? [];
 }

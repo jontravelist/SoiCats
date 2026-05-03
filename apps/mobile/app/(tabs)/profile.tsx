@@ -1,13 +1,15 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
 import { useAuthStore } from "@/stores/auth";
 import { useProfile } from "@/hooks/useProfile";
-import { colors, spacing, typography } from "@/lib/theme";
+import { fetchStickerPacks, fetchUserStickers } from "@/lib/api";
+import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
 export default function ProfileTab() {
   const { t } = useTranslation();
@@ -15,6 +17,13 @@ export default function ProfileTab() {
   const session = useAuthStore((s) => s.session);
   const signOut = useAuthStore((s) => s.signOut);
   const { data: profile, isLoading } = useProfile();
+
+  const ownedQ = useQuery({
+    queryKey: ["my-stickers", session?.user.id],
+    queryFn: () => fetchUserStickers(session!.user.id),
+    enabled: !!session,
+  });
+  const packsQ = useQuery({ queryKey: ["sticker-packs"], queryFn: fetchStickerPacks });
 
   if (!session) {
     return (
@@ -34,6 +43,10 @@ export default function ProfileTab() {
     return <Screen><ActivityIndicator style={{ flex: 1 }} /></Screen>;
   }
 
+  const points = profile.points;
+  const nextPack = (packsQ.data ?? []).find((p) => p.unlock_threshold > points);
+  const recentStickers = (ownedQ.data ?? []).slice(0, 3);
+
   return (
     <Screen scroll>
       <View style={styles.header}>
@@ -41,12 +54,45 @@ export default function ProfileTab() {
           <Image source={profile.avatar_url} style={styles.avatar} />
         ) : (
           <View style={[styles.avatar, styles.avatarPlaceholder]}>
-            <Text style={{ fontSize: 32 }}>🐈</Text>
+            <Text style={{ fontSize: 40 }}>🐈</Text>
           </View>
         )}
         <Text style={styles.handle}>@{profile.handle ?? "anon"}</Text>
-        <Text style={styles.points}>{t("profile.points", { count: profile.points })}</Text>
+        {profile.display_name ? <Text style={styles.displayName}>{profile.display_name}</Text> : null}
+        <View style={styles.pointsPill}>
+          <Text style={styles.pointsText}>{t("profile.points", { count: profile.points })}</Text>
+        </View>
       </View>
+
+      {/* Stickers section. Tap any sticker or the header to open the full drawer. */}
+      <Pressable onPress={() => router.push("/stickers")} style={styles.stickerCard}>
+        <View style={styles.stickerHeader}>
+          <Text style={styles.sectionTitle}>Stickers</Text>
+          <Text style={styles.sectionLink}>View all →</Text>
+        </View>
+        {nextPack ? (
+          <Text style={styles.progress}>
+            {t("stickers.progress", { points, next: nextPack.unlock_threshold, packName: nextPack.name })}
+          </Text>
+        ) : (
+          <Text style={styles.progress}>{t("stickers.unlockedAll")}</Text>
+        )}
+        <View style={styles.stickerRow}>
+          {recentStickers.length > 0 ? (
+            recentStickers.map((row) => {
+              const s = row.stickers;
+              if (!s) return null;
+              return (
+                <View key={s.id} style={styles.stickerThumbWrap}>
+                  <Image source={s.image_url} style={styles.stickerThumb} contentFit="contain" />
+                </View>
+              );
+            })
+          ) : (
+            <Text style={styles.stickerEmpty}>Earn 100 points to unlock your first pack.</Text>
+          )}
+        </View>
+      </Pressable>
 
       <View style={styles.section}>
         <Button label={t("profile.edit")} variant="secondary" onPress={() => router.push("/profile/edit")} />
@@ -59,13 +105,40 @@ export default function ProfileTab() {
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: spacing(6), gap: spacing(3) },
   bigEmoji: { fontSize: 80 },
-  h1: { ...typography.h1 },
+  h1: { ...typography.h1, color: colors.text },
   tagline: { ...typography.body, color: colors.textDim, textAlign: "center" },
   body: { ...typography.body, color: colors.text, textAlign: "center", paddingHorizontal: spacing(4) },
+
   header: { alignItems: "center", padding: spacing(6), gap: spacing(2) },
-  avatar: { width: 96, height: 96, borderRadius: 48, backgroundColor: colors.border },
+  avatar: { width: 112, height: 112, borderRadius: 56, backgroundColor: colors.surface, ...shadow.card },
   avatarPlaceholder: { alignItems: "center", justifyContent: "center" },
-  handle: { ...typography.h2 },
-  points: { ...typography.body, color: colors.primary, fontWeight: "600" },
-  section: { paddingHorizontal: spacing(4), gap: spacing(2) },
+  handle: { ...typography.h2, color: colors.text },
+  displayName: { ...typography.body, color: colors.textDim },
+  pointsPill: {
+    paddingHorizontal: 14, paddingVertical: 6, borderRadius: radius.pill,
+    backgroundColor: colors.accent, marginTop: spacing(1),
+  },
+  pointsText: { color: "#fff", fontWeight: "700" },
+
+  stickerCard: {
+    marginHorizontal: spacing(4),
+    marginVertical: spacing(2),
+    padding: spacing(4),
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    ...shadow.card,
+  },
+  stickerHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: spacing(2) },
+  sectionTitle: { ...typography.h3, color: colors.text },
+  sectionLink: { ...typography.body, color: colors.primary, fontWeight: "700" },
+  progress: { ...typography.small, color: colors.textDim, marginBottom: spacing(2) },
+  stickerRow: { flexDirection: "row", gap: spacing(2) },
+  stickerThumbWrap: {
+    width: 64, height: 64, borderRadius: radius.md,
+    backgroundColor: colors.bg, padding: 6, alignItems: "center", justifyContent: "center",
+  },
+  stickerThumb: { width: "100%", height: "100%" },
+  stickerEmpty: { ...typography.small, color: colors.textDim, fontStyle: "italic" },
+
+  section: { paddingHorizontal: spacing(4), paddingVertical: spacing(2), gap: spacing(2) },
 });
