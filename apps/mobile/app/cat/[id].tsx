@@ -1,4 +1,4 @@
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -76,6 +76,8 @@ export default function CatProfile() {
         <View style={styles.statsRow}>
           <Stat label={t("cat.stats.photos", { count: sightings.length })} />
           <Stat label={`${cat.pattern} · ${cat.primary_color}`} />
+          {cat.sex && cat.sex !== "unknown" ? <Stat label={t(`sexes.${cat.sex}`)} /> : null}
+          {cat.age_guess ? <Stat label={t(`ages.${cat.age_guess}`)} /> : null}
         </View>
 
         {cat.distinguishing_features ? (
@@ -109,7 +111,12 @@ export default function CatProfile() {
         numColumns={3}
         scrollEnabled={false}
         renderItem={({ item }) => (
-          <Image source={item.photo_url} style={styles.gridImage} contentFit="cover" />
+          <Pressable
+            onPress={() => router.push(`/sighting/${item.id}`)}
+            style={({ pressed }) => [styles.gridCell, pressed && { opacity: 0.85 }]}
+          >
+            <Image source={item.photo_url} style={styles.gridImage} contentFit="cover" />
+          </Pressable>
         )}
         contentContainerStyle={styles.grid}
       />
@@ -157,5 +164,6 @@ const styles = StyleSheet.create({
   welfareItem: { ...typography.body, color: colors.textDim },
   actions: { marginTop: spacing(4), gap: spacing(2) },
   grid: { paddingHorizontal: 2 },
-  gridImage: { flex: 1 / 3, aspectRatio: 1, margin: 1, backgroundColor: colors.border },
+  gridCell: { flex: 1 / 3, aspectRatio: 1, margin: 1 },
+  gridImage: { width: "100%", height: "100%", backgroundColor: colors.border },
 });

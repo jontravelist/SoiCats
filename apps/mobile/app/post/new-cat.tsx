@@ -17,7 +17,7 @@ import { CatCard } from "@/components/CatCard";
 import { useUploadStore } from "@/stores/upload";
 import { useAuthStore } from "@/stores/auth";
 import { colors, spacing, typography } from "@/lib/theme";
-import { AGE_GUESSES, PATTERNS, PRIMARY_COLOURS, SUGGESTED_CAT_NAMES } from "@shared/cat-names";
+import { AGE_GUESSES, PATTERNS, PRIMARY_COLOURS, SEXES, SUGGESTED_CAT_NAMES } from "@shared/cat-names";
 
 type Duplicate = { id: string; name: string; distance_m: number; thumbnail_url: string | null };
 
@@ -31,6 +31,7 @@ export default function NewCatScreen() {
   const [pattern, setPattern] = useState<string | null>(null);
   const [color, setColor] = useState<string | null>(null);
   const [age, setAge] = useState<string | null>(null);
+  const [sex, setSex] = useState<string | null>(null);
   const [features, setFeatures] = useState("");
   const [duplicates, setDuplicates] = useState<Duplicate[] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -74,6 +75,7 @@ export default function NewCatScreen() {
         primary_color: color!,
         pattern: pattern!,
         age_guess: age,
+        sex,
         distinguishing_features: features || null,
         lat: pending.lat,
         lng: pending.lng,
@@ -127,6 +129,13 @@ export default function NewCatScreen() {
         <View style={styles.chipWrap}>
           {AGE_GUESSES.map((a) => (
             <Chip key={a} label={t(`ages.${a}`)} selected={age === a} onPress={() => setAge(a)} />
+          ))}
+        </View>
+
+        <Text style={styles.label}>Sex</Text>
+        <View style={styles.chipWrap}>
+          {SEXES.map((s) => (
+            <Chip key={s} label={t(`sexes.${s}`)} selected={sex === s} onPress={() => setSex(s)} />
           ))}
         </View>
 

@@ -27,23 +27,35 @@ export async function fetchNearbyCats(
 export async function fetchAllCats(limit = 200) {
   const { data, error } = await supabase
     .from("cats")
-    .select("id, name, name_th, primary_color, pattern, status, last_seen_at, distinguishing_features")
+    .select("id, name, name_th, primary_color, pattern, status, last_seen_at, distinguishing_features, sex, age_guess")
     .order("name", { ascending: true })
     .limit(limit);
   if (error) throw error;
   return data ?? [];
 }
 
-// The nearby_cats RPC doesn't return distinguishing_features (would require
-// a migration). Batch-fetch it for a list of IDs and return a lookup map.
-export async function fetchFeaturesByCatId(catIds: string[]): Promise<Record<string, string | null>> {
+// The nearby_cats RPC doesn't return distinguishing_features / sex / age_guess
+// (would require a migration). Batch-fetch them for a list of IDs and return a
+// lookup map.
+export async function fetchExtrasByCatId(
+  catIds: string[],
+): Promise<Record<string, { distinguishing_features: string | null; sex: string; age_guess: string | null }>> {
   if (catIds.length === 0) return {};
   const { data, error } = await supabase
     .from("cats")
-    .select("id, distinguishing_features")
+    .select("id, distinguishing_features, sex, age_guess")
     .in("id", catIds);
   if (error) throw error;
-  return Object.fromEntries((data ?? []).map((r) => [r.id, r.distinguishing_features]));
+  return Object.fromEntries(
+    (data ?? []).map((r) => [
+      r.id,
+      {
+        distinguishing_features: r.distinguishing_features,
+        sex: r.sex,
+        age_guess: r.age_guess,
+      },
+    ]),
+  );
 }
 
 export async function fetchNearbyFeed(
@@ -110,6 +122,7 @@ export async function createCat(input: {
   primary_color: string;
   pattern: string;
   age_guess?: string | null;
+  sex?: string | null;
   distinguishing_features?: string | null;
   lat: number;
   lng: number;
@@ -124,6 +137,7 @@ export async function createCat(input: {
       primary_color: input.primary_color,
       pattern: input.pattern,
       age_guess: (input.age_guess as Database["public"]["Enums"]["cat_age_guess"]) ?? null,
+      sex: (input.sex as Database["public"]["Enums"]["cat_sex"]) ?? "unknown",
       distinguishing_features: input.distinguishing_features ?? null,
       discovered_by_user_id: user.user.id,
       // PostGIS accepts WKT through PostgREST when sent as a string.

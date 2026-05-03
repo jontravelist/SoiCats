@@ -41,3 +41,5 @@ export const PRIMARY_COLOURS = [
 ] as const;
 
 export const AGE_GUESSES = ["kitten", "young", "adult", "senior"] as const;
+
+export const SEXES = ["male", "female", "unknown"] as const;

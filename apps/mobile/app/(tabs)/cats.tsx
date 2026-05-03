@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
 import { SignInPill } from "@/components/SignInPill";
-import { fetchNearbyCats, fetchAllCats, fetchFeaturesByCatId } from "@/lib/api";
+import { fetchNearbyCats, fetchAllCats, fetchExtrasByCatId } from "@/lib/api";
 import { useLocation } from "@/hooks/useLocation";
 import { formatDistance } from "@/lib/location";
 import { useTimeAgo } from "@/hooks/useTimeAgo";
@@ -38,36 +38,40 @@ export default function CatsTab() {
     enabled: sort === "name" || !coords,
   });
 
-  // The nearby_cats RPC doesn't return distinguishing_features, so we
+  // The nearby_cats RPC doesn't return features / sex / age, so we
   // batch-fetch them and merge into the rows.
   const nearbyIds = (nearQ.data ?? []).map((r) => r.id);
-  const featuresQ = useQuery({
-    queryKey: ["features-by-id", nearbyIds.join(",")],
-    queryFn: () => fetchFeaturesByCatId(nearbyIds),
+  const extrasQ = useQuery({
+    queryKey: ["extras-by-id", nearbyIds.join(",")],
+    queryFn: () => fetchExtrasByCatId(nearbyIds),
     enabled: nearbyIds.length > 0,
   });
 
   // The two queries return slightly different row shapes; normalise to one
-  // and merge in the distinguishing_features lookup for the nearby case.
-  const features = featuresQ.data ?? {};
+  // and merge in the extras lookup for the nearby case.
+  const extras = extrasQ.data ?? {};
   const items = useMemo(() => {
     const raw = sort === "near" && coords ? nearQ.data ?? [] : nameQ.data ?? [];
-    return raw.map((r) => ({
-      id: r.id,
-      name: r.name,
-      pattern: r.pattern,
-      primary_color: r.primary_color,
-      status: r.status,
-      last_seen_at: r.last_seen_at,
-      distance_m: "distance_m" in r ? (r.distance_m as number) : undefined,
-      thumbnail_url: "thumbnail_url" in r ? (r.thumbnail_url as string | null) : null,
-      photo_count: "photo_count" in r ? (r.photo_count as number) : undefined,
-      distinguishing_features:
-        "distinguishing_features" in r
-          ? ((r as { distinguishing_features: string | null }).distinguishing_features ?? null)
-          : (features[r.id] ?? null),
-    }));
-  }, [nearQ.data, nameQ.data, features, sort, coords]);
+    return raw.map((r) => {
+      const extra = extras[r.id];
+      return {
+        id: r.id,
+        name: r.name,
+        pattern: r.pattern,
+        primary_color: r.primary_color,
+        status: r.status,
+        last_seen_at: r.last_seen_at,
+        distance_m: "distance_m" in r ? (r.distance_m as number) : undefined,
+        thumbnail_url: "thumbnail_url" in r ? (r.thumbnail_url as string | null) : null,
+        photo_count: "photo_count" in r ? (r.photo_count as number) : undefined,
+        distinguishing_features:
+          "distinguishing_features" in r
+            ? ((r as { distinguishing_features: string | null }).distinguishing_features ?? null)
+            : (extra?.distinguishing_features ?? null),
+        sex: ("sex" in r ? (r as { sex: string }).sex : extra?.sex) ?? "unknown",
+      };
+    });
+  }, [nearQ.data, nameQ.data, extras, sort, coords]);
 
   // Client-side search — cheap for our scale and avoids an extra round-trip.
   const filtered = useMemo(() => {
@@ -144,14 +148,17 @@ interface CatRowProps {
   thumbnail_url: string | null;
   photo_count?: number;
   distinguishing_features: string | null;
+  sex: string;
   onPress: () => void;
 }
 
-function CatRow({ name, pattern, primary_color, distance_m, thumbnail_url, photo_count, last_seen_at, distinguishing_features, onPress }: CatRowProps) {
+function CatRow({ name, pattern, primary_color, distance_m, thumbnail_url, photo_count, last_seen_at, distinguishing_features, sex, onPress }: CatRowProps) {
   const { t } = useTranslation();
   const timeAgo = useTimeAgo();
+  const sexEmoji = sex === "male" ? "♂" : sex === "female" ? "♀" : null;
   const subtitleParts = [
     `${primary_color} · ${pattern}`,
+    sexEmoji,
     photo_count != null ? `${photo_count} ${photo_count === 1 ? "photo" : "photos"}` : null,
     distance_m != null ? formatDistance(distance_m, t) : `Last seen ${timeAgo(last_seen_at)}`,
   ].filter(Boolean) as string[];

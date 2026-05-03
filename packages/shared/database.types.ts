@@ -44,6 +44,7 @@ export interface Database {
           pattern: string;
           distinguishing_features: string | null;
           age_guess: Database["public"]["Enums"]["cat_age_guess"] | null;
+          sex: Database["public"]["Enums"]["cat_sex"];
           territory_centroid: Geography;
           last_seen_at: string;
           status: Database["public"]["Enums"]["cat_status"];
@@ -257,6 +258,7 @@ export interface Database {
       user_role: "user" | "feeder" | "clinic_admin" | "app_admin";
       cat_status: "active" | "injured" | "missing" | "deceased";
       cat_age_guess: "kitten" | "young" | "adult" | "senior";
+      cat_sex: "male" | "female" | "unknown";
       tnr_status: "unknown" | "intact" | "ear_tipped" | "sterilised";
       vaccination_status: "unknown" | "partial" | "fully_vaccinated";
       sighting_status: "confirmed" | "pending_id" | "rejected";
