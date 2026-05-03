@@ -255,6 +255,45 @@ export async function fetchComments(sightingId: string) {
   return data ?? [];
 }
 
+// Cats with an open verified welfare flag — what powers the 'Needs help'
+// pinned section at the top of the Feed.
+export async function fetchCatsNeedingHelp(lat?: number, lng?: number) {
+  const { data, error } = await supabase.rpc("cats_needing_help", {
+    lat: lat ?? null,
+    lng: lng ?? null,
+    radius_m: 50_000,
+    max_rows: 20,
+  });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function fetchLatestFlagForCat(catId: string) {
+  const { data, error } = await supabase.rpc("latest_flag_for_cat", { target_cat: catId });
+  if (error) throw error;
+  return (data ?? [])[0] ?? null;
+}
+
+// Insert a welfare flag. The DB trigger immediately auto-verifies if the
+// flagger is a feeder/admin or there's already a corroborating open flag.
+export async function flagCat(input: {
+  catId: string;
+  flagType: "injured" | "missing" | "deceased";
+  description: string;
+  photoUrl?: string | null;
+}) {
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) throw new Error("Not signed in");
+  const { error } = await supabase.from("cat_health_flags").insert({
+    cat_id: input.catId,
+    flagged_by: user.user.id,
+    flag_type: input.flagType,
+    description: input.description,
+    photo_url: input.photoUrl ?? null,
+  });
+  if (error) throw error;
+}
+
 // Returns cats with their centroid lng/lat so the Map tab can pin markers
 // at the correct location instead of clustering them at the user's spot.
 export async function fetchCatsInRadius(lat: number, lng: number, radius_m = 50_000, max_rows = 500) {

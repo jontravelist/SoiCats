@@ -289,6 +289,31 @@ export interface Database {
           centroid_lat: number;
         }[];
       };
+      cats_needing_help: {
+        Args: { lng?: number | null; lat?: number | null; radius_m?: number; max_rows?: number };
+        Returns: {
+          cat_id: string;
+          cat_name: string;
+          flag_id: string;
+          flag_type: Database["public"]["Enums"]["flag_type"];
+          flagged_at: string;
+          description: string | null;
+          thumbnail_url: string | null;
+          distance_m: number | null;
+          centroid_lng: number;
+          centroid_lat: number;
+        }[];
+      };
+      latest_flag_for_cat: {
+        Args: { target_cat: string };
+        Returns: {
+          id: string;
+          flag_type: Database["public"]["Enums"]["flag_type"];
+          status: Database["public"]["Enums"]["flag_status"];
+          description: string | null;
+          created_at: string;
+        }[];
+      };
     };
     Enums: {
       user_role: "user" | "feeder" | "clinic_admin" | "app_admin";

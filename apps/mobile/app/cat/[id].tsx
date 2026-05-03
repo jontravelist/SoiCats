@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
-import { fetchCat, fetchCatSightings, toggleFavourite } from "@/lib/api";
+import { fetchCat, fetchCatSightings, fetchLatestFlagForCat, toggleFavourite } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth";
 import { useTimeAgo } from "@/hooks/useTimeAgo";
@@ -24,6 +24,11 @@ export default function CatProfile() {
   const sightingsQ = useQuery({
     queryKey: ["cat-sightings", id],
     queryFn: () => fetchCatSightings(id!),
+    enabled: !!id,
+  });
+  const flagQ = useQuery({
+    queryKey: ["latest-flag", id],
+    queryFn: () => fetchLatestFlagForCat(id!),
     enabled: !!id,
   });
   const favQ = useQuery({
@@ -96,12 +101,34 @@ export default function CatProfile() {
           </Text>
         </View>
 
+        {flagQ.data && flagQ.data.status === "verified" ? (
+          <View style={styles.flagBanner}>
+            <Text style={styles.flagBannerLabel}>
+              {flagQ.data.flag_type === "deceased"
+                ? "💔 Reported deceased"
+                : flagQ.data.flag_type === "missing"
+                  ? "📍 Reported missing"
+                  : "🚑 Reported injured"}
+            </Text>
+            {flagQ.data.description ? (
+              <Text style={styles.flagBannerText}>{flagQ.data.description}</Text>
+            ) : null}
+          </View>
+        ) : null}
+
         <View style={styles.actions}>
           <Button
             label={favQ.data ? t("cat.actions.unfavourite") : t("cat.actions.favourite")}
             onPress={() => session ? favMut.mutate() : router.push("/auth")}
             variant={favQ.data ? "secondary" : "primary"}
           />
+          {cat.status !== "deceased" ? (
+            <Button
+              label="Report welfare issue"
+              variant="ghost"
+              onPress={() => session ? router.push(`/flag/${id}`) : router.push("/auth")}
+            />
+          ) : null}
         </View>
       </View>
 
@@ -162,6 +189,14 @@ const styles = StyleSheet.create({
   featureText: { ...typography.body, color: colors.text },
   welfare: { marginTop: spacing(3), gap: 4 },
   welfareItem: { ...typography.body, color: colors.textDim },
+  flagBanner: {
+    marginTop: spacing(3),
+    padding: spacing(3),
+    borderRadius: radius.lg,
+    backgroundColor: colors.danger,
+  },
+  flagBannerLabel: { ...typography.h3, color: "#fff" },
+  flagBannerText: { ...typography.body, color: "#fff", marginTop: 4, opacity: 0.95 },
   actions: { marginTop: spacing(4), gap: spacing(2) },
   grid: { paddingHorizontal: 2 },
   gridCell: { flex: 1 / 3, aspectRatio: 1, margin: 1 },

@@ -8,7 +8,7 @@ import { useRouter } from "expo-router";
 import { Screen } from "@/components/Screen";
 import { SignInPill } from "@/components/SignInPill";
 import { FeedItem } from "@/components/FeedItem";
-import { fetchNearbyFeed, fetchFollowingFeed, fetchPendingIdentificationCount } from "@/lib/api";
+import { fetchNearbyFeed, fetchFollowingFeed, fetchPendingIdentificationCount, fetchCatsNeedingHelp } from "@/lib/api";
 import { useLocation } from "@/hooks/useLocation";
 import { useAuthStore } from "@/stores/auth";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
@@ -28,6 +28,14 @@ export default function FeedTab() {
     enabled: !!session,
   });
   const pendingCount = pendingCountQ.data ?? 0;
+
+  // Cats with verified welfare flags within 50km. The pinned section at the
+  // top of the feed comes from this — see BRIEF section 7.7.
+  const helpQ = useQuery({
+    queryKey: ["cats-needing-help", coords?.latitude, coords?.longitude],
+    queryFn: () => fetchCatsNeedingHelp(coords?.latitude, coords?.longitude),
+  });
+  const helpItems = helpQ.data ?? [];
 
   const nearbyQ = useQuery({
     queryKey: ["nearby-feed", coords?.latitude, coords?.longitude],
@@ -51,6 +59,28 @@ export default function FeedTab() {
         <Text style={styles.brand}>{t("app.name")}</Text>
         <Text style={styles.tagline}>{t("app.tagline")}</Text>
       </View>
+
+      {helpItems.length > 0 ? (
+        <View style={styles.needsHelp}>
+          <Text style={styles.needsHelpTitle}>Needs help</Text>
+          <FlatList
+            horizontal
+            data={helpItems}
+            keyExtractor={(it) => it.flag_id}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: spacing(4), gap: spacing(2) }}
+            renderItem={({ item }) => (
+              <Pressable onPress={() => router.push(`/cat/${item.cat_id}`)} style={styles.needsHelpCard}>
+                <Text style={styles.needsHelpFlag}>
+                  {item.flag_type === "deceased" ? "💔" : item.flag_type === "missing" ? "📍" : "🚑"}
+                </Text>
+                <Text style={styles.needsHelpName} numberOfLines={1}>{item.cat_name}</Text>
+                <Text style={styles.needsHelpType}>{item.flag_type}</Text>
+              </Pressable>
+            )}
+          />
+        </View>
+      ) : null}
 
       {pendingCount > 0 ? (
         <Pressable onPress={() => router.push("/identify")} style={styles.helpCard}>
@@ -136,4 +166,19 @@ const styles = StyleSheet.create({
   helpEmoji: { fontSize: 32 },
   helpTitle: { ...typography.h3, color: "#fff" },
   helpBody: { ...typography.small, color: "#fff", opacity: 0.9, marginTop: 2 },
+  needsHelp: { paddingTop: spacing(2), paddingBottom: spacing(1) },
+  needsHelpTitle: { ...typography.label, color: colors.danger, paddingHorizontal: spacing(6), marginBottom: spacing(2) },
+  needsHelpCard: {
+    width: 130,
+    padding: spacing(3),
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 2,
+    borderColor: colors.danger,
+    alignItems: "center",
+    gap: 4,
+  },
+  needsHelpFlag: { fontSize: 28 },
+  needsHelpName: { ...typography.h3, color: colors.text },
+  needsHelpType: { ...typography.small, color: colors.danger, fontWeight: "700", textTransform: "uppercase" },
 });
