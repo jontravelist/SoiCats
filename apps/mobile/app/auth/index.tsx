@@ -137,6 +137,13 @@ export default function AuthScreen() {
               loading={busy}
               style={{ marginTop: spacing(3) }}
             />
+            <Pressable onPress={() => setMode(mode === "sign_up" ? "sign_in" : "sign_up")}>
+              <Text style={styles.swap}>
+                {mode === "sign_up"
+                  ? "Already have an account? Sign in"
+                  : "Don't have an account? Create one"}
+              </Text>
+            </Pressable>
             <Pressable onPress={() => setStep("welcome")}>
               <Text style={styles.skip}>← Back</Text>
             </Pressable>
@@ -187,6 +194,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.text,
   },
-  skip: { ...typography.body, color: colors.text, opacity: 0.7, textAlign: "center", marginTop: spacing(3), padding: spacing(2) },
+  swap: { ...typography.body, color: colors.primary, fontWeight: "700", textAlign: "center", marginTop: spacing(3), padding: spacing(2) },
+  skip: { ...typography.body, color: colors.text, opacity: 0.7, textAlign: "center", marginTop: spacing(1), padding: spacing(2) },
   terms: { ...typography.small, color: colors.text, opacity: 0.5, textAlign: "center", marginTop: spacing(4) },
 });
