@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, Linking, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Linking, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
@@ -110,6 +110,11 @@ export default function EditProfile() {
   const previewAvatar = pendingAvatarUri ?? avatarUrl;
 
   return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={64}
+    >
     <Screen scroll>
       <View style={styles.container}>
         <Text style={styles.h1}>Edit profile</Text>
@@ -154,6 +159,7 @@ export default function EditProfile() {
         <Button label="Cancel" variant="ghost" onPress={() => router.back()} />
       </View>
     </Screen>
+    </KeyboardAvoidingView>
   );
 }
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import * as AppleAuthentication from "expo-apple-authentication";
@@ -69,7 +69,10 @@ export default function AuthScreen() {
   };
 
   return (
-    <View style={styles.bg}>
+    <KeyboardAvoidingView
+      style={styles.bg}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
 
         <View style={styles.hero}>
@@ -142,7 +145,7 @@ export default function AuthScreen() {
 
         <Text style={styles.terms}>By continuing you agree to the Terms and Privacy Policy.</Text>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
