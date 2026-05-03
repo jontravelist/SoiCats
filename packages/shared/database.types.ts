@@ -53,6 +53,7 @@ export interface Database {
           tnr_confirmed_by_clinic: string | null;
           vaccination_status: Database["public"]["Enums"]["vaccination_status"];
           last_vaccination_at: string | null;
+          district_id: string | null;
           created_at: string;
         };
         Insert: Omit<Database["public"]["Tables"]["cats"]["Row"], "id" | "created_at" | "discovered_at" | "last_seen_at"> & {
@@ -75,7 +76,9 @@ export interface Database {
           model_version: string | null;
           location: Geography;
           location_accuracy_m: number | null;
+          district_id: string | null;
           caption: string | null;
+          like_count: number;
           points_awarded: number;
           status: Database["public"]["Enums"]["sighting_status"];
           created_at: string;
@@ -186,6 +189,24 @@ export interface Database {
         Row: { id: string; cat_id: string; clinic_id: string; update_type: Database["public"]["Enums"]["clinic_update_type"]; notes: string | null; performed_at: string; created_at: string };
         Insert: Omit<Database["public"]["Tables"]["clinic_updates"]["Row"], "id" | "created_at"> & { id?: string; created_at?: string };
         Update: Partial<Database["public"]["Tables"]["clinic_updates"]["Row"]>;
+        Relationships: [];
+      };
+      districts: {
+        Row: {
+          id: string;
+          name: string;
+          name_th: string | null;
+          slug: string;
+          boundary: Geography;
+          is_curated: boolean;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["districts"]["Row"], "id" | "created_at" | "is_curated"> & {
+          id?: string;
+          created_at?: string;
+          is_curated?: boolean;
+        };
+        Update: Partial<Database["public"]["Tables"]["districts"]["Row"]>;
         Relationships: [];
       };
     };
@@ -339,6 +360,14 @@ export interface Database {
       reject_feeder_application: {
         Args: { application_id: string; why?: string | null };
         Returns: void;
+      };
+      find_district_for_point: {
+        Args: { lng: number; lat: number };
+        Returns: string | null;
+      };
+      greater_bangkok_district_id: {
+        Args: Record<string, never>;
+        Returns: string;
       };
     };
     Enums: {

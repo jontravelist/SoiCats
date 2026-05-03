@@ -98,11 +98,20 @@ export async function fetchDuplicateCandidates(
 export async function fetchCat(catId: string) {
   const { data, error } = await supabase
     .from("cats")
-    .select("*")
+    .select("*, district:district_id(id, slug, name, name_th)")
     .eq("id", catId)
     .single();
   if (error) throw error;
   return data;
+}
+
+export async function fetchDistricts() {
+  const { data, error } = await supabase
+    .from("districts")
+    .select("id, slug, name, name_th, is_curated")
+    .order("name");
+  if (error) throw error;
+  return data ?? [];
 }
 
 export async function fetchCatSightings(catId: string) {

@@ -104,6 +104,11 @@ export default function CatProfile() {
             <Text style={styles.statusText}>{cat.status}</Text>
           </View>
         </View>
+        {(cat as { district?: { name?: string } | null }).district?.name ? (
+          <View style={styles.districtChip}>
+            <Text style={styles.districtText}>📍 {(cat as { district?: { name: string } }).district!.name}</Text>
+          </View>
+        ) : null}
         <Text style={styles.meta}>
           {t("cat.lastSeen", { time: timeAgo(cat.last_seen_at) })}
         </Text>
@@ -267,6 +272,15 @@ const styles = StyleSheet.create({
   meta: { ...typography.small, color: colors.textDim, marginTop: 4 },
   statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
   statusText: { color: "#fff", fontSize: 12, fontWeight: "600", textTransform: "uppercase" },
+  districtChip: {
+    alignSelf: "flex-start",
+    marginTop: spacing(1),
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    backgroundColor: colors.surface,
+    borderRadius: radius.pill,
+  },
+  districtText: { ...typography.small, color: colors.text, fontWeight: "600" },
   statsRow: { flexDirection: "row", gap: spacing(2), marginTop: spacing(3) },
   stat: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: radius.sm, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   statText: { ...typography.small },
