@@ -324,6 +324,14 @@ export interface Database {
           photo_url: string;
         }[];
       };
+      approve_cat_merge: {
+        Args: { request_id: string };
+        Returns: void;
+      };
+      reject_cat_merge: {
+        Args: { request_id: string; _reason?: string | null };
+        Returns: void;
+      };
     };
     Enums: {
       user_role: "user" | "feeder" | "clinic_admin" | "app_admin";

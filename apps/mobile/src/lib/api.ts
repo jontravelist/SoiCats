@@ -177,6 +177,32 @@ export async function requestCatMerge(input: { sourceCatId: string; targetCatId:
   if (error) throw error;
 }
 
+// Admin queue: open merge requests with both cats hydrated for display.
+export async function fetchOpenMergeRequests() {
+  const { data, error } = await supabase
+    .from("cat_merge_requests")
+    .select(`
+      id, reason, created_at, requested_by,
+      source:source_cat_id(id, name, primary_color, pattern, distinguishing_features),
+      target:target_cat_id(id, name, primary_color, pattern, distinguishing_features),
+      requester:requested_by(handle)
+    `)
+    .eq("status", "open")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function approveCatMerge(requestId: string) {
+  const { error } = await supabase.rpc("approve_cat_merge", { request_id: requestId });
+  if (error) throw error;
+}
+
+export async function rejectCatMerge(requestId: string) {
+  const { error } = await supabase.rpc("reject_cat_merge", { request_id: requestId });
+  if (error) throw error;
+}
+
 export async function createCat(input: {
   name: string;
   primary_color: string;
