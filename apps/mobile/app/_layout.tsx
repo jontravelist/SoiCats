@@ -39,6 +39,7 @@ export default function RootLayout() {
           <Stack.Screen name="sighting/[id]" options={{ headerShown: true, title: "" }} />
           <Stack.Screen name="post/identify" options={{ headerShown: true, title: "Which cat?" }} />
           <Stack.Screen name="post/new-cat" options={{ headerShown: true, title: "New cat" }} />
+          <Stack.Screen name="profile/edit" options={{ headerShown: true, title: "Edit profile" }} />
           <Stack.Screen name="sticker/[id]" options={{ presentation: "modal" }} />
         </Stack>
       </QueryClientProvider>

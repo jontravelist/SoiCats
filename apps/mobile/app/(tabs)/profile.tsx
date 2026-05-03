@@ -49,10 +49,7 @@ export default function ProfileTab() {
       </View>
 
       <View style={styles.section}>
-        <Button label={t("profile.edit")} variant="secondary" />
-        {profile.role === "user" ? (
-          <Button label={t("profile.applyFeeder")} variant="ghost" />
-        ) : null}
+        <Button label={t("profile.edit")} variant="secondary" onPress={() => router.push("/profile/edit")} />
         <Button label={t("profile.signOut")} variant="ghost" onPress={() => void signOut()} />
       </View>
     </Screen>
