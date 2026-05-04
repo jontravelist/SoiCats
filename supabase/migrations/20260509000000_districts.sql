@@ -38,14 +38,14 @@ create index cats_district_idx on public.cats (district_id);
 
 alter table public.sightings
   add column district_id uuid references public.districts (id);
-create index sightings_district_created_idx on public.sightings (district_id, created_at desc);
-create index sightings_district_likes_idx on public.sightings (district_id, like_count desc);
 
--- Add the like_count column too while we're here — needed by Wave 3 / 4
--- (Hall of Fame + weekly leaderboards). Defaults zero, populated by trigger
--- in a later wave.
+-- Add the like_count column before any index that references it (Wave 3
+-- will populate it via a trigger; default zero is fine for now).
 alter table public.sightings
   add column if not exists like_count int not null default 0;
+
+create index sightings_district_created_idx on public.sightings (district_id, created_at desc);
+create index sightings_district_likes_idx on public.sightings (district_id, like_count desc);
 
 -- find_district_for_point: prefer the smallest curated polygon containing the
 -- point (handles overlapping polygons sensibly). Falls back to NULL when
