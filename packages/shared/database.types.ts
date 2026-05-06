@@ -54,6 +54,15 @@ export interface Database {
           vaccination_status: Database["public"]["Enums"]["vaccination_status"];
           last_vaccination_at: string | null;
           district_id: string | null;
+          stat_chonk: number | null;
+          stat_spice: number | null;
+          stat_floof: number | null;
+          stat_slink: number | null;
+          stat_vibes: number | null;
+          stats_rating_count: number;
+          stats_photo_count: number;
+          stats_last_computed_at: string | null;
+          specialty_stat: Database["public"]["Enums"]["cat_stat"] | null;
           created_at: string;
         };
         Insert: Omit<Database["public"]["Tables"]["cats"]["Row"], "id" | "created_at" | "discovered_at" | "last_seen_at"> & {
@@ -189,6 +198,22 @@ export interface Database {
         Row: { id: string; cat_id: string; clinic_id: string; update_type: Database["public"]["Enums"]["clinic_update_type"]; notes: string | null; performed_at: string; created_at: string };
         Insert: Omit<Database["public"]["Tables"]["clinic_updates"]["Row"], "id" | "created_at"> & { id?: string; created_at?: string };
         Update: Partial<Database["public"]["Tables"]["clinic_updates"]["Row"]>;
+        Relationships: [];
+      };
+      photo_ratings: {
+        Row: {
+          sighting_id: string;
+          voter_id: string;
+          stat: Database["public"]["Enums"]["cat_stat"];
+          score: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["photo_ratings"]["Row"], "created_at" | "updated_at"> & {
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["photo_ratings"]["Row"]>;
         Relationships: [];
       };
       districts: {
@@ -369,12 +394,17 @@ export interface Database {
         Args: Record<string, never>;
         Returns: string;
       };
+      recompute_cat_stats: {
+        Args: { target_cat: string };
+        Returns: void;
+      };
     };
     Enums: {
       user_role: "user" | "feeder" | "clinic_admin" | "app_admin";
       cat_status: "active" | "injured" | "missing" | "deceased";
       cat_age_guess: "kitten" | "young" | "adult" | "senior";
       cat_sex: "male" | "female" | "unknown";
+      cat_stat: "chonk" | "spice" | "floof" | "slink" | "vibes";
       tnr_status: "unknown" | "intact" | "ear_tipped" | "sterilised";
       vaccination_status: "unknown" | "partial" | "fully_vaccinated";
       sighting_status: "confirmed" | "pending_id" | "rejected";

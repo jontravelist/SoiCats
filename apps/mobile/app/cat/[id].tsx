@@ -7,6 +7,8 @@ import MapView, { Marker } from "react-native-maps";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
+import { StatRadar } from "@/components/StatRadar";
+import { SpecialtyBadge } from "@/components/SpecialtyBadge";
 import { fetchCat, fetchCatSightingLocations, fetchCatSightings, fetchLatestFlagForCat, fetchRecentFeedsForCat, toggleFavourite } from "@/lib/api";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/lib/supabase";
@@ -135,6 +137,47 @@ export default function CatProfile() {
             {t(`cat.welfare.vaccination.${cat.vaccination_status}`)}
           </Text>
         </View>
+
+        {/* Pokemon-style five-stat panel — only renders once the cat has
+            crossed the BRIEF threshold (>=5 ratings on >=2 photos). Below that
+            we show 'Stats coming soon' so users understand it's accumulating
+            rather than broken. */}
+        {(() => {
+          const ratings = (cat as { stats_rating_count?: number }).stats_rating_count ?? 0;
+          const photos  = (cat as { stats_photo_count?:  number }).stats_photo_count  ?? 0;
+          const ready = ratings >= 5 && photos >= 2;
+          const stats = {
+            chonk: (cat as { stat_chonk: number | null }).stat_chonk,
+            spice: (cat as { stat_spice: number | null }).stat_spice,
+            floof: (cat as { stat_floof: number | null }).stat_floof,
+            slink: (cat as { stat_slink: number | null }).stat_slink,
+            vibes: (cat as { stat_vibes: number | null }).stat_vibes,
+          };
+          const specialty = (cat as { specialty_stat?: "chonk" | "spice" | "floof" | "slink" | "vibes" | null }).specialty_stat ?? null;
+          const specialtyScore = specialty ? stats[specialty] ?? null : null;
+          return (
+            <View style={styles.statsBlock}>
+              {ready && specialty ? (
+                <SpecialtyBadge stat={specialty} score={specialtyScore ?? undefined} />
+              ) : null}
+              {ready ? (
+                <View style={styles.radarWrap}>
+                  <StatRadar values={stats} size={240} />
+                  <Text style={styles.statsCount}>
+                    Rated by {ratings} {ratings === 1 ? "vote" : "votes"} across {photos} photos
+                  </Text>
+                </View>
+              ) : (
+                <View style={styles.statsTeaser}>
+                  <Text style={styles.statsTeaserTitle}>Stats coming soon</Text>
+                  <Text style={styles.statsTeaserBody}>
+                    Once this cat has 5 ratings across 2 photos, their Chonk / Spice / Floof / Slink / Vibes show up here.
+                  </Text>
+                </View>
+              )}
+            </View>
+          );
+        })()}
 
         {flagQ.data && flagQ.data.status === "verified" ? (
           <View style={styles.flagBanner}>
@@ -311,6 +354,16 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   miniMap: { width: "100%", height: "100%" },
+  statsBlock: { marginTop: spacing(3), gap: spacing(3) },
+  radarWrap: { alignItems: "center", gap: spacing(2) },
+  statsCount: { ...typography.small, color: colors.textDim },
+  statsTeaser: {
+    padding: spacing(3),
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+  },
+  statsTeaserTitle: { ...typography.h3, color: colors.text },
+  statsTeaserBody: { ...typography.small, color: colors.textDim, marginTop: 4 },
   feedsWrap: { paddingHorizontal: spacing(4), marginTop: spacing(2), marginBottom: spacing(3), gap: spacing(2) },
   feedRow: {
     flexDirection: "row",

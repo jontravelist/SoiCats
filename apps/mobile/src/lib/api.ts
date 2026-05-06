@@ -105,6 +105,37 @@ export async function fetchCat(catId: string) {
   return data;
 }
 
+// Stat ratings.
+export type StatKey = "chonk" | "spice" | "floof" | "slink" | "vibes";
+export const STAT_KEYS: StatKey[] = ["chonk", "spice", "floof", "slink", "vibes"];
+
+export async function submitRating(input: { sightingId: string; stat: StatKey; score: number }) {
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) throw new Error("Not signed in");
+  const { error } = await supabase.from("photo_ratings").upsert({
+    sighting_id: input.sightingId,
+    voter_id: user.user.id,
+    stat: input.stat,
+    score: input.score,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) throw error;
+}
+
+export async function fetchMyRatingsForSighting(sightingId: string): Promise<Partial<Record<StatKey, number>>> {
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) return {};
+  const { data, error } = await supabase
+    .from("photo_ratings")
+    .select("stat, score")
+    .eq("sighting_id", sightingId)
+    .eq("voter_id", user.user.id);
+  if (error) throw error;
+  const out: Partial<Record<StatKey, number>> = {};
+  for (const r of data ?? []) out[r.stat as StatKey] = r.score;
+  return out;
+}
+
 export async function fetchDistricts() {
   const { data, error } = await supabase
     .from("districts")
