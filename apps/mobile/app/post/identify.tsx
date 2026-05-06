@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -110,6 +110,11 @@ export default function IdentifyScreen() {
   };
 
   return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={64}
+    >
     <Screen scroll>
       <Image source={pending.localUri} style={styles.photo} contentFit="cover" />
 
@@ -187,6 +192,7 @@ export default function IdentifyScreen() {
         style={styles.caption}
       />
     </Screen>
+    </KeyboardAvoidingView>
   );
 }
 

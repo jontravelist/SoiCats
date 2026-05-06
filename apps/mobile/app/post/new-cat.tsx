@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
@@ -99,6 +99,11 @@ export default function NewCatScreen() {
   };
 
   return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={64}
+    >
     <Screen scroll>
       <View style={styles.container}>
         <Text style={styles.h1}>{t("newCat.title")}</Text>
@@ -163,6 +168,7 @@ export default function NewCatScreen() {
         )}
       </View>
     </Screen>
+    </KeyboardAvoidingView>
   );
 }
 

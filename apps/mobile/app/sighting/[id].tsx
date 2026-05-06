@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -73,6 +73,11 @@ export default function SightingDetail() {
   const s = sightingQ.data;
 
   return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={64}
+    >
     <Screen scroll>
       <Image source={s.photo_url} style={styles.photo} contentFit="cover" />
       <View style={styles.body}>
@@ -125,6 +130,7 @@ export default function SightingDetail() {
         </View>
       ) : null}
     </Screen>
+    </KeyboardAvoidingView>
   );
 }
 
