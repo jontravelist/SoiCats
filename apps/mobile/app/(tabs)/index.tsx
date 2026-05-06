@@ -8,7 +8,7 @@ import { useRouter } from "expo-router";
 import { Screen } from "@/components/Screen";
 import { SignInPill } from "@/components/SignInPill";
 import { FeedItem } from "@/components/FeedItem";
-import { fetchNearbyFeed, fetchFollowingFeed, fetchPendingIdentificationCount, fetchCatsNeedingHelp } from "@/lib/api";
+import { fetchNearbyFeed, fetchFavouritesFeed, fetchPendingIdentificationCount, fetchCatsNeedingHelp } from "@/lib/api";
 import { useLocation } from "@/hooks/useLocation";
 import { useAuthStore } from "@/stores/auth";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
@@ -45,7 +45,7 @@ export default function FeedTab() {
 
   const favouritesQ = useQuery({
     queryKey: ["favourites-feed", session?.user.id],
-    queryFn: () => fetchFollowingFeed(),
+    queryFn: () => fetchFavouritesFeed(),
     enabled: tab === "favourites" && !!session,
   });
 

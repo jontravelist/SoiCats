@@ -73,8 +73,8 @@ export async function fetchNearbyFeed(
   return data ?? [];
 }
 
-export async function fetchFollowingFeed(before?: string) {
-  const { data, error } = await supabase.rpc("following_feed", {
+export async function fetchFavouritesFeed(before?: string) {
+  const { data, error } = await supabase.rpc("favourites_feed", {
     max_rows: 50,
     before: before ?? null,
   });

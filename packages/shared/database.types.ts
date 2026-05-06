@@ -268,7 +268,7 @@ export interface Database {
           comment_count: number;
         }[];
       };
-      following_feed: {
+      favourites_feed: {
         Args: { max_rows?: number; before?: string | null };
         Returns: {
           sighting_id: string;
