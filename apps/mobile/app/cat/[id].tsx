@@ -9,12 +9,12 @@ import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
 import { StatRadar } from "@/components/StatRadar";
 import { SpecialtyBadge } from "@/components/SpecialtyBadge";
-import { fetchCat, fetchCatSightingLocations, fetchCatSightings, fetchLatestFlagForCat, fetchRecentFeedsForCat, toggleFavourite } from "@/lib/api";
+import { fetchCat, fetchCatSightingLocations, fetchCatSightings, fetchCatTopPhotos, fetchLatestFlagForCat, fetchRecentFeedsForCat, toggleFavourite } from "@/lib/api";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth";
 import { useTimeAgo } from "@/hooks/useTimeAgo";
-import { colors, radius, spacing, typography } from "@/lib/theme";
+import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
 export default function CatProfile() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -38,6 +38,11 @@ export default function CatProfile() {
   const flagQ = useQuery({
     queryKey: ["latest-flag", id],
     queryFn: () => fetchLatestFlagForCat(id!),
+    enabled: !!id,
+  });
+  const topQ = useQuery({
+    queryKey: ["cat-top-photos", id],
+    queryFn: () => fetchCatTopPhotos(id!, 3),
     enabled: !!id,
   });
   const feedsQ = useQuery({
@@ -271,6 +276,28 @@ export default function CatProfile() {
         </View>
       ) : null}
 
+      {(topQ.data ?? []).length > 0 ? (
+        <View style={styles.hofWrap}>
+          <Text style={styles.sectionLabel}>🏆 Hall of Fame · Top photos</Text>
+          {(topQ.data ?? []).map((row, i) => (
+            <Pressable
+              key={row.sighting_id}
+              onPress={() => router.push(`/sighting/${row.sighting_id}`)}
+              style={({ pressed }) => [styles.hofRow, pressed && { opacity: 0.92 }]}
+            >
+              <Text style={styles.hofRank}>{["🥇","🥈","🥉"][i] ?? `#${i + 1}`}</Text>
+              <Image source={row.photo_url} style={styles.hofThumb} contentFit="cover" />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.hofMeta}>
+                  ♥ {row.like_count}{row.photographer_handle ? ` · @${row.photographer_handle}` : ""}
+                </Text>
+                {row.caption ? <Text style={styles.hofCaption} numberOfLines={2}>{row.caption}</Text> : null}
+              </View>
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
+
       <FlatList
         data={sightings}
         keyExtractor={(s) => s.id}
@@ -376,6 +403,20 @@ const styles = StyleSheet.create({
   feedHandle: { ...typography.h3, color: colors.text },
   feedTime: { ...typography.small, color: colors.textDim, marginTop: 2 },
   feedNotes: { ...typography.body, color: colors.text, marginTop: 4 },
+  hofWrap: { paddingHorizontal: spacing(4), marginTop: spacing(2), marginBottom: spacing(3), gap: spacing(2) },
+  hofRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.surface,
+    padding: spacing(3),
+    borderRadius: radius.lg,
+    gap: spacing(3),
+    ...shadow.card,
+  },
+  hofRank: { fontSize: 24 },
+  hofThumb: { width: 64, height: 64, borderRadius: radius.md, backgroundColor: colors.surfaceAlt },
+  hofMeta: { ...typography.body, color: colors.text, fontWeight: "700" },
+  hofCaption: { ...typography.small, color: colors.textDim, marginTop: 2 },
   grid: { paddingHorizontal: 2 },
   gridCell: { flex: 1 / 3, aspectRatio: 1, margin: 1 },
   gridImage: { width: "100%", height: "100%", backgroundColor: colors.border },

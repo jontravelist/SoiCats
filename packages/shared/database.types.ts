@@ -398,6 +398,18 @@ export interface Database {
         Args: { target_cat: string };
         Returns: void;
       };
+      cat_top_photos: {
+        Args: { target_cat: string; max_rows?: number };
+        Returns: {
+          sighting_id: string;
+          photo_url: string;
+          caption: string | null;
+          like_count: number;
+          created_at: string;
+          photographer_id: string;
+          photographer_handle: string | null;
+        }[];
+      };
     };
     Enums: {
       user_role: "user" | "feeder" | "clinic_admin" | "app_admin";

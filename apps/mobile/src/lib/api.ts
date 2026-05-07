@@ -157,6 +157,16 @@ export async function fetchCatSightings(catId: string) {
   return data ?? [];
 }
 
+// Top photos of this cat by all-time likes — the per-cat Hall of Fame.
+export async function fetchCatTopPhotos(catId: string, max = 3) {
+  const { data, error } = await supabase.rpc("cat_top_photos", {
+    target_cat: catId,
+    max_rows: max,
+  });
+  if (error) throw error;
+  return data ?? [];
+}
+
 // Last 10 confirmed sighting locations for the territory map on cat profile.
 // Returns plain lng/lat columns so we don't have to parse PostGIS geography.
 export async function fetchCatSightingLocations(catId: string) {
