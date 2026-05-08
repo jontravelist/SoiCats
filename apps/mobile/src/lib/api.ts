@@ -169,6 +169,30 @@ export async function fetchCurrentWeekTopPhotos(districtId: string, max = 10) {
   return data ?? [];
 }
 
+// Five-stat champion list for a district (Chonkiest, Spiciest, etc.).
+export async function fetchDistrictStatChampions(districtId: string) {
+  const { data, error } = await supabase.rpc("district_stat_champions", {
+    target_district: districtId,
+  });
+  if (error) throw error;
+  return data ?? [];
+}
+
+// Top N cats per single stat in a district. Powers the per-stat scroll.
+export async function fetchStatChampionTop5(
+  districtId: string,
+  stat: "chonk" | "spice" | "floof" | "slink" | "vibes",
+  max = 5,
+) {
+  const { data, error } = await supabase.rpc("stat_champion_top5", {
+    target_district: districtId,
+    target_stat: stat,
+    max_rows: max,
+  });
+  if (error) throw error;
+  return data ?? [];
+}
+
 // Frozen archive of weekly winners for a district.
 export async function fetchFrozenWeeklyWinners(districtId: string, maxWeeks = 8) {
   const { data, error } = await supabase.rpc("frozen_weekly_winners", {

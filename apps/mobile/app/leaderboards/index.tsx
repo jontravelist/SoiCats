@@ -9,12 +9,21 @@ import {
   fetchCurrentWeekTopPhotos,
   fetchDistricts,
   fetchDistrictForPoint,
+  fetchDistrictStatChampions,
   fetchFrozenWeeklyWinners,
 } from "@/lib/api";
 import { useLocation } from "@/hooks/useLocation";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
-type Tab = "this_week" | "archive";
+type Tab = "this_week" | "champions" | "archive";
+
+const STAT_META: Record<string, { title: string; emoji: string }> = {
+  chonk: { title: "Chonkiest",  emoji: "🍡" },
+  spice: { title: "Spiciest",   emoji: "🌶️" },
+  floof: { title: "Floofiest",  emoji: "☁️" },
+  slink: { title: "Slinkiest",  emoji: "🥷" },
+  vibes: { title: "Best Vibes", emoji: "🧘" },
+};
 
 export default function Leaderboards() {
   const router = useRouter();
@@ -49,6 +58,11 @@ export default function Leaderboards() {
     queryFn: () => fetchFrozenWeeklyWinners(districtId!, 8),
     enabled: !!districtId && tab === "archive",
   });
+  const championsQ = useQuery({
+    queryKey: ["leaderboard-champions", districtId],
+    queryFn: () => fetchDistrictStatChampions(districtId!),
+    enabled: !!districtId && tab === "champions",
+  });
 
   const districtName = useMemo(() => {
     return districtsQ.data?.find((d) => d.id === districtId)?.name ?? "";
@@ -76,6 +90,7 @@ export default function Leaderboards() {
 
       <View style={styles.tabs}>
         <TabBtn label="This week" active={tab === "this_week"} onPress={() => setTab("this_week")} />
+        <TabBtn label="Champions" active={tab === "champions"} onPress={() => setTab("champions")} />
         <TabBtn label="Archive"   active={tab === "archive"}   onPress={() => setTab("archive")} />
       </View>
 
@@ -85,6 +100,13 @@ export default function Leaderboards() {
           rows={currentQ.data ?? []}
           districtName={districtName}
           onTap={(id) => router.push(`/sighting/${id}`)}
+        />
+      ) : tab === "champions" ? (
+        <Champions
+          loading={championsQ.isLoading}
+          rows={championsQ.data ?? []}
+          districtName={districtName}
+          onTap={(catId) => router.push(`/cat/${catId}`)}
         />
       ) : (
         <Archive
@@ -141,6 +163,62 @@ function ThisWeek({ loading, rows, districtName, onTap }:
         </Pressable>
       )}
     />
+  );
+}
+
+interface ChampionRow {
+  stat: "chonk" | "spice" | "floof" | "slink" | "vibes";
+  cat_id: string | null;
+  cat_name: string | null;
+  score: number | null;
+  thumbnail: string | null;
+}
+
+function Champions({ loading, rows, districtName, onTap }:
+  { loading: boolean; rows: ChampionRow[]; districtName: string; onTap: (catId: string) => void }) {
+  if (loading) return <View style={styles.center}><ActivityIndicator /></View>;
+  const filled = rows.filter((r) => r.cat_id != null);
+  if (filled.length === 0) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.empty}>
+          No champions in {districtName} yet. Cats need at least 3 ratings to qualify.
+        </Text>
+      </View>
+    );
+  }
+  return (
+    <View style={styles.list}>
+      {rows.map((r) => {
+        const meta = STAT_META[r.stat];
+        const filled = r.cat_id != null;
+        return (
+          <Pressable
+            key={r.stat}
+            disabled={!filled}
+            onPress={() => filled && r.cat_id && onTap(r.cat_id)}
+            style={[styles.row, !filled && { opacity: 0.5 }]}
+          >
+            <Text style={styles.rank}>{meta.emoji}</Text>
+            {r.thumbnail ? (
+              <Image source={r.thumbnail} style={styles.thumb} contentFit="cover" />
+            ) : (
+              <View style={[styles.thumb, { alignItems: "center", justifyContent: "center" }]}>
+                <Text style={{ fontSize: 28 }}>🐈</Text>
+              </View>
+            )}
+            <View style={{ flex: 1 }}>
+              <Text style={styles.cat}>
+                {meta.title} {filled ? `· ${r.cat_name}` : ""}
+              </Text>
+              <Text style={styles.meta}>
+                {filled ? `${r.score?.toFixed(1)} / 5` : "Title open — needs more ratings"}
+              </Text>
+            </View>
+          </Pressable>
+        );
+      })}
+    </View>
   );
 }
 

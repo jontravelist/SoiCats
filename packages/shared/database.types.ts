@@ -443,6 +443,31 @@ export interface Database {
         Args: Record<string, never>;
         Returns: number;
       };
+      recompute_stat_champions: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      district_stat_champions: {
+        Args: { target_district: string };
+        Returns: {
+          stat: Database["public"]["Enums"]["cat_stat"];
+          cat_id: string | null;
+          cat_name: string | null;
+          score: number | null;
+          thumbnail: string | null;
+          held_since: string | null;
+        }[];
+      };
+      stat_champion_top5: {
+        Args: { target_district: string; target_stat: Database["public"]["Enums"]["cat_stat"]; max_rows?: number };
+        Returns: {
+          rank: number;
+          cat_id: string;
+          cat_name: string;
+          score: number;
+          thumbnail: string | null;
+        }[];
+      };
     };
     Enums: {
       user_role: "user" | "feeder" | "clinic_admin" | "app_admin";
