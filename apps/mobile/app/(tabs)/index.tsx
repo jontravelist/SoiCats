@@ -56,8 +56,15 @@ export default function FeedTab() {
     <Screen>
       <SignInPill />
       <View style={styles.header}>
-        <Text style={styles.brand}>{t("app.name")}</Text>
-        <Text style={styles.tagline}>{t("app.tagline")}</Text>
+        <View style={styles.headerRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.brand}>{t("app.name")}</Text>
+            <Text style={styles.tagline}>{t("app.tagline")}</Text>
+          </View>
+          <Pressable onPress={() => router.push("/leaderboards")} style={styles.leaderboardChip}>
+            <Text style={styles.leaderboardChipText}>🏆</Text>
+          </Pressable>
+        </View>
       </View>
 
       {helpItems.length > 0 ? (
@@ -143,8 +150,19 @@ function TabButton({ label, active, onPress }: { label: string; active: boolean;
 
 const styles = StyleSheet.create({
   header: { paddingHorizontal: spacing(6), paddingTop: spacing(2), paddingBottom: spacing(1) },
+  headerRow: { flexDirection: "row", alignItems: "center", gap: spacing(2) },
   brand: { fontSize: 36, fontWeight: "900", color: colors.text, letterSpacing: -1 },
   tagline: { ...typography.body, color: colors.textDim, marginTop: 4 },
+  leaderboardChip: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.accent,
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadow.button,
+  },
+  leaderboardChipText: { fontSize: 22 },
   tabs: { flexDirection: "row", paddingHorizontal: spacing(4), paddingVertical: spacing(2), gap: spacing(2) },
   tabBtn: { paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999, backgroundColor: colors.surface },
   tabBtnActive: { backgroundColor: colors.primary },

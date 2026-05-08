@@ -410,6 +410,39 @@ export interface Database {
           photographer_handle: string | null;
         }[];
       };
+      current_week_top_photos: {
+        Args: { target_district: string; max_rows?: number };
+        Returns: {
+          rank: number;
+          sighting_id: string;
+          photo_url: string;
+          caption: string | null;
+          like_count: number;
+          cat_id: string;
+          cat_name: string;
+          photographer_id: string;
+          photographer_handle: string | null;
+          created_at: string;
+        }[];
+      };
+      frozen_weekly_winners: {
+        Args: { target_district: string; max_weeks?: number };
+        Returns: {
+          week_start: string;
+          rank: number;
+          sighting_id: string;
+          photo_url: string;
+          cat_id: string;
+          cat_name: string;
+          photographer_id: string;
+          photographer_handle: string | null;
+          like_count: number;
+        }[];
+      };
+      freeze_weekly_winners: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
     };
     Enums: {
       user_role: "user" | "feeder" | "clinic_admin" | "app_admin";

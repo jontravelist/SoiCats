@@ -56,3 +56,6 @@ verify_jwt = true
 
 [functions.send-push]
 verify_jwt = true
+
+[functions.compute-weekly-winners]
+verify_jwt = true

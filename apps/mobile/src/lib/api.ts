@@ -157,6 +157,33 @@ export async function fetchCatSightings(catId: string) {
   return data ?? [];
 }
 
+// Live current-week top N photos for a district.
+export async function fetchCurrentWeekTopPhotos(districtId: string, max = 10) {
+  const { data, error } = await supabase.rpc("current_week_top_photos", {
+    target_district: districtId,
+    max_rows: max,
+  });
+  if (error) throw error;
+  return data ?? [];
+}
+
+// Frozen archive of weekly winners for a district.
+export async function fetchFrozenWeeklyWinners(districtId: string, maxWeeks = 8) {
+  const { data, error } = await supabase.rpc("frozen_weekly_winners", {
+    target_district: districtId,
+    max_weeks: maxWeeks,
+  });
+  if (error) throw error;
+  return data ?? [];
+}
+
+// Best-effort lookup of which district a (lat, lng) lies in.
+export async function fetchDistrictForPoint(lat: number, lng: number): Promise<string | null> {
+  const { data, error } = await supabase.rpc("find_district_for_point", { lat, lng });
+  if (error) throw error;
+  return (data as unknown as string) ?? null;
+}
+
 // Top photos of this cat by all-time likes — the per-cat Hall of Fame.
 export async function fetchCatTopPhotos(catId: string, max = 3) {
   const { data, error } = await supabase.rpc("cat_top_photos", {
