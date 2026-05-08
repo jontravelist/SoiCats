@@ -1,17 +1,14 @@
 import { useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
 import { SignInPill } from "@/components/SignInPill";
+import { PokedexCard } from "@/components/PokedexCard";
 import { fetchNearbyCats, fetchAllCats, fetchExtrasByCatId } from "@/lib/api";
 import { useLocation } from "@/hooks/useLocation";
-import { formatDistance } from "@/lib/location";
-import { useTimeAgo } from "@/hooks/useTimeAgo";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
-import { useTranslation } from "react-i18next";
 
 type Sort = "near" | "name";
 
@@ -117,10 +114,15 @@ export default function CatsTab() {
         <FlatList
           data={filtered}
           keyExtractor={(c) => c.id}
+          numColumns={2}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
-            <CatRow
-              {...item}
+            <PokedexCard
+              catId={item.id}
+              name={item.name}
+              primaryColor={item.primary_color}
+              pattern={item.pattern}
+              thumbnailUrl={item.thumbnail_url}
               onPress={() => router.push(`/cat/${item.id}`)}
             />
           )}
@@ -134,52 +136,6 @@ function SortButton({ label, active, onPress }: { label: string; active: boolean
   return (
     <Pressable onPress={onPress} style={[styles.sortBtn, active && styles.sortBtnActive]}>
       <Text style={[styles.sortLabel, active && styles.sortLabelActive]}>{label}</Text>
-    </Pressable>
-  );
-}
-
-interface CatRowProps {
-  name: string;
-  pattern: string;
-  primary_color: string;
-  status: string;
-  last_seen_at: string;
-  distance_m?: number;
-  thumbnail_url: string | null;
-  photo_count?: number;
-  distinguishing_features: string | null;
-  sex: string;
-  onPress: () => void;
-}
-
-function CatRow({ name, pattern, primary_color, distance_m, thumbnail_url, photo_count, last_seen_at, distinguishing_features, sex, onPress }: CatRowProps) {
-  const { t } = useTranslation();
-  const timeAgo = useTimeAgo();
-  const sexEmoji = sex === "male" ? "♂" : sex === "female" ? "♀" : null;
-  const subtitleParts = [
-    `${primary_color} · ${pattern}`,
-    sexEmoji,
-    photo_count != null ? `${photo_count} ${photo_count === 1 ? "photo" : "photos"}` : null,
-    distance_m != null ? formatDistance(distance_m, t) : `Last seen ${timeAgo(last_seen_at)}`,
-  ].filter(Boolean) as string[];
-  return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.row, pressed && { opacity: 0.92 }]}>
-      <View style={styles.thumbWrap}>
-        {thumbnail_url ? (
-          <Image source={thumbnail_url} style={styles.thumb} contentFit="cover" />
-        ) : (
-          <Text style={styles.thumbEmoji}>🐈</Text>
-        )}
-      </View>
-      <View style={styles.rowText}>
-        <Text style={styles.rowName}>{name}</Text>
-        <Text style={styles.rowMeta}>{subtitleParts.join("  ·  ")}</Text>
-        {distinguishing_features ? (
-          <Text style={styles.rowFeature} numberOfLines={2}>
-            ✨ {distinguishing_features}
-          </Text>
-        ) : null}
-      </View>
     </Pressable>
   );
 }
@@ -205,27 +161,7 @@ const styles = StyleSheet.create({
   sortLabel: { ...typography.body, color: colors.text, fontWeight: "600" },
   sortLabelActive: { color: "#fff", fontWeight: "700" },
 
-  list: { padding: spacing(4), gap: spacing(2) },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.surface,
-    padding: spacing(3),
-    borderRadius: radius.lg,
-    gap: spacing(3),
-    ...shadow.card,
-  },
-  thumbWrap: {
-    width: 64, height: 64, borderRadius: radius.md, overflow: "hidden",
-    backgroundColor: colors.accentSoft, alignItems: "center", justifyContent: "center",
-  },
-  thumb: { width: "100%", height: "100%" },
-  thumbEmoji: { fontSize: 32 },
-  rowText: { flex: 1 },
-  rowName: { ...typography.h3, color: colors.text },
-  rowMeta: { ...typography.small, color: colors.textDim, marginTop: 2 },
-  rowFeature: { ...typography.small, color: colors.text, marginTop: 4, fontStyle: "italic" },
-
+  list: { padding: spacing(2) },
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 32 },
   empty: { ...typography.body, color: colors.textDim, textAlign: "center" },
 });
