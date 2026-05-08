@@ -234,6 +234,11 @@ export default function CatProfile() {
           {lastPin ? (
             <Button label="Directions to last sighting" variant="secondary" onPress={openDirections} />
           ) : null}
+          <Button
+            label="📣 Share card"
+            variant="secondary"
+            onPress={() => router.push(`/share-card/${id}`)}
+          />
           {cat.status !== "deceased" ? (
             <Button
               label="Report welfare issue"

@@ -68,6 +68,7 @@ export default function RootLayout() {
           <Stack.Screen name="admin/merges" options={{ headerShown: true, title: "Merge requests" }} />
           <Stack.Screen name="admin/feeders" options={{ headerShown: true, title: "Feeder applications" }} />
           <Stack.Screen name="leaderboards/index" options={{ headerShown: true, title: "Leaderboards" }} />
+          <Stack.Screen name="share-card/[catId]" options={{ presentation: "modal", headerShown: true, title: "Share" }} />
           <Stack.Screen name="profile/apply-feeder" options={{ headerShown: true, title: "Verified Feeder" }} />
           <Stack.Screen name="log-feed/[catId]" options={{ headerShown: true, title: "Log feed" }} />
           <Stack.Screen name="stickers/index" options={{ headerShown: true, title: "Stickers" }} />
