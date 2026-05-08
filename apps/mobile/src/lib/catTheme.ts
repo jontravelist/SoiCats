@@ -1,24 +1,29 @@
-// Pokedex-style colour theming per cat. Maps the cat's primary_color string
-// to a coordinated palette (background, accent, text) so list cards and
-// profile cards feel like trading-card-game layouts.
+// Pokedex-style colour theming per cat. Soi Sunset typePalettes per the
+// design exploration (themes.jsx · TYPE_PALETTES.sunset). Each cat's
+// primary_color string maps to a coordinated card palette.
 
 export interface CatPalette {
   bg: string;       // card / hero background
-  accent: string;   // banner + bar fills + section labels
-  light: string;    // pale tint for chips
+  accent: string;   // banner + bar fills + section labels + CatGlyph stroke
+  light: string;    // pale tint for chips and softer surfaces
   text: string;     // primary text colour over `bg`
   textDim: string;  // secondary text over `bg`
 }
 
 const PALETTES: Record<string, CatPalette> = {
-  black:  { bg: "#3D3852", accent: "#A78BFF", light: "#5C5478", text: "#FFFFFF", textDim: "#CFC9DD" },
-  white:  { bg: "#F4E89A", accent: "#E0A93D", light: "#FFF4C2", text: "#3A2E0A", textDim: "#7A6724" },
-  grey:   { bg: "#7E8FA6", accent: "#365787", light: "#A8B6CC", text: "#FFFFFF", textDim: "#E0E7F1" },
-  orange: { bg: "#FF8B3D", accent: "#B84A0F", light: "#FFC79A", text: "#3D1F00", textDim: "#7A3D00" },
-  ginger: { bg: "#FF8B3D", accent: "#B84A0F", light: "#FFC79A", text: "#3D1F00", textDim: "#7A3D00" },
-  brown:  { bg: "#9C6E3F", accent: "#5C3A1A", light: "#C9A576", text: "#FFFFFF", textDim: "#F1DDB6" },
-  cream:  { bg: "#F2DCB8", accent: "#B88A3D", light: "#FFEBC9", text: "#3D2A0A", textDim: "#7A5A24" },
-  mixed:  { bg: "#5CB89A", accent: "#1F6E4F", light: "#9FE0CC", text: "#FFFFFF", textDim: "#CCEBDF" },
+  tabby:   { bg: "#FFB627", accent: "#B83C00", text: "#171A1F", textDim: "#6B5018", light: "#FFE0A6" },
+  tortie:  { bg: "#B8442A", accent: "#5C1A00", text: "#FFF8EE", textDim: "#F4D8C8", light: "#E89580" },
+  calico:  { bg: "#FF8B5C", accent: "#B8351E", text: "#FFFFFF", textDim: "#FBE0CC", light: "#FFD1B8" },
+  tuxedo:  { bg: "#171A1F", accent: "#FFB627", text: "#FFFFFF", textDim: "#C2C5CB", light: "#3D3D45" },
+  black:   { bg: "#2A2A30", accent: "#FF6B35", text: "#FFFFFF", textDim: "#C2C5CB", light: "#4A4A55" },
+  white:   { bg: "#FFEDDA", accent: "#0B7A6B", text: "#171A1F", textDim: "#6B5A48", light: "#FFF6E6" },
+  orange:  { bg: "#FF6B35", accent: "#B8351E", text: "#FFFFFF", textDim: "#FBDDCC", light: "#FFC5A8" },
+  ginger:  { bg: "#FF6B35", accent: "#B8351E", text: "#FFFFFF", textDim: "#FBDDCC", light: "#FFC5A8" },
+  grey:    { bg: "#6B8588", accent: "#1F3F42", text: "#FFFFFF", textDim: "#D6E2E4", light: "#B8CCCE" },
+  cream:   { bg: "#FFE0A6", accent: "#B85C00", text: "#171A1F", textDim: "#7A5A20", light: "#FFF0CC" },
+  siamese: { bg: "#E8D4B8", accent: "#B85C00", text: "#171A1F", textDim: "#7A6648", light: "#F4E8D2" },
+  brown:   { bg: "#8C5A3A", accent: "#3A1F0A", text: "#FFF8EE", textDim: "#E8D2BD", light: "#C29980" },
+  mixed:   { bg: "#0B7A6B", accent: "#FFB627", text: "#FFFFFF", textDim: "#C8E2DD", light: "#5CAEA0" },
 };
 
 const DEFAULT: CatPalette = PALETTES.mixed;
@@ -35,4 +40,12 @@ export function pokedexNumber(catId: string): string {
   const tail = catId.replace(/[^0-9a-f]/gi, "").slice(-3) || "000";
   const n = parseInt(tail, 16);
   return n.toString().padStart(3, "0");
+}
+
+// Pose index for the CatGlyph illustration — three round-headed
+// emoji-style poses (sit / loaf / peek). Stable per cat so a given cat
+// always shows the same pose.
+export function poseForCat(catId: string): 0 | 1 | 2 {
+  const last = catId.charCodeAt(catId.length - 1) || 0;
+  return (last % 3) as 0 | 1 | 2;
 }

@@ -6,6 +6,7 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import Constants from "expo-constants";
 
 import { Button } from "@/components/Button";
+import { CatGlyph } from "@/components/CatGlyph";
 import { supabase } from "@/lib/supabase";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
@@ -88,9 +89,15 @@ export default function AuthScreen() {
             <Text style={styles.tagline}>Every cat in your neighbourhood, named.</Text>
 
             <View style={styles.mascots}>
-              <Text style={[styles.cat, styles.cat1]}>🐈</Text>
-              <Text style={[styles.cat, styles.cat2]}>🐱</Text>
-              <Text style={[styles.cat, styles.cat3]}>🐈‍⬛</Text>
+              <View style={[styles.cat, styles.cat1]}>
+                <CatGlyph color={colors.accent} secondary={colors.text} size={120} pose={0} />
+              </View>
+              <View style={[styles.cat, styles.cat2]}>
+                <CatGlyph color={colors.primary} secondary={colors.text} size={130} pose={2} />
+              </View>
+              <View style={[styles.cat, styles.cat3]}>
+                <CatGlyph color={colors.secondary} secondary="#FFFFFF" size={110} pose={1} />
+              </View>
             </View>
           </View>
         ) : (
@@ -182,10 +189,10 @@ const styles = StyleSheet.create({
   heroCompact: { alignItems: "center", marginTop: spacing(2) },
   titleCompact: { fontSize: 36, fontWeight: "900", color: colors.text, letterSpacing: -1 },
 
-  mascots: { height: 240, width: "100%", alignItems: "center", justifyContent: "center", marginTop: spacing(4), position: "relative" },
-  cat: { fontSize: 110, position: "absolute" },
-  cat1: { left: 10, top: 30, transform: [{ rotate: "-12deg" }] },
-  cat2: { right: 20, top: 60, transform: [{ rotate: "10deg" }] },
+  mascots: { height: 260, width: "100%", alignItems: "center", justifyContent: "center", marginTop: spacing(4), position: "relative" },
+  cat: { position: "absolute" },
+  cat1: { left: 10, top: 0, transform: [{ rotate: "-12deg" }] },
+  cat2: { right: 16, top: 30, transform: [{ rotate: "10deg" }] },
   cat3: { bottom: 0, alignSelf: "center" },
 
   actions: { gap: spacing(3), marginTop: spacing(6) },

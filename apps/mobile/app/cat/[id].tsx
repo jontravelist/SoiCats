@@ -15,7 +15,8 @@ import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth";
 import { useTimeAgo } from "@/hooks/useTimeAgo";
-import { paletteForCat, pokedexNumber } from "@/lib/catTheme";
+import { CatGlyph } from "@/components/CatGlyph";
+import { paletteForCat, pokedexNumber, poseForCat } from "@/lib/catTheme";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
 export default function CatProfile() {
@@ -123,7 +124,7 @@ export default function CatProfile() {
           {hero ? (
             <Image source={hero} style={styles.heroPhoto} contentFit="cover" />
           ) : (
-            <Text style={{ fontSize: 96 }}>🐈</Text>
+            <CatGlyph color={pal.accent} secondary={pal.text} size={180} pose={poseForCat(cat.id)} />
           )}
         </View>
 

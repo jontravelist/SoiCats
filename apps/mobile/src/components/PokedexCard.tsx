@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { paletteForCat, pokedexNumber } from "@/lib/catTheme";
+import { paletteForCat, pokedexNumber, poseForCat } from "@/lib/catTheme";
+import { CatGlyph } from "@/components/CatGlyph";
 import { colors, radius, shadow, typography } from "@/lib/theme";
 
 interface Props {
@@ -32,11 +33,11 @@ export function PokedexCard({ catId, name, primaryColor, pattern, thumbnailUrl, 
         </View>
       </View>
 
-      <View style={styles.thumbWrap}>
+      <View style={[styles.thumbWrap, { backgroundColor: p.light }]}>
         {thumbnailUrl ? (
           <Image source={thumbnailUrl} style={styles.thumb} contentFit="cover" />
         ) : (
-          <Text style={styles.thumbEmoji}>🐈</Text>
+          <CatGlyph color={p.accent} secondary={p.text} size={72} pose={poseForCat(catId)} />
         )}
       </View>
     </Pressable>

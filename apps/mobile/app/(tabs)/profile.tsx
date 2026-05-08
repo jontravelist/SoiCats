@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
+import { CatGlyph } from "@/components/CatGlyph";
 import { useAuthStore } from "@/stores/auth";
 import { useProfile } from "@/hooks/useProfile";
 import { fetchStickerPacks, fetchUserStickers } from "@/lib/api";
@@ -28,7 +29,7 @@ export default function ProfileTab() {
   if (!session) {
     return (
       <Screen style={styles.center}>
-        <Text style={styles.bigEmoji}>🐈</Text>
+        <CatGlyph color={colors.primary} secondary={colors.text} size={140} pose={2} />
         <Text style={styles.h1}>{t("app.name")}</Text>
         <Text style={styles.tagline}>{t("app.tagline")}</Text>
         <Text style={styles.body}>
@@ -54,7 +55,7 @@ export default function ProfileTab() {
           <Image source={profile.avatar_url} style={styles.avatar} />
         ) : (
           <View style={[styles.avatar, styles.avatarPlaceholder]}>
-            <Text style={{ fontSize: 40 }}>🐈</Text>
+            <CatGlyph color={colors.accent} secondary={colors.text} size={64} pose={0} />
           </View>
         )}
         <Text style={styles.handle}>@{profile.handle ?? "anon"}</Text>
