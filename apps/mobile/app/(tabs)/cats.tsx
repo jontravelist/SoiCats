@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 import { Screen } from "@/components/Screen";
 import { SignInPill } from "@/components/SignInPill";
