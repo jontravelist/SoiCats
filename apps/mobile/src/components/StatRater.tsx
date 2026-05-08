@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { fetchMyRatingsForSighting, STAT_KEYS, StatKey, submitRating } from "@/lib/api";
+import { fetchMyCatRatings, rateCat, STAT_KEYS, StatKey } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
@@ -15,22 +15,20 @@ const LABELS: Record<StatKey, { name: string; emoji: string; low: string; high: 
 };
 
 interface Props {
-  sightingId: string;
-  isOwnPhoto?: boolean;
+  catId: string;
 }
 
-// Five-stat rater for a single sighting. Tap a number 1-5 per row to set
-// (or update) your score for that stat. Self-vote prevention is enforced
-// by RLS, but we hide the UI when isOwnPhoto so users don't get confusing
-// errors.
-export function StatRater({ sightingId, isOwnPhoto }: Props) {
+// Five-stat rater scoped to a cat. Tap a number 1-5 per row to set or
+// update your score for that stat. RLS allows any signed-in user to rate
+// any cat (we treat cats as community subjects, not owned content).
+export function StatRater({ catId }: Props) {
   const session = useAuthStore((s) => s.session);
   const qc = useQueryClient();
 
   const myQ = useQuery({
-    queryKey: ["my-ratings", sightingId, session?.user.id],
-    queryFn: () => fetchMyRatingsForSighting(sightingId),
-    enabled: !!session && !isOwnPhoto,
+    queryKey: ["my-cat-ratings", catId, session?.user.id],
+    queryFn: () => fetchMyCatRatings(catId),
+    enabled: !!session,
   });
 
   const [pending, setPending] = useState<Partial<Record<StatKey, number>>>({});
@@ -38,24 +36,17 @@ export function StatRater({ sightingId, isOwnPhoto }: Props) {
 
   const mut = useMutation({
     mutationFn: (input: { stat: StatKey; score: number }) =>
-      submitRating({ sightingId, ...input }),
+      rateCat({ catId, ...input }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["my-ratings", sightingId] });
-      qc.invalidateQueries({ queryKey: ["cat"] });
+      qc.invalidateQueries({ queryKey: ["my-cat-ratings", catId] });
+      qc.invalidateQueries({ queryKey: ["cat", catId] });
     },
   });
 
-  if (isOwnPhoto) {
-    return (
-      <View style={styles.notice}>
-        <Text style={styles.noticeText}>Other people will rate this photo's stats.</Text>
-      </View>
-    );
-  }
   if (!session) {
     return (
       <View style={styles.notice}>
-        <Text style={styles.noticeText}>Sign in to rate this cat's stats.</Text>
+        <Text style={styles.noticeText}>Sign in to rate this cat.</Text>
       </View>
     );
   }
@@ -68,7 +59,7 @@ export function StatRater({ sightingId, isOwnPhoto }: Props) {
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.title}>Rate this photo</Text>
+        <Text style={styles.title}>Rate this cat</Text>
         {mut.isPending ? <ActivityIndicator size="small" /> : null}
       </View>
       {STAT_KEYS.map((stat) => {

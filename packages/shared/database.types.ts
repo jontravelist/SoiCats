@@ -200,20 +200,20 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["clinic_updates"]["Row"]>;
         Relationships: [];
       };
-      photo_ratings: {
+      cat_ratings: {
         Row: {
-          sighting_id: string;
+          cat_id: string;
           voter_id: string;
           stat: Database["public"]["Enums"]["cat_stat"];
           score: number;
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["photo_ratings"]["Row"], "created_at" | "updated_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["cat_ratings"]["Row"], "created_at" | "updated_at"> & {
           created_at?: string;
           updated_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["photo_ratings"]["Row"]>;
+        Update: Partial<Database["public"]["Tables"]["cat_ratings"]["Row"]>;
         Relationships: [];
       };
       districts: {

@@ -105,15 +105,17 @@ export async function fetchCat(catId: string) {
   return data;
 }
 
-// Stat ratings.
+// Cat-level stat ratings (Chonk / Spice / Floof / Slink / Vibes).
+// Each user gets one score per stat per cat. Cats are persistent characters,
+// so the rating describes the cat as a whole — not a single photo of it.
 export type StatKey = "chonk" | "spice" | "floof" | "slink" | "vibes";
 export const STAT_KEYS: StatKey[] = ["chonk", "spice", "floof", "slink", "vibes"];
 
-export async function submitRating(input: { sightingId: string; stat: StatKey; score: number }) {
+export async function rateCat(input: { catId: string; stat: StatKey; score: number }) {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) throw new Error("Not signed in");
-  const { error } = await supabase.from("photo_ratings").upsert({
-    sighting_id: input.sightingId,
+  const { error } = await supabase.from("cat_ratings").upsert({
+    cat_id: input.catId,
     voter_id: user.user.id,
     stat: input.stat,
     score: input.score,
@@ -122,13 +124,13 @@ export async function submitRating(input: { sightingId: string; stat: StatKey; s
   if (error) throw error;
 }
 
-export async function fetchMyRatingsForSighting(sightingId: string): Promise<Partial<Record<StatKey, number>>> {
+export async function fetchMyCatRatings(catId: string): Promise<Partial<Record<StatKey, number>>> {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) return {};
   const { data, error } = await supabase
-    .from("photo_ratings")
+    .from("cat_ratings")
     .select("stat, score")
-    .eq("sighting_id", sightingId)
+    .eq("cat_id", catId)
     .eq("voter_id", user.user.id);
   if (error) throw error;
   const out: Partial<Record<StatKey, number>> = {};

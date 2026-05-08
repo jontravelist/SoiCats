@@ -6,7 +6,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
-import { StatRater } from "@/components/StatRater";
 import { fetchComments, postComment, toggleLike } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth";
@@ -103,11 +102,6 @@ export default function SightingDetail() {
           />
         </View>
       </View>
-
-      <StatRater
-        sightingId={s.id}
-        isOwnPhoto={!!session && s.photographer_id === session.user.id}
-      />
 
       <FlatList
         data={commentsQ.data ?? []}

@@ -8,6 +8,7 @@ import MapView, { Marker } from "react-native-maps";
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
 import { StatBars } from "@/components/StatBars";
+import { StatRater } from "@/components/StatRater";
 import { SpecialtyBadge } from "@/components/SpecialtyBadge";
 import { fetchCat, fetchCatSightingLocations, fetchCatSightings, fetchCatTopPhotos, fetchLatestFlagForCat, fetchRecentFeedsForCat, toggleFavourite } from "@/lib/api";
 import { useProfile } from "@/hooks/useProfile";
@@ -194,6 +195,10 @@ export default function CatProfile() {
           <SpecialtyBadge stat={specialty} score={specialtyScore ?? undefined} />
         ) : null}
 
+        {/* Rate-the-cat panel — anyone signed in can score the five stats.
+            Hidden when the cat is deceased (RIP, no posthumous opinions). */}
+        {cat.status !== "deceased" ? <StatRater catId={cat.id} /> : null}
+
         {(cat.tnr_status !== "unknown" || cat.vaccination_status !== "unknown") ? (
           <View style={styles.welfare}>
             {cat.tnr_status !== "unknown" ? (
@@ -226,17 +231,6 @@ export default function CatProfile() {
             onPress={() => session ? favMut.mutate() : router.push("/auth")}
             variant={favQ.data ? "secondary" : "primary"}
           />
-          {/* Rating shortcut — sends the user to the hero photo where the
-              StatRater already lives. Hidden on cats with no photos yet
-              and on the user's own photo (the rater hides itself in that
-              case but the trip would feel pointless). */}
-          {sightings.length > 0 && session && sightings[0].photographer_id !== session.user.id ? (
-            <Button
-              label="🌶️ Rate this cat"
-              variant="accent"
-              onPress={() => router.push(`/sighting/${sightings[0].id}`)}
-            />
-          ) : null}
           {lastPin ? (
             <Button label="Directions to last sighting" variant="secondary" onPress={openDirections} />
           ) : null}
