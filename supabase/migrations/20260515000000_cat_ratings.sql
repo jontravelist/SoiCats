@@ -23,6 +23,20 @@ exception
   when duplicate_object then null;
 end $$;
 
+-- Stat aggregate columns on cats. Same situation as the enum — were
+-- originally added in the photo_ratings migration; if that didn't run
+-- locally we add them here.
+alter table public.cats
+  add column if not exists stat_chonk numeric(3,2),
+  add column if not exists stat_spice numeric(3,2),
+  add column if not exists stat_floof numeric(3,2),
+  add column if not exists stat_slink numeric(3,2),
+  add column if not exists stat_vibes numeric(3,2),
+  add column if not exists stats_rating_count     int not null default 0,
+  add column if not exists stats_photo_count      int not null default 0,
+  add column if not exists stats_last_computed_at timestamptz,
+  add column if not exists specialty_stat         cat_stat;
+
 create table public.cat_ratings (
   cat_id     uuid not null references public.cats (id) on delete cascade,
   voter_id   uuid not null references public.users (id) on delete cascade,
