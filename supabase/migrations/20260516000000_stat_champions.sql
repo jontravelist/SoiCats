@@ -1,3 +1,12 @@
+-- Defensive: create the cat_stat enum if it wasn't already. The cat_ratings
+-- migration normally adds it; this guard makes the migration runnable
+-- regardless of order or whether earlier migrations were skipped.
+do $$ begin
+  create type cat_stat as enum ('chonk', 'spice', 'floof', 'slink', 'vibes');
+exception
+  when duplicate_object then null;
+end $$;
+
 -- Wave 5 of v1.1: stat champions (per district, per stat).
 --
 -- Each district has five champion slots (Chonkiest, Spiciest, Floofiest,
