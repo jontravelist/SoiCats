@@ -226,6 +226,17 @@ export default function CatProfile() {
             onPress={() => session ? favMut.mutate() : router.push("/auth")}
             variant={favQ.data ? "secondary" : "primary"}
           />
+          {/* Rating shortcut — sends the user to the hero photo where the
+              StatRater already lives. Hidden on cats with no photos yet
+              and on the user's own photo (the rater hides itself in that
+              case but the trip would feel pointless). */}
+          {sightings.length > 0 && session && sightings[0].photographer_id !== session.user.id ? (
+            <Button
+              label="🌶️ Rate this cat"
+              variant="accent"
+              onPress={() => router.push(`/sighting/${sightings[0].id}`)}
+            />
+          ) : null}
           {lastPin ? (
             <Button label="Directions to last sighting" variant="secondary" onPress={openDirections} />
           ) : null}
