@@ -5,9 +5,23 @@
 -- Pokemon framing — Chonk/Spice/etc. describe the creature, not a single
 -- snapshot of it.
 
-drop trigger if exists photo_ratings_recompute on public.photo_ratings;
+-- Drop the previous photo_ratings era safely whether or not it ever
+-- existed locally.
+do $$ begin
+  if exists (select 1 from pg_class where relname = 'photo_ratings' and relnamespace = 'public'::regnamespace) then
+    drop trigger if exists photo_ratings_recompute on public.photo_ratings;
+  end if;
+end $$;
 drop function if exists public.photo_ratings_after_change();
 drop table if exists public.photo_ratings;
+
+-- Defensive: cat_stat enum may or may not already exist depending on
+-- which prior migrations ran. Create it if missing.
+do $$ begin
+  create type cat_stat as enum ('chonk', 'spice', 'floof', 'slink', 'vibes');
+exception
+  when duplicate_object then null;
+end $$;
 
 create table public.cat_ratings (
   cat_id     uuid not null references public.cats (id) on delete cascade,
