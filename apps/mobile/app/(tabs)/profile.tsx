@@ -9,7 +9,7 @@ import { Button } from "@/components/Button";
 import { CatGlyph } from "@/components/CatGlyph";
 import { useAuthStore } from "@/stores/auth";
 import { useProfile } from "@/hooks/useProfile";
-import { fetchStickerPacks, fetchUserStickers } from "@/lib/api";
+import { fetchMyPosts, fetchStickerPacks, fetchUserStickers } from "@/lib/api";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
 export default function ProfileTab() {
@@ -25,6 +25,11 @@ export default function ProfileTab() {
     enabled: !!session,
   });
   const packsQ = useQuery({ queryKey: ["sticker-packs"], queryFn: fetchStickerPacks });
+  const myPostsQ = useQuery({
+    queryKey: ["my-posts", session?.user.id],
+    queryFn: fetchMyPosts,
+    enabled: !!session,
+  });
 
   if (!session) {
     return (
@@ -63,6 +68,15 @@ export default function ProfileTab() {
         <View style={styles.pointsPill}>
           <Text style={styles.pointsText}>{t("profile.points", { count: profile.points })}</Text>
         </View>
+      </View>
+
+      {/* Stat strip per the Soi Sunset profile spec. Counts are placeholders
+          until we wire actual aggregations (cats spotted, feeds logged,
+          streak). For MVP they pull from data we already have. */}
+      <View style={styles.statStrip}>
+        <StatCell label="Cats spotted" value={(myPostsQ.data ?? []).length} />
+        <StatCell label="Stickers"     value={(ownedQ.data ?? []).length} />
+        <StatCell label="Points"       value={profile.points} />
       </View>
 
       {/* Stickers section. Tap any sticker or the header to open the full drawer. */}
@@ -111,6 +125,15 @@ export default function ProfileTab() {
   );
 }
 
+function StatCell({ label, value }: { label: string; value: number }) {
+  return (
+    <View style={styles.statCell}>
+      <Text style={styles.statValue}>{value.toLocaleString()}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center", padding: spacing(6), gap: spacing(3) },
   bigEmoji: { fontSize: 80 },
@@ -128,6 +151,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent, marginTop: spacing(1),
   },
   pointsText: { color: "#fff", fontWeight: "700" },
+
+  statStrip: {
+    flexDirection: "row",
+    marginHorizontal: spacing(4),
+    marginBottom: spacing(2),
+    paddingVertical: spacing(3),
+    paddingHorizontal: spacing(2),
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    ...shadow.card,
+  },
+  statCell: { flex: 1, alignItems: "center" },
+  statValue: { fontSize: 22, fontWeight: "900", color: colors.text, letterSpacing: -0.5, fontVariant: ["tabular-nums"] },
+  statLabel: { ...typography.label, fontSize: 10, color: colors.textDim, marginTop: 2 },
 
   stickerCard: {
     marginHorizontal: spacing(4),

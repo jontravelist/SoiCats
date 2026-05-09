@@ -174,6 +174,7 @@ export default function AuthScreen() {
         )}
 
         <Text style={styles.terms}>By continuing you agree to the Terms and Privacy Policy.</Text>
+        <Text style={styles.footerStrip}>Made in Bangkok · 4,200 cats logged</Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -225,4 +226,5 @@ const styles = StyleSheet.create({
   // 'create account > sign in > browse'.
   browse: { ...typography.small, color: colors.textDim, textAlign: "center", marginTop: spacing(3), padding: spacing(2), textDecorationLine: "underline" },
   terms: { ...typography.small, color: colors.text, opacity: 0.5, textAlign: "center", marginTop: spacing(4) },
+  footerStrip: { ...typography.label, color: colors.textDim, fontSize: 10, letterSpacing: 1.4, textAlign: "center", marginTop: spacing(3), opacity: 0.7 },
 });
