@@ -1,36 +1,37 @@
 import { StyleSheet, Text, View } from "react-native";
 import { typography } from "@/lib/theme";
+import { STAT_COLORS, STAT_META } from "@/lib/stats";
 import type { StatKey } from "@/lib/api";
 
-const ROWS: { key: StatKey; label: string }[] = [
-  { key: "chonk", label: "Chonk" },
-  { key: "spice", label: "Spice" },
-  { key: "floof", label: "Floof" },
-  { key: "slink", label: "Slink" },
-  { key: "vibes", label: "Vibes" },
-];
+const ROWS: StatKey[] = ["chonk", "spice", "floof", "slink", "vibes"];
 
 interface Props {
   values: Partial<Record<StatKey, number | null>>;
-  fillColor: string;
   trackColor: string;
   textColor: string;
 }
 
-// Pokemon-style horizontal stat bars. Each row: label on the left, then a
-// rounded track with a coloured fill scaled to score / 5.
-export function StatBars({ values, fillColor, trackColor, textColor }: Props) {
+// Pokemon-style horizontal stat bars, one per stat, each tinted with the
+// stat's signature colour from the Soi Sunset palette (Chonk mango, Spice
+// pink, Floof teal, Slink charcoal, Vibes papaya).
+export function StatBars({ values, trackColor, textColor }: Props) {
   return (
     <View style={styles.wrap}>
-      {ROWS.map(({ key, label }) => {
+      {ROWS.map((key) => {
         const v = values[key];
         const pct = v ? Math.max(0, Math.min(1, v / 5)) : 0;
+        const meta = STAT_META[key];
+        const fill = STAT_COLORS[key];
         return (
           <View key={key} style={styles.row}>
-            <Text style={[styles.label, { color: textColor }]}>{label}</Text>
-            <View style={[styles.track, { backgroundColor: trackColor }]}>
-              <View style={[styles.fill, { width: `${pct * 100}%`, backgroundColor: fillColor }]} />
+            <View style={styles.label}>
+              <Text style={styles.icon}>{meta.icon}</Text>
+              <Text style={[styles.name, { color: textColor }]}>{meta.label}</Text>
             </View>
+            <View style={[styles.track, { backgroundColor: trackColor }]}>
+              <View style={[styles.fill, { width: `${pct * 100}%`, backgroundColor: fill }]} />
+            </View>
+            <Text style={[styles.value, { color: textColor }]}>{v ? v.toFixed(1) : "—"}</Text>
           </View>
         );
       })}
@@ -39,14 +40,17 @@ export function StatBars({ values, fillColor, trackColor, textColor }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { gap: 8 },
-  row: { flexDirection: "row", alignItems: "center", gap: 12 },
-  label: { ...typography.small, fontWeight: "700", width: 64, textAlign: "right" },
+  wrap: { gap: 6 },
+  row: { flexDirection: "row", alignItems: "center", gap: 10 },
+  label: { width: 78, flexDirection: "row", alignItems: "center", gap: 4 },
+  icon: { fontSize: 13 },
+  name: { ...typography.label, fontSize: 10, letterSpacing: 1.4 },
   track: {
     flex: 1,
-    height: 8,
-    borderRadius: 4,
+    height: 9,
+    borderRadius: 5,
     overflow: "hidden",
   },
-  fill: { height: "100%", borderRadius: 4 },
+  fill: { height: "100%", borderRadius: 5 },
+  value: { ...typography.small, fontWeight: "800", width: 30, textAlign: "right" },
 });

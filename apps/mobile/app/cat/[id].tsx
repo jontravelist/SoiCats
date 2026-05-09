@@ -16,6 +16,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth";
 import { useTimeAgo } from "@/hooks/useTimeAgo";
 import { CatGlyph } from "@/components/CatGlyph";
+import { TradingCard } from "@/components/TradingCard";
 import { paletteForCat, pokedexNumber, poseForCat } from "@/lib/catTheme";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
@@ -115,81 +116,32 @@ export default function CatProfile() {
 
   return (
     <Screen scroll>
-      {/* Pokemon-style hero card: solid coloured panel with a rounded photo,
-          name banner, N°XXX, type pills, description, stat bars. */}
-      <View style={[styles.hero, { backgroundColor: pal.bg }]}>
-        <Text style={[styles.heroNumber, { color: pal.textDim }]}>N°{pokedexNumber(cat.id)}</Text>
+      {/* Pokémon trading-card hero — see src/components/TradingCard.tsx
+          for the layout spec from the Soi Sunset design handoff. */}
+      <TradingCard
+        cat={cat}
+        heroPhotoUrl={hero ?? null}
+        photographerHandle={(sightings[0] as { users?: { handle?: string } } | undefined)?.users?.handle}
+        lastSeen={timeAgo(cat.last_seen_at)}
+        photoCount={sightings.length}
+      />
 
-        <View style={styles.heroPhotoFrame}>
-          {hero ? (
-            <Image source={hero} style={styles.heroPhoto} contentFit="cover" />
-          ) : (
-            <CatGlyph color={pal.accent} secondary={pal.text} size={180} pose={poseForCat(cat.id)} />
-          )}
+      <View style={styles.statusRow}>
+        <View style={[styles.statusBadge, statusStyle(cat.status)]}>
+          <Text style={styles.statusText}>{cat.status}</Text>
         </View>
-
-        <View style={[styles.nameBanner, { backgroundColor: pal.light }]}>
-          <Text numberOfLines={1} style={[styles.heroName, { color: pal.text }]}>{cat.name}</Text>
-        </View>
-
-        {cat.distinguishing_features ? (
-          <Text style={[styles.heroDescription, { color: pal.text }]} numberOfLines={3}>
-            {cat.distinguishing_features}
-          </Text>
+        {district?.name ? (
+          <Text style={styles.districtText}>📍 {district.name}</Text>
         ) : null}
+      </View>
 
-        <View style={styles.heroBlocks}>
-          <View style={styles.heroBlock}>
-            <Text style={[styles.sectionLabel, { color: pal.accent }]}>STATS</Text>
-            {statsReady ? (
-              <StatBars
-                values={stats}
-                fillColor={pal.accent}
-                trackColor={pal.light}
-                textColor={pal.text}
-              />
-            ) : (
-              <Text style={[styles.bodyText, { color: pal.textDim }]}>
-                Need {Math.max(0, 5 - ratings)} more rating{ratings === 4 ? "" : "s"} on {Math.max(0, 2 - photoCount)} more photo{photoCount === 1 ? "" : "s"} to unlock.
-              </Text>
-            )}
-          </View>
-
-          <View style={styles.heroSide}>
-            <Text style={[styles.sectionLabel, { color: pal.accent }]}>TYPE</Text>
-            <View style={[styles.typePill, { backgroundColor: pal.light }]}>
-              <Text style={[styles.typeText, { color: pal.text }]}>{cat.primary_color}</Text>
-            </View>
-            <View style={[styles.typePill, { backgroundColor: pal.light }]}>
-              <Text style={[styles.typeText, { color: pal.text }]}>{cat.pattern}</Text>
-            </View>
-
-            <Text style={[styles.sectionLabel, { color: pal.accent, marginTop: spacing(3) }]}>CATEGORY</Text>
-            <Text style={[styles.bodyText, { color: pal.text, textTransform: "capitalize" }]}>
-              {[cat.age_guess, cat.sex !== "unknown" ? cat.sex : null].filter(Boolean).join(" · ") || "Cat"}
-            </Text>
-
-            {district?.name ? (
-              <>
-                <Text style={[styles.sectionLabel, { color: pal.accent, marginTop: spacing(3) }]}>DISTRICT</Text>
-                <Text style={[styles.bodyText, { color: pal.text }]}>{district.name}</Text>
-              </>
-            ) : null}
-
-            <Text style={[styles.sectionLabel, { color: pal.accent, marginTop: spacing(3) }]}>LAST SEEN</Text>
-            <Text style={[styles.bodyText, { color: pal.text }]}>{timeAgo(cat.last_seen_at)}</Text>
-          </View>
-        </View>
-
-        <View style={[styles.heroStatusRow]}>
-          <View style={[styles.statusBadge, statusStyle(cat.status)]}>
-            <Text style={styles.statusText}>{cat.status}</Text>
-          </View>
-          <Text style={[styles.heroPhotoCount, { color: pal.textDim }]}>
-            {sightings.length} photo{sightings.length === 1 ? "" : "s"}
+      {!statsReady ? (
+        <View style={styles.statsHint}>
+          <Text style={styles.statsHintText}>
+            Need {Math.max(0, 5 - ratings)} more rating{ratings === 4 ? "" : "s"} from {Math.max(0, 2 - photoCount)} more photo{photoCount === 1 ? "" : "s"} for the field stats to lock in.
           </Text>
         </View>
-      </View>
+      ) : null}
 
       <View style={styles.body}>
         {statsReady && specialty ? (
@@ -367,49 +319,27 @@ function statusStyle(status: string) {
 }
 
 const styles = StyleSheet.create({
-  // Pokemon-style hero card
-  hero: { padding: spacing(5), paddingBottom: spacing(5), gap: spacing(2), position: "relative" },
-  heroNumber: { position: "absolute", top: 16, right: 24, fontSize: 14, fontWeight: "700", letterSpacing: 0.5 },
-  heroPhotoFrame: {
-    width: "100%",
-    aspectRatio: 1.4,
-    borderRadius: radius.xl,
-    overflow: "hidden",
-    backgroundColor: "rgba(255,255,255,0.25)",
+  statusRow: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    gap: spacing(2),
+    paddingHorizontal: spacing(4),
+    marginTop: -spacing(1),
+    marginBottom: spacing(2),
   },
-  heroPhoto: { width: "100%", height: "100%" },
-  nameBanner: {
-    alignSelf: "flex-start",
-    marginTop: -32,
-    paddingHorizontal: 22,
-    paddingVertical: 10,
-    borderRadius: radius.pill,
-    minWidth: 200,
-    maxWidth: "80%",
-    ...shadow.card,
+  statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
+  statusText: { color: "#fff", fontSize: 12, fontWeight: "700", textTransform: "uppercase" },
+  districtText: { ...typography.small, color: colors.textDim, fontWeight: "700" },
+  statsHint: {
+    marginHorizontal: spacing(4),
+    marginBottom: spacing(2),
+    padding: spacing(3),
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.md,
   },
-  heroName: { fontSize: 28, fontWeight: "900", letterSpacing: -0.5 },
-  heroDescription: { ...typography.body, opacity: 0.9, marginTop: spacing(1) },
-  heroBlocks: { flexDirection: "row", gap: spacing(4), marginTop: spacing(2) },
-  heroBlock: { flex: 1.4 },
-  heroSide: { flex: 1, gap: 4 },
-  bodyText: { ...typography.body, fontWeight: "600" },
-  typePill: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: radius.pill,
-    marginBottom: 4,
-  },
-  typeText: { ...typography.small, fontWeight: "700", textTransform: "capitalize" },
-  heroStatusRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: spacing(2) },
-  heroPhotoCount: { ...typography.small, fontWeight: "700" },
+  statsHintText: { ...typography.small, color: colors.text, textAlign: "center" },
 
   body: { padding: spacing(4), gap: spacing(3) },
-  statusBadge: { alignSelf: "flex-start", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
-  statusText: { color: "#fff", fontSize: 12, fontWeight: "700", textTransform: "uppercase" },
   welfare: { gap: 4 },
   welfareItem: { ...typography.body, color: colors.textDim },
   flagBanner: {
