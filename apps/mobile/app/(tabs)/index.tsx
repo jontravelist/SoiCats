@@ -8,9 +8,12 @@ import { useRouter } from "expo-router";
 import { Screen } from "@/components/Screen";
 import { SignInPill } from "@/components/SignInPill";
 import { FeedItem } from "@/components/FeedItem";
-import { fetchNearbyFeed, fetchFavouritesFeed, fetchPendingIdentificationCount, fetchCatsNeedingHelp } from "@/lib/api";
+import { CatGlyph } from "@/components/CatGlyph";
+import { fetchNearbyCats, fetchNearbyFeed, fetchFavouritesFeed, fetchPendingIdentificationCount, fetchCatsNeedingHelp } from "@/lib/api";
 import { useLocation } from "@/hooks/useLocation";
 import { useAuthStore } from "@/stores/auth";
+import { useProfile } from "@/hooks/useProfile";
+import { paletteForCat, poseForCat } from "@/lib/catTheme";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
 type Tab = "nearby" | "favourites";
@@ -20,7 +23,16 @@ export default function FeedTab() {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("nearby");
   const session = useAuthStore((s) => s.session);
+  const profile = useProfile();
   const { coords, loading: locLoading } = useLocation();
+
+  // Cats nearby — used to populate the story-strip of CatGlyph chips
+  // along the top of the feed per the Soi Sunset spec.
+  const storyQ = useQuery({
+    queryKey: ["story-cats", coords?.latitude, coords?.longitude],
+    queryFn: () => fetchNearbyCats(coords!.latitude, coords!.longitude, 50_000, 8),
+    enabled: !!coords,
+  });
 
   const pendingCountQ = useQuery({
     queryKey: ["pending-id-count", coords?.latitude, coords?.longitude],
@@ -58,14 +70,43 @@ export default function FeedTab() {
       <View style={styles.header}>
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
+            <Text style={styles.greeting} numberOfLines={1}>
+              Hello, {profile.data?.handle ? `@${profile.data.handle}` : "cat lover"}
+            </Text>
             <Text style={styles.brand}>{t("app.name")}</Text>
-            <Text style={styles.tagline}>{t("app.tagline")}</Text>
           </View>
-          <Pressable onPress={() => router.push("/leaderboards")} style={styles.leaderboardChip}>
-            <Text style={styles.leaderboardChipText}>🏆</Text>
+          {profile.data ? (
+            <View style={styles.pointsPill}>
+              <Text style={styles.pointsPillText}>★ {profile.data.points.toLocaleString()}</Text>
+            </View>
+          ) : null}
+          <Pressable onPress={() => router.push("/leaderboards")} style={styles.bellChip}>
+            <Text style={styles.bellChipText}>🏆</Text>
           </Pressable>
         </View>
       </View>
+
+      {/* Story strip — round CatGlyph chips for nearby cats. Tap → cat profile. */}
+      {(storyQ.data ?? []).length > 0 ? (
+        <FlatList
+          horizontal
+          data={storyQ.data ?? []}
+          keyExtractor={(c) => c.id}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.storyRow}
+          renderItem={({ item }) => {
+            const pal = paletteForCat(item.primary_color);
+            return (
+              <Pressable onPress={() => router.push(`/cat/${item.id}`)} style={styles.storyItem}>
+                <View style={[styles.storyChip, { backgroundColor: pal.bg, borderColor: pal.accent }]}>
+                  <CatGlyph color={pal.accent} secondary={pal.bg === pal.accent ? pal.text : pal.bg} size={48} pose={poseForCat(item.id)} />
+                </View>
+                <Text numberOfLines={1} style={styles.storyName}>{item.name}</Text>
+              </Pressable>
+            );
+          }}
+        />
+      ) : null}
 
       {helpItems.length > 0 ? (
         <View style={styles.needsHelp}>
@@ -149,20 +190,41 @@ function TabButton({ label, active, onPress }: { label: string; active: boolean;
 }
 
 const styles = StyleSheet.create({
-  header: { paddingHorizontal: spacing(6), paddingTop: spacing(2), paddingBottom: spacing(1) },
+  header: { paddingHorizontal: spacing(4), paddingTop: spacing(2), paddingBottom: spacing(1) },
   headerRow: { flexDirection: "row", alignItems: "center", gap: spacing(2) },
-  brand: { fontSize: 36, fontWeight: "900", color: colors.text, letterSpacing: -1 },
-  tagline: { ...typography.body, color: colors.textDim, marginTop: 4 },
-  leaderboardChip: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  greeting: { ...typography.small, color: colors.textDim, fontWeight: "700", letterSpacing: 0.2 },
+  brand: { fontSize: 28, fontWeight: "900", color: colors.text, letterSpacing: -0.5, marginTop: 2 },
+  pointsPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
     backgroundColor: colors.accent,
+    ...shadow.card,
+  },
+  pointsPillText: { color: colors.text, fontWeight: "900", fontSize: 13, letterSpacing: 0.2, fontVariant: ["tabular-nums"] },
+  bellChip: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
-    ...shadow.button,
+    ...shadow.card,
   },
-  leaderboardChipText: { fontSize: 22 },
+  bellChipText: { fontSize: 18 },
+
+  storyRow: { paddingHorizontal: spacing(4), paddingVertical: spacing(2), gap: spacing(3) },
+  storyItem: { width: 64, alignItems: "center", marginRight: 4 },
+  storyChip: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  storyName: { ...typography.small, fontSize: 11, color: colors.text, marginTop: 4, fontWeight: "700" },
   tabs: { flexDirection: "row", paddingHorizontal: spacing(4), paddingVertical: spacing(2), gap: spacing(2) },
   tabBtn: { paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999, backgroundColor: colors.surface },
   tabBtnActive: { backgroundColor: colors.primary },
