@@ -102,7 +102,11 @@ export default function CatProfile() {
   const pal = paletteForCat(cat.primary_color);
   const ratings = (cat as { stats_rating_count?: number }).stats_rating_count ?? 0;
   const photoCount = (cat as { stats_photo_count?: number }).stats_photo_count ?? 0;
-  const statsReady = ratings >= 5 && photoCount >= 2;
+  // Show stats as soon as any rating exists. The five-rating threshold
+  // earlier discounted single voters as 'unreliable' but felt punishing on
+  // newly-discovered cats. Score volatility is fine — the radar will just
+  // shift as more votes come in.
+  const statsReady = ratings >= 1;
   const stats = {
     chonk: (cat as { stat_chonk: number | null }).stat_chonk,
     spice: (cat as { stat_spice: number | null }).stat_spice,
