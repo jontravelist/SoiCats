@@ -33,12 +33,11 @@ export function paletteForCat(primaryColor: string | null | undefined): CatPalet
   return PALETTES[primaryColor.toLowerCase()] ?? DEFAULT;
 }
 
-// Stable fake "N°042" Pokedex number from the cat's UUID — last three hex
-// chars converted to decimal (0..4095). Looks like Pokedex flavour without
-// requiring a sequential discovery_number column.
+// Stable fake "N°042" Pokedex number from the cat's UUID. Mod by 1000 so
+// the badge is always three digits (matches the spec from themes.jsx).
 export function pokedexNumber(catId: string): string {
   const tail = catId.replace(/[^0-9a-f]/gi, "").slice(-3) || "000";
-  const n = parseInt(tail, 16);
+  const n = parseInt(tail, 16) % 1000;
   return n.toString().padStart(3, "0");
 }
 
