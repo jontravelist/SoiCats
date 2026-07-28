@@ -6,10 +6,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
-import { CatCard } from "@/components/CatCard";
+import { DogCard } from "@/components/DogCard";
 import {
   castIdentificationVote,
-  fetchNearbyCats,
+  fetchNearbyDogs,
   fetchPendingIdentifications,
 } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
@@ -90,19 +90,19 @@ function PendingCard({ item, onVoted }: { item: PendingItem; onVoted: () => void
   const timeAgo = useTimeAgo();
   const [busy, setBusy] = useState(false);
 
-  // Suggest cats near where the photo was taken.
+  // Suggest dogs near where the photo was taken.
   const suggestionsQ = useQuery({
     queryKey: ["id-suggestions", item.sighting_id],
-    queryFn: () => fetchNearbyCats(item.sighting_lat, item.sighting_lng, 200, 8),
+    queryFn: () => fetchNearbyDogs(item.sighting_lat, item.sighting_lng, 200, 8),
   });
 
-  const vote = async (input: { proposedCatId?: string | null; proposedNew?: boolean; skip?: boolean }) => {
+  const vote = async (input: { proposedDogId?: string | null; proposedNew?: boolean; skip?: boolean }) => {
     setBusy(true);
     try {
       if (!input.skip) {
         await castIdentificationVote({
           sightingId: item.sighting_id,
-          proposedCatId: input.proposedCatId,
+          proposedDogId: input.proposedDogId,
           proposedNew: input.proposedNew,
         });
       }
@@ -130,28 +130,28 @@ function PendingCard({ item, onVoted }: { item: PendingItem; onVoted: () => void
         </Text>
         {item.caption ? <Text style={styles.caption}>{item.caption}</Text> : null}
 
-        <Text style={styles.h3}>Which cat is this?</Text>
+        <Text style={styles.h3}>Which dog is this?</Text>
 
         {suggestionsQ.isLoading ? (
           <ActivityIndicator />
         ) : suggestions.length === 0 ? (
-          <Text style={styles.body}>No known cats nearby. If it's not a known cat, vote "New cat".</Text>
+          <Text style={styles.body}>No known dogs nearby. If it's not a known dog, vote "New dog".</Text>
         ) : (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsRow}>
             {suggestions.map((c) => (
-              <CatCard
+              <DogCard
                 key={c.id}
                 name={c.name}
                 thumbnailUrl={c.thumbnail_url}
                 subtitle={`${Math.round(c.distance_m)}m`}
-                onPress={() => vote({ proposedCatId: c.id })}
+                onPress={() => vote({ proposedDogId: c.id })}
               />
             ))}
           </ScrollView>
         )}
 
         <View style={styles.actions}>
-          <Button label="New cat" variant="secondary" onPress={() => vote({ proposedNew: true })} loading={busy} />
+          <Button label="New dog" variant="secondary" onPress={() => vote({ proposedNew: true })} loading={busy} />
           <Button label="Skip" variant="ghost" onPress={() => vote({ skip: true })} disabled={busy} />
         </View>
       </View>

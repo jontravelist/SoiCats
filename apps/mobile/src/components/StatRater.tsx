@@ -2,32 +2,32 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { fetchMyCatRatings, rateCat, STAT_KEYS, StatKey } from "@/lib/api";
+import { fetchMyDogRatings, rateDog, STAT_KEYS, StatKey } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
 const LABELS: Record<StatKey, { name: string; emoji: string; low: string; high: string }> = {
-  chonk: { name: "Chonk", emoji: "🍡", low: "Lean machine",     high: "Absolute unit" },
-  spice: { name: "Spice", emoji: "🌶️", low: "Soft soul",        high: "Spicy queen" },
-  floof: { name: "Floof", emoji: "☁️", low: "Sleek",            high: "Cloud cat" },
-  slink: { name: "Slink", emoji: "🥷", low: "Solid presence",   high: "Pure shadow" },
-  vibes: { name: "Vibes", emoji: "🧘", low: "Chaos energy",     high: "Buddha cat" },
+  bork: { name: "Bork", emoji: "🗣️", low: "Lean machine",     high: "Absolute unit" },
+  zoom: { name: "Zoom", emoji: "🌶️", low: "Soft soul",        high: "Spicy queen" },
+  floof: { name: "Floof", emoji: "☁️", low: "Sleek",            high: "Cloud dog" },
+  chill: { name: "Chill", emoji: "🧘", low: "Solid presence",   high: "Pure shadow" },
+  guard: { name: "Guard", emoji: "🧘", low: "Anxious guard",     high: "Buddha dog" },
 };
 
 interface Props {
-  catId: string;
+  dogId: string;
 }
 
-// Five-stat rater scoped to a cat. Tap a number 1-5 per row to set or
+// Five-stat rater scoped to a dog. Tap a number 1-5 per row to set or
 // update your score for that stat. RLS allows any signed-in user to rate
-// any cat (we treat cats as community subjects, not owned content).
-export function StatRater({ catId }: Props) {
+// any dog (we treat dogs as community subjects, not owned content).
+export function StatRater({ dogId }: Props) {
   const session = useAuthStore((s) => s.session);
   const qc = useQueryClient();
 
   const myQ = useQuery({
-    queryKey: ["my-cat-ratings", catId, session?.user.id],
-    queryFn: () => fetchMyCatRatings(catId),
+    queryKey: ["my-dog-ratings", dogId, session?.user.id],
+    queryFn: () => fetchMyDogRatings(dogId),
     enabled: !!session,
   });
 
@@ -36,17 +36,17 @@ export function StatRater({ catId }: Props) {
 
   const mut = useMutation({
     mutationFn: (input: { stat: StatKey; score: number }) =>
-      rateCat({ catId, ...input }),
+      rateDog({ dogId, ...input }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["my-cat-ratings", catId] });
-      qc.invalidateQueries({ queryKey: ["cat", catId] });
+      qc.invalidateQueries({ queryKey: ["my-dog-ratings", dogId] });
+      qc.invalidateQueries({ queryKey: ["dog", dogId] });
     },
   });
 
   if (!session) {
     return (
       <View style={styles.notice}>
-        <Text style={styles.noticeText}>Sign in to rate this cat.</Text>
+        <Text style={styles.noticeText}>Sign in to rate this dog.</Text>
       </View>
     );
   }
@@ -59,7 +59,7 @@ export function StatRater({ catId }: Props) {
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.title}>Rate this cat</Text>
+        <Text style={styles.title}>Rate this dog</Text>
         {mut.isPending ? <ActivityIndicator size="small" /> : null}
       </View>
       {STAT_KEYS.map((stat) => {

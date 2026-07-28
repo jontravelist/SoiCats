@@ -1,4 +1,4 @@
--- Soi Cats: storage buckets and policies.
+-- Soi Dogs: storage buckets and policies.
 -- Note: when running locally with the Supabase CLI, these buckets are created here.
 -- Hosted projects can also create them via the dashboard.
 

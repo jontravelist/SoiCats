@@ -53,24 +53,24 @@ export default function RootLayout() {
         >
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="auth/index" options={{ presentation: "modal" }} />
-          <Stack.Screen name="cat/[id]" options={{ headerShown: true, title: "" }} />
+          <Stack.Screen name="dog/[id]" options={{ headerShown: true, title: "" }} />
           <Stack.Screen name="sighting/[id]" options={{ headerShown: true, title: "" }} />
-          <Stack.Screen name="post/identify" options={{ headerShown: true, title: "Which cat?" }} />
-          <Stack.Screen name="post/new-cat" options={{ headerShown: true, title: "New cat" }} />
+          <Stack.Screen name="post/identify" options={{ headerShown: true, title: "Which dog?" }} />
+          <Stack.Screen name="post/new-dog" options={{ headerShown: true, title: "New dog" }} />
           <Stack.Screen name="profile/edit" options={{ headerShown: true, title: "Edit profile" }} />
           <Stack.Screen name="profile/my-posts" options={{ headerShown: true, title: "My posts" }} />
           <Stack.Screen name="profile/notifications" options={{ headerShown: true, title: "Notifications" }} />
           <Stack.Screen name="identify/index" options={{ headerShown: true, title: "Help identify" }} />
-          <Stack.Screen name="flag/[catId]" options={{ headerShown: true, title: "Report welfare issue" }} />
-          <Stack.Screen name="edit-cat/[id]" options={{ headerShown: true, title: "Edit cat" }} />
-          <Stack.Screen name="merge/[catId]" options={{ headerShown: true, title: "Mark as duplicate" }} />
+          <Stack.Screen name="flag/[dogId]" options={{ headerShown: true, title: "Report welfare issue" }} />
+          <Stack.Screen name="edit-dog/[id]" options={{ headerShown: true, title: "Edit dog" }} />
+          <Stack.Screen name="merge/[dogId]" options={{ headerShown: true, title: "Mark as duplicate" }} />
           <Stack.Screen name="admin/index" options={{ headerShown: true, title: "Admin" }} />
           <Stack.Screen name="admin/merges" options={{ headerShown: true, title: "Merge requests" }} />
           <Stack.Screen name="admin/feeders" options={{ headerShown: true, title: "Feeder applications" }} />
           <Stack.Screen name="leaderboards/index" options={{ headerShown: true, title: "Leaderboards" }} />
-          <Stack.Screen name="share-card/[catId]" options={{ presentation: "modal", headerShown: true, title: "Share" }} />
+          <Stack.Screen name="share-card/[dogId]" options={{ presentation: "modal", headerShown: true, title: "Share" }} />
           <Stack.Screen name="profile/apply-feeder" options={{ headerShown: true, title: "Verified Feeder" }} />
-          <Stack.Screen name="log-feed/[catId]" options={{ headerShown: true, title: "Log feed" }} />
+          <Stack.Screen name="log-feed/[dogId]" options={{ headerShown: true, title: "Log feed" }} />
           <Stack.Screen name="stickers/index" options={{ headerShown: true, title: "Stickers" }} />
           <Stack.Screen name="sticker/[id]" options={{ presentation: "modal" }} />
         </Stack>

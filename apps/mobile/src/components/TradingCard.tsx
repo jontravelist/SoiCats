@@ -1,14 +1,14 @@
 import { Image } from "expo-image";
 import { StyleSheet, Text, View } from "react-native";
-import { CatGlyph } from "@/components/CatGlyph";
+import { DogGlyph } from "@/components/DogGlyph";
 import { StatBars } from "@/components/StatBars";
 import { SpecialtyBadge } from "@/components/SpecialtyBadge";
-import { paletteForCat, poseForCat, pokedexNumber } from "@/lib/catTheme";
+import { paletteForDog, poseForDog, pokedexNumber } from "@/lib/dogTheme";
 import { STAT_COLORS, STAT_META } from "@/lib/stats";
 import { radius, typography } from "@/lib/theme";
 import type { StatKey } from "@/lib/api";
 
-interface CatLike {
+interface DogLike {
   id: string;
   name: string;
   name_th?: string | null;
@@ -17,24 +17,24 @@ interface CatLike {
   sex?: string | null;
   age_guess?: string | null;
   distinguishing_features?: string | null;
-  stat_chonk: number | null;
-  stat_spice: number | null;
+  stat_bork: number | null;
+  stat_zoom: number | null;
   stat_floof: number | null;
-  stat_slink: number | null;
-  stat_vibes: number | null;
+  stat_chill: number | null;
+  stat_guard: number | null;
   specialty_stat: StatKey | null;
 }
 
 interface Props {
-  cat: CatLike;
+  dog: DogLike;
   heroPhotoUrl?: string | null;
   photographerHandle?: string | null;
   lastSeen?: string;
   photoCount?: number;
 }
 
-// Pokémon trading-card cat profile hero. Spec lives in
-// soi-cats/project/design_handoff_soi_sunset/screens-cat.jsx → CatProfileScreen.
+// Pokémon trading-card dog profile hero. Spec lives in
+// soi-dogs/project/design_handoff_soi_sunset/screens-dog.jsx → DogProfileScreen.
 //
 // Composition (top to bottom):
 //   1. Outer thick coloured frame (4px solid pal.accent)
@@ -54,25 +54,25 @@ interface Props {
 // and are a follow-up.
 
 const MOVE_LIB: Record<StatKey, [{ name: string; flavor: string }, { name: string; flavor: string }]> = {
-  chonk: [
-    { name: "Chonk Slam",    flavor: "Heavy. Devastating. Smug." },
-    { name: "Loaf Form",     flavor: "Tucks. Becomes immovable." },
+  bork: [
+    { name: "Alley Alarm",    flavor: "Warns the whole soi. Deafening." },
+    { name: "Backup Chorus",  flavor: "The rest of the pack joins in." },
   ],
-  spice: [
-    { name: "Hiss Cyclone",  flavor: "Soi-clearing battle cry." },
-    { name: "Tail Whip",     flavor: "A warning shot." },
+  zoom: [
+    { name: "Scooter Chase",  flavor: "Full-tilt sprint after wheels." },
+    { name: "Zoomies",        flavor: "Uncontainable 3am energy." },
   ],
   floof: [
-    { name: "Floofball",     flavor: "Doubles in volume on contact." },
-    { name: "Cloud Form",    flavor: "Becomes vapor. Untouchable." },
+    { name: "Fluff Cloud",    flavor: "Doubles in volume when wet." },
+    { name: "Coat of Static", flavor: "Absorbs pats. Rebroadcasts joy." },
   ],
-  slink: [
-    { name: "Soi Slip",      flavor: "Disappears between motorbikes." },
-    { name: "Shadow Step",   flavor: "Reappears 3 sois away." },
+  chill: [
+    { name: "Nap on 7-11",    flavor: "Immovable until closing time." },
+    { name: "Zen Slump",      flavor: "Ignores fireworks. And you." },
   ],
-  vibes: [
-    { name: "Soft Purr",     flavor: "Heals all allies for +20." },
-    { name: "Sun Trance",    flavor: "Restores serenity to the soi." },
+  guard: [
+    { name: "Territory Bark", flavor: "Guards the shopfront to the death." },
+    { name: "Escort Trot",    flavor: "Walks you home. Then walks you back." },
   ],
 };
 
@@ -85,29 +85,26 @@ function deriveMoves(stats: Record<StatKey, number | null>) {
   const [supKey, supVal] = ranked[1] ?? ranked[0];
   return [
     { stat: sigKey, name: MOVE_LIB[sigKey][0].name, flavor: MOVE_LIB[sigKey][0].flavor, dmg: Math.round((sigVal ?? 0) * 22 / 10) * 10, cost: [sigKey, sigKey] as StatKey[] },
-    { stat: supKey, name: MOVE_LIB[supKey][1].name, flavor: MOVE_LIB[supKey][1].flavor, dmg: Math.round((supVal ?? 0) * 14 / 10) * 10, cost: [supKey, "vibes"] as StatKey[] },
+    { stat: supKey, name: MOVE_LIB[supKey][1].name, flavor: MOVE_LIB[supKey][1].flavor, dmg: Math.round((supVal ?? 0) * 14 / 10) * 10, cost: [supKey, "guard"] as StatKey[] },
   ];
 }
 
 function deriveHP(stats: Record<StatKey, number | null>): number {
   const total = Object.values(stats).reduce<number>((s, v) => s + (v ?? 0), 0);
-  // Spec: 40 + sum * 8, max 290. With max stats (25 sum) → 240.
   return Math.min(290, 40 + Math.round(total) * 8);
 }
 
-export function TradingCard({ cat, heroPhotoUrl, photographerHandle, lastSeen, photoCount }: Props) {
-  const pal = paletteForCat(cat.primary_color);
+export function TradingCard({ dog, heroPhotoUrl, photographerHandle, lastSeen, photoCount }: Props) {
+  const pal = paletteForDog(dog.primary_color);
   const stats: Record<StatKey, number | null> = {
-    chonk: cat.stat_chonk,
-    spice: cat.stat_spice,
-    floof: cat.stat_floof,
-    slink: cat.stat_slink,
-    vibes: cat.stat_vibes,
+    bork:  dog.stat_bork,
+    zoom:  dog.stat_zoom,
+    floof: dog.stat_floof,
+    chill: dog.stat_chill,
+    guard: dog.stat_guard,
   };
   const hp = deriveHP(stats);
   const moves = deriveMoves(stats);
-  // Use the lightest text colour for "on-frame" gold-notch border so it
-  // stands out against both light and dark cards.
   const onFrame = pal.bg === pal.text ? pal.light : pal.text;
 
   return (
@@ -118,17 +115,16 @@ export function TradingCard({ cat, heroPhotoUrl, photographerHandle, lastSeen, p
       <View style={[styles.notch, styles.notchBL, { borderColor: onFrame }]} />
       <View style={[styles.notch, styles.notchBR, { borderColor: onFrame }]} />
 
-      {/* Inner card frame */}
       <View style={[styles.inner, { borderColor: onFrame }]}>
         {/* Top strip: name banner + HP, plus N°XXX side badge */}
         <View style={styles.topRow}>
           <View style={[styles.nameBanner, { backgroundColor: pal.accent, borderColor: pal.bg }]}>
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text numberOfLines={1} style={[styles.name, { color: pal.bg === pal.accent ? pal.text : pal.light }]}>
-                {cat.name}
+                {dog.name}
               </Text>
               <Text style={[styles.nameMeta, { color: pal.bg === pal.accent ? pal.text : pal.light }]}>
-                {[cat.name_th, cat.sex && cat.sex !== "unknown" ? cat.sex : null, cat.age_guess].filter(Boolean).join(" · ")}
+                {[dog.name_th, dog.sex && dog.sex !== "unknown" ? dog.sex : null, dog.age_guess].filter(Boolean).join(" · ")}
               </Text>
             </View>
             <View style={styles.hpBlock}>
@@ -138,7 +134,7 @@ export function TradingCard({ cat, heroPhotoUrl, photographerHandle, lastSeen, p
           </View>
           <View style={[styles.dexBadge, { backgroundColor: onFrame, borderColor: pal.accent }]}>
             <Text style={[styles.dexLabel, { color: pal.bg }]}>N°</Text>
-            <Text style={[styles.dexValue, { color: pal.bg }]}>{pokedexNumber(cat.id)}</Text>
+            <Text style={[styles.dexValue, { color: pal.bg }]}>{pokedexNumber(dog.id)}</Text>
           </View>
         </View>
 
@@ -148,21 +144,19 @@ export function TradingCard({ cat, heroPhotoUrl, photographerHandle, lastSeen, p
             <Image source={heroPhotoUrl} style={styles.photo} contentFit="cover" />
           ) : (
             <View style={styles.photoPlaceholder}>
-              <CatGlyph color={pal.accent} secondary={pal.text} size={170} pose={poseForCat(cat.id)} />
+              <DogGlyph color={pal.accent} secondary={pal.text} size={170} pose={poseForDog(dog.id)} />
             </View>
           )}
 
-          {/* Type pills overlaid top-left */}
           <View style={styles.typeRow}>
             <View style={[styles.typePill, { backgroundColor: pal.accent, borderColor: pal.bg }]}>
-              <Text style={[styles.typePillText, { color: pal.bg === pal.accent ? pal.text : pal.light }]}>{cat.pattern}</Text>
+              <Text style={[styles.typePillText, { color: pal.bg === pal.accent ? pal.text : pal.light }]}>{dog.pattern}</Text>
             </View>
             <View style={[styles.typePill, { backgroundColor: pal.accent, borderColor: pal.bg }]}>
-              <Text style={[styles.typePillText, { color: pal.bg === pal.accent ? pal.text : pal.light }]}>{cat.primary_color}</Text>
+              <Text style={[styles.typePillText, { color: pal.bg === pal.accent ? pal.text : pal.light }]}>{dog.primary_color}</Text>
             </View>
           </View>
 
-          {/* Bottom gradient with photo credit + last seen */}
           <View style={styles.photoFooter}>
             <Text style={styles.photoFooterText}>
               {photographerHandle ? `📷 @${photographerHandle}` : "📷 community"}
@@ -174,10 +168,10 @@ export function TradingCard({ cat, heroPhotoUrl, photographerHandle, lastSeen, p
         </View>
 
         {/* Trait line */}
-        {cat.distinguishing_features ? (
+        {dog.distinguishing_features ? (
           <View style={[styles.trait, { borderColor: pal.accent + "88" }]}>
             <Text style={[styles.traitLabel, { color: pal.text }]}>TRAIT</Text>
-            <Text style={[styles.traitText, { color: pal.text }]}>{cat.distinguishing_features}</Text>
+            <Text style={[styles.traitText, { color: pal.text }]}>{dog.distinguishing_features}</Text>
           </View>
         ) : null}
 
@@ -213,16 +207,16 @@ export function TradingCard({ cat, heroPhotoUrl, photographerHandle, lastSeen, p
         </View>
 
         {/* Specialty banner */}
-        {cat.specialty_stat ? (
+        {dog.specialty_stat ? (
           <View style={styles.specialtyWrap}>
-            <SpecialtyBadge stat={cat.specialty_stat} score={stats[cat.specialty_stat] ?? undefined} />
+            <SpecialtyBadge stat={dog.specialty_stat} score={stats[dog.specialty_stat] ?? undefined} />
           </View>
         ) : null}
 
         {/* Footer */}
         <View style={[styles.footer, { borderTopColor: pal.accent + "55" }]}>
           <Text style={[styles.footerText, { color: pal.text }]}>illus. {photographerHandle ?? "—"}</Text>
-          <Text style={[styles.footerText, { color: pal.text }]}>SOI · {pokedexNumber(cat.id)}</Text>
+          <Text style={[styles.footerText, { color: pal.text }]}>SOI · {pokedexNumber(dog.id)}</Text>
         </View>
       </View>
     </View>

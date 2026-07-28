@@ -33,7 +33,7 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["users"]["Row"]>;
         Relationships: [];
       };
-      cats: {
+      dogs: {
         Row: {
           id: string;
           name: string;
@@ -43,41 +43,41 @@ export interface Database {
           primary_color: string;
           pattern: string;
           distinguishing_features: string | null;
-          age_guess: Database["public"]["Enums"]["cat_age_guess"] | null;
-          sex: Database["public"]["Enums"]["cat_sex"];
+          age_guess: Database["public"]["Enums"]["dog_age_guess"] | null;
+          sex: Database["public"]["Enums"]["dog_sex"];
           territory_centroid: Geography;
           last_seen_at: string;
-          status: Database["public"]["Enums"]["cat_status"];
+          status: Database["public"]["Enums"]["dog_status"];
           tnr_status: Database["public"]["Enums"]["tnr_status"];
           tnr_confirmed_at: string | null;
           tnr_confirmed_by_clinic: string | null;
           vaccination_status: Database["public"]["Enums"]["vaccination_status"];
           last_vaccination_at: string | null;
           district_id: string | null;
-          stat_chonk: number | null;
-          stat_spice: number | null;
+          stat_bork: number | null;
+          stat_zoom: number | null;
           stat_floof: number | null;
-          stat_slink: number | null;
-          stat_vibes: number | null;
+          stat_chill: number | null;
+          stat_guard: number | null;
           stats_rating_count: number;
           stats_photo_count: number;
           stats_last_computed_at: string | null;
-          specialty_stat: Database["public"]["Enums"]["cat_stat"] | null;
+          specialty_stat: Database["public"]["Enums"]["dog_stat"] | null;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["cats"]["Row"], "id" | "created_at" | "discovered_at" | "last_seen_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["dogs"]["Row"], "id" | "created_at" | "discovered_at" | "last_seen_at"> & {
           id?: string;
           created_at?: string;
           discovered_at?: string;
           last_seen_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["cats"]["Row"]>;
+        Update: Partial<Database["public"]["Tables"]["dogs"]["Row"]>;
         Relationships: [];
       };
       sightings: {
         Row: {
           id: string;
-          cat_id: string | null;
+          dog_id: string | null;
           photographer_id: string;
           photo_url: string;
           photo_hash: string | null;
@@ -112,16 +112,16 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["likes"]["Row"]>;
         Relationships: [];
       };
-      user_favourite_cats: {
-        Row: { user_id: string; cat_id: string; created_at: string };
-        Insert: { user_id: string; cat_id: string; created_at?: string };
-        Update: Partial<Database["public"]["Tables"]["user_favourite_cats"]["Row"]>;
+      user_favourite_dogs: {
+        Row: { user_id: string; dog_id: string; created_at: string };
+        Insert: { user_id: string; dog_id: string; created_at?: string };
+        Update: Partial<Database["public"]["Tables"]["user_favourite_dogs"]["Row"]>;
         Relationships: [];
       };
-      cat_health_flags: {
+      dog_health_flags: {
         Row: {
           id: string;
-          cat_id: string;
+          dog_id: string;
           flagged_by: string;
           flag_type: Database["public"]["Enums"]["flag_type"];
           description: string | null;
@@ -132,16 +132,16 @@ export interface Database {
           resolved_at: string | null;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["cat_health_flags"]["Row"], "id" | "created_at" | "status" | "verified_at" | "verified_by" | "resolved_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["dog_health_flags"]["Row"], "id" | "created_at" | "status" | "verified_at" | "verified_by" | "resolved_at"> & {
           id?: string;
           created_at?: string;
           status?: Database["public"]["Enums"]["flag_status"];
         };
-        Update: Partial<Database["public"]["Tables"]["cat_health_flags"]["Row"]>;
+        Update: Partial<Database["public"]["Tables"]["dog_health_flags"]["Row"]>;
         Relationships: [];
       };
       feed_logs: {
-        Row: { id: string; cat_id: string; feeder_id: string; fed_at: string; location: Geography | null; notes: string | null; photo_url: string | null; created_at: string };
+        Row: { id: string; dog_id: string; feeder_id: string; fed_at: string; location: Geography | null; notes: string | null; photo_url: string | null; created_at: string };
         Insert: Omit<Database["public"]["Tables"]["feed_logs"]["Row"], "id" | "created_at"> & { id?: string; created_at?: string };
         Update: Partial<Database["public"]["Tables"]["feed_logs"]["Row"]>;
         Relationships: [];
@@ -171,8 +171,8 @@ export interface Database {
         Relationships: [];
       };
       identification_votes: {
-        Row: { sighting_id: string; voter_id: string; proposed_cat_id: string | null; proposed_new: boolean; created_at: string };
-        Insert: { sighting_id: string; voter_id: string; proposed_cat_id?: string | null; proposed_new?: boolean; created_at?: string };
+        Row: { sighting_id: string; voter_id: string; proposed_dog_id: string | null; proposed_new: boolean; created_at: string };
+        Insert: { sighting_id: string; voter_id: string; proposed_dog_id?: string | null; proposed_new?: boolean; created_at?: string };
         Update: Partial<Database["public"]["Tables"]["identification_votes"]["Row"]>;
         Relationships: [];
       };
@@ -183,7 +183,7 @@ export interface Database {
         Relationships: [];
       };
       notification_settings: {
-        Row: { user_id: string; favourite_cat_photo: boolean; injured_or_missing: boolean; sticker_unlocked: boolean; comment_on_my_photo: boolean; identify_resolved: boolean };
+        Row: { user_id: string; favourite_dog_photo: boolean; injured_or_missing: boolean; sticker_unlocked: boolean; comment_on_my_photo: boolean; identify_resolved: boolean };
         Insert: Database["public"]["Tables"]["notification_settings"]["Row"];
         Update: Partial<Database["public"]["Tables"]["notification_settings"]["Row"]>;
         Relationships: [];
@@ -195,25 +195,25 @@ export interface Database {
         Relationships: [];
       };
       clinic_updates: {
-        Row: { id: string; cat_id: string; clinic_id: string; update_type: Database["public"]["Enums"]["clinic_update_type"]; notes: string | null; performed_at: string; created_at: string };
+        Row: { id: string; dog_id: string; clinic_id: string; update_type: Database["public"]["Enums"]["clinic_update_type"]; notes: string | null; performed_at: string; created_at: string };
         Insert: Omit<Database["public"]["Tables"]["clinic_updates"]["Row"], "id" | "created_at"> & { id?: string; created_at?: string };
         Update: Partial<Database["public"]["Tables"]["clinic_updates"]["Row"]>;
         Relationships: [];
       };
-      cat_ratings: {
+      dog_ratings: {
         Row: {
-          cat_id: string;
+          dog_id: string;
           voter_id: string;
-          stat: Database["public"]["Enums"]["cat_stat"];
+          stat: Database["public"]["Enums"]["dog_stat"];
           score: number;
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["cat_ratings"]["Row"], "created_at" | "updated_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["dog_ratings"]["Row"], "created_at" | "updated_at"> & {
           created_at?: string;
           updated_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["cat_ratings"]["Row"]>;
+        Update: Partial<Database["public"]["Tables"]["dog_ratings"]["Row"]>;
         Relationships: [];
       };
       districts: {
@@ -237,7 +237,7 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
-      nearby_cats: {
+      nearby_dogs: {
         Args: { lat: number; lng: number; radius_m?: number; max_rows?: number };
         Returns: {
           id: string;
@@ -245,7 +245,7 @@ export interface Database {
           name_th: string | null;
           primary_color: string;
           pattern: string;
-          status: Database["public"]["Enums"]["cat_status"];
+          status: Database["public"]["Enums"]["dog_status"];
           distance_m: number;
           last_seen_at: string;
           thumbnail_url: string | null;
@@ -256,8 +256,8 @@ export interface Database {
         Args: { lat: number; lng: number; radius_m?: number; max_rows?: number; before?: string | null };
         Returns: {
           sighting_id: string;
-          cat_id: string | null;
-          cat_name: string | null;
+          dog_id: string | null;
+          dog_name: string | null;
           photographer_id: string;
           photographer_handle: string | null;
           photo_url: string;
@@ -272,8 +272,8 @@ export interface Database {
         Args: { max_rows?: number; before?: string | null };
         Returns: {
           sighting_id: string;
-          cat_id: string | null;
-          cat_name: string | null;
+          dog_id: string | null;
+          dog_name: string | null;
           photographer_id: string;
           photographer_handle: string | null;
           photo_url: string;
@@ -292,11 +292,11 @@ export interface Database {
         Returns: number;
       };
       recalculate_territory: {
-        Args: { target_cat_id: string };
+        Args: { target_dog_id: string };
         Returns: void;
       };
       recent_close_sighting: {
-        Args: { photographer: string; target_cat: string; exclude_id: string; radius_m: number; since: string };
+        Args: { photographer: string; target_dog: string; exclude_id: string; radius_m: number; since: string };
         Returns: boolean;
       };
       pending_identifications: {
@@ -320,14 +320,14 @@ export interface Database {
         Args: { target_sighting: string };
         Returns: void;
       };
-      cats_in_radius: {
+      dogs_in_radius: {
         Args: { lat: number; lng: number; radius_m?: number; max_rows?: number };
         Returns: {
           id: string;
           name: string;
           primary_color: string;
           pattern: string;
-          status: Database["public"]["Enums"]["cat_status"];
+          status: Database["public"]["Enums"]["dog_status"];
           distance_m: number;
           last_seen_at: string;
           thumbnail_url: string | null;
@@ -335,11 +335,11 @@ export interface Database {
           centroid_lat: number;
         }[];
       };
-      cats_needing_help: {
+      dogs_needing_help: {
         Args: { lng?: number | null; lat?: number | null; radius_m?: number; max_rows?: number };
         Returns: {
-          cat_id: string;
-          cat_name: string;
+          dog_id: string;
+          dog_name: string;
           flag_id: string;
           flag_type: Database["public"]["Enums"]["flag_type"];
           flagged_at: string;
@@ -350,8 +350,8 @@ export interface Database {
           centroid_lat: number;
         }[];
       };
-      latest_flag_for_cat: {
-        Args: { target_cat: string };
+      latest_flag_for_dog: {
+        Args: { target_dog: string };
         Returns: {
           id: string;
           flag_type: Database["public"]["Enums"]["flag_type"];
@@ -360,8 +360,8 @@ export interface Database {
           created_at: string;
         }[];
       };
-      cat_recent_sighting_pins: {
-        Args: { target_cat: string; max_rows?: number };
+      dog_recent_sighting_pins: {
+        Args: { target_dog: string; max_rows?: number };
         Returns: {
           sighting_id: string;
           lng: number;
@@ -370,11 +370,11 @@ export interface Database {
           photo_url: string;
         }[];
       };
-      approve_cat_merge: {
+      approve_dog_merge: {
         Args: { request_id: string };
         Returns: void;
       };
-      reject_cat_merge: {
+      reject_dog_merge: {
         Args: { request_id: string; _reason?: string | null };
         Returns: void;
       };
@@ -394,12 +394,12 @@ export interface Database {
         Args: Record<string, never>;
         Returns: string;
       };
-      recompute_cat_stats: {
-        Args: { target_cat: string };
+      recompute_dog_stats: {
+        Args: { target_dog: string };
         Returns: void;
       };
-      cat_top_photos: {
-        Args: { target_cat: string; max_rows?: number };
+      dog_top_photos: {
+        Args: { target_dog: string; max_rows?: number };
         Returns: {
           sighting_id: string;
           photo_url: string;
@@ -418,8 +418,8 @@ export interface Database {
           photo_url: string;
           caption: string | null;
           like_count: number;
-          cat_id: string;
-          cat_name: string;
+          dog_id: string;
+          dog_name: string;
           photographer_id: string;
           photographer_handle: string | null;
           created_at: string;
@@ -432,8 +432,8 @@ export interface Database {
           rank: number;
           sighting_id: string;
           photo_url: string;
-          cat_id: string;
-          cat_name: string;
+          dog_id: string;
+          dog_name: string;
           photographer_id: string;
           photographer_handle: string | null;
           like_count: number;
@@ -450,20 +450,20 @@ export interface Database {
       district_stat_champions: {
         Args: { target_district: string };
         Returns: {
-          stat: Database["public"]["Enums"]["cat_stat"];
-          cat_id: string | null;
-          cat_name: string | null;
+          stat: Database["public"]["Enums"]["dog_stat"];
+          dog_id: string | null;
+          dog_name: string | null;
           score: number | null;
           thumbnail: string | null;
           held_since: string | null;
         }[];
       };
       stat_champion_top5: {
-        Args: { target_district: string; target_stat: Database["public"]["Enums"]["cat_stat"]; max_rows?: number };
+        Args: { target_district: string; target_stat: Database["public"]["Enums"]["dog_stat"]; max_rows?: number };
         Returns: {
           rank: number;
-          cat_id: string;
-          cat_name: string;
+          dog_id: string;
+          dog_name: string;
           score: number;
           thumbnail: string | null;
         }[];
@@ -471,10 +471,10 @@ export interface Database {
     };
     Enums: {
       user_role: "user" | "feeder" | "clinic_admin" | "app_admin";
-      cat_status: "active" | "injured" | "missing" | "deceased";
-      cat_age_guess: "kitten" | "young" | "adult" | "senior";
-      cat_sex: "male" | "female" | "unknown";
-      cat_stat: "chonk" | "spice" | "floof" | "slink" | "vibes";
+      dog_status: "active" | "injured" | "missing" | "deceased";
+      dog_age_guess: "puppy" | "young" | "adult" | "senior";
+      dog_sex: "male" | "female" | "unknown";
+      dog_stat: "bork" | "zoom" | "floof" | "chill" | "guard";
       tnr_status: "unknown" | "intact" | "ear_tipped" | "sterilised";
       vaccination_status: "unknown" | "partial" | "fully_vaccinated";
       sighting_status: "confirmed" | "pending_id" | "rejected";

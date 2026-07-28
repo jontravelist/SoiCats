@@ -18,7 +18,7 @@ async function pickPhoto(): Promise<string | null> {
   if (!perm.granted) {
     Alert.alert(
       "Photos permission needed",
-      "เติมแมว needs Photos access to set your profile picture. Open Settings → Expo Go → Photos.",
+      "หมาซอย needs Photos access to set your profile picture. Open Settings → Expo Go → Photos.",
       [
         { text: "Cancel", style: "cancel" },
         { text: "Open Settings", onPress: () => Linking.openSettings() },
@@ -124,7 +124,7 @@ export default function EditProfile() {
             <Image source={previewAvatar} style={styles.avatar} contentFit="cover" />
           ) : (
             <View style={[styles.avatar, styles.avatarPlaceholder]}>
-              <Text style={{ fontSize: 56 }}>🐈</Text>
+              <Text style={{ fontSize: 56 }}>🐕</Text>
             </View>
           )}
           <View style={styles.avatarBadge}>

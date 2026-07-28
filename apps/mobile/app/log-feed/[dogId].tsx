@@ -6,7 +6,7 @@ import * as ImagePicker from "expo-image-picker";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
-import { fetchCat, logFeed } from "@/lib/api";
+import { fetchDog, logFeed } from "@/lib/api";
 import { preparePhoto, uploadSightingPhoto } from "@/lib/photo";
 import { useAuthStore } from "@/stores/auth";
 import { useLocation } from "@/hooks/useLocation";
@@ -15,7 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
 export default function LogFeed() {
-  const { catId } = useLocalSearchParams<{ catId: string }>();
+  const { dogId } = useLocalSearchParams<{ dogId: string }>();
   const router = useRouter();
   const session = useAuthStore((s) => s.session);
   const profile = useProfile();
@@ -24,7 +24,7 @@ export default function LogFeed() {
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const catQ = useQuery({ queryKey: ["cat", catId], queryFn: () => fetchCat(catId!), enabled: !!catId });
+  const dogQ = useQuery({ queryKey: ["dog", dogId], queryFn: () => fetchDog(dogId!), enabled: !!dogId });
 
   if (!session || !profile.data) {
     return <Screen style={styles.center}><Text style={styles.body}>Loading…</Text></Screen>;
@@ -61,7 +61,7 @@ export default function LogFeed() {
   };
 
   const submit = async () => {
-    if (!catId) return;
+    if (!dogId) return;
     setBusy(true);
     try {
       let photoUrl: string | null = null;
@@ -70,7 +70,7 @@ export default function LogFeed() {
         photoUrl = await uploadSightingPhoto(prepared.uri, session.user.id);
       }
       await logFeed({
-        catId,
+        dogId,
         notes: notes.trim() || null,
         photoUrl,
         lat: coords?.latitude,
@@ -93,7 +93,7 @@ export default function LogFeed() {
       <Screen scroll>
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
           <Text style={styles.h1}>Log feed</Text>
-          {catQ.data ? <Text style={styles.subtitle}>For {catQ.data.name}</Text> : null}
+          {dogQ.data ? <Text style={styles.subtitle}>For {dogQ.data.name}</Text> : null}
           <Text style={styles.intro}>
             We'll record the time as now ({new Date().toLocaleTimeString()}) and your current location
             (if you've granted GPS).

@@ -18,11 +18,11 @@ import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 type Tab = "this_week" | "champions" | "archive";
 
 const STAT_META: Record<string, { title: string; emoji: string }> = {
-  chonk: { title: "Chonkiest",  emoji: "🍡" },
-  spice: { title: "Spiciest",   emoji: "🌶️" },
+  bork: { title: "Borkiest",  emoji: "🗣️" },
+  zoom: { title: "Zoomiest",   emoji: "🌶️" },
   floof: { title: "Floofiest",  emoji: "☁️" },
-  slink: { title: "Slinkiest",  emoji: "🥷" },
-  vibes: { title: "Best Vibes", emoji: "🧘" },
+  chill: { title: "Chilliest",  emoji: "🧘" },
+  guard: { title: "Guardiest", emoji: "🧘" },
 };
 
 export default function Leaderboards() {
@@ -106,7 +106,7 @@ export default function Leaderboards() {
           loading={championsQ.isLoading}
           rows={championsQ.data ?? []}
           districtName={districtName}
-          onTap={(catId) => router.push(`/cat/${catId}`)}
+          onTap={(dogId) => router.push(`/dog/${dogId}`)}
         />
       ) : (
         <Archive
@@ -131,7 +131,7 @@ interface CurrentRow {
   rank: number;
   sighting_id: string;
   photo_url: string;
-  cat_name: string;
+  dog_name: string;
   like_count: number;
   photographer_handle: string | null;
 }
@@ -157,7 +157,7 @@ function ThisWeek({ loading, rows, districtName, onTap }:
           <Text style={styles.rank}>{["🥇","🥈","🥉"][item.rank - 1] ?? `#${item.rank}`}</Text>
           <Image source={item.photo_url} style={styles.thumb} contentFit="cover" />
           <View style={{ flex: 1 }}>
-            <Text style={styles.cat}>{item.cat_name}</Text>
+            <Text style={styles.dog}>{item.dog_name}</Text>
             <Text style={styles.meta}>♥ {item.like_count}{item.photographer_handle ? ` · @${item.photographer_handle}` : ""}</Text>
           </View>
         </Pressable>
@@ -167,22 +167,22 @@ function ThisWeek({ loading, rows, districtName, onTap }:
 }
 
 interface ChampionRow {
-  stat: "chonk" | "spice" | "floof" | "slink" | "vibes";
-  cat_id: string | null;
-  cat_name: string | null;
+  stat: "bork" | "zoom" | "floof" | "chill" | "guard";
+  dog_id: string | null;
+  dog_name: string | null;
   score: number | null;
   thumbnail: string | null;
 }
 
 function Champions({ loading, rows, districtName, onTap }:
-  { loading: boolean; rows: ChampionRow[]; districtName: string; onTap: (catId: string) => void }) {
+  { loading: boolean; rows: ChampionRow[]; districtName: string; onTap: (dogId: string) => void }) {
   if (loading) return <View style={styles.center}><ActivityIndicator /></View>;
-  const filled = rows.filter((r) => r.cat_id != null);
+  const filled = rows.filter((r) => r.dog_id != null);
   if (filled.length === 0) {
     return (
       <View style={styles.center}>
         <Text style={styles.empty}>
-          No champions in {districtName} yet. Cats need at least 3 ratings to qualify.
+          No champions in {districtName} yet. Dogs need at least 3 ratings to qualify.
         </Text>
       </View>
     );
@@ -191,12 +191,12 @@ function Champions({ loading, rows, districtName, onTap }:
     <View style={styles.list}>
       {rows.map((r) => {
         const meta = STAT_META[r.stat];
-        const filled = r.cat_id != null;
+        const filled = r.dog_id != null;
         return (
           <Pressable
             key={r.stat}
             disabled={!filled}
-            onPress={() => filled && r.cat_id && onTap(r.cat_id)}
+            onPress={() => filled && r.dog_id && onTap(r.dog_id)}
             style={[styles.row, !filled && { opacity: 0.5 }]}
           >
             <Text style={styles.rank}>{meta.emoji}</Text>
@@ -204,12 +204,12 @@ function Champions({ loading, rows, districtName, onTap }:
               <Image source={r.thumbnail} style={styles.thumb} contentFit="cover" />
             ) : (
               <View style={[styles.thumb, { alignItems: "center", justifyContent: "center" }]}>
-                <Text style={{ fontSize: 28 }}>🐈</Text>
+                <Text style={{ fontSize: 28 }}>🐕</Text>
               </View>
             )}
             <View style={{ flex: 1 }}>
-              <Text style={styles.cat}>
-                {meta.title} {filled ? `· ${r.cat_name}` : ""}
+              <Text style={styles.dog}>
+                {meta.title} {filled ? `· ${r.dog_name}` : ""}
               </Text>
               <Text style={styles.meta}>
                 {filled ? `${r.score?.toFixed(1)} / 5` : "Title open — needs more ratings"}
@@ -227,7 +227,7 @@ interface ArchiveRow {
   rank: number;
   sighting_id: string;
   photo_url: string;
-  cat_name: string;
+  dog_name: string;
   photographer_handle: string | null;
   like_count: number;
 }
@@ -259,7 +259,7 @@ function Archive({ loading, rows, onTap }:
               <Text style={styles.rank}>{["🥇","🥈","🥉"][r.rank - 1] ?? `#${r.rank}`}</Text>
               <Image source={r.photo_url} style={styles.thumb} contentFit="cover" />
               <View style={{ flex: 1 }}>
-                <Text style={styles.cat}>{r.cat_name}</Text>
+                <Text style={styles.dog}>{r.dog_name}</Text>
                 <Text style={styles.meta}>♥ {r.like_count}{r.photographer_handle ? ` · @${r.photographer_handle}` : ""}</Text>
               </View>
             </Pressable>
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   },
   rank: { fontSize: 24 },
   thumb: { width: 64, height: 64, borderRadius: radius.md, backgroundColor: colors.surfaceAlt },
-  cat: { ...typography.h3, color: colors.text },
+  dog: { ...typography.h3, color: colors.text },
   meta: { ...typography.small, color: colors.textDim, marginTop: 2 },
 
   weekBlock: { gap: spacing(2) },

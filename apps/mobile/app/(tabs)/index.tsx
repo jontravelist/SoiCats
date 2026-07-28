@@ -8,12 +8,12 @@ import { useRouter } from "expo-router";
 import { Screen } from "@/components/Screen";
 import { SignInPill } from "@/components/SignInPill";
 import { FeedItem } from "@/components/FeedItem";
-import { CatGlyph } from "@/components/CatGlyph";
-import { fetchNearbyCats, fetchNearbyFeed, fetchFavouritesFeed, fetchPendingIdentificationCount, fetchCatsNeedingHelp } from "@/lib/api";
+import { DogGlyph } from "@/components/DogGlyph";
+import { fetchNearbyDogs, fetchNearbyFeed, fetchFavouritesFeed, fetchPendingIdentificationCount, fetchDogsNeedingHelp } from "@/lib/api";
 import { useLocation } from "@/hooks/useLocation";
 import { useAuthStore } from "@/stores/auth";
 import { useProfile } from "@/hooks/useProfile";
-import { paletteForCat, poseForCat } from "@/lib/catTheme";
+import { paletteForDog, poseForDog } from "@/lib/dogTheme";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
 type Tab = "nearby" | "favourites";
@@ -26,11 +26,11 @@ export default function FeedTab() {
   const profile = useProfile();
   const { coords, loading: locLoading } = useLocation();
 
-  // Cats nearby — used to populate the story-strip of CatGlyph chips
+  // Dogs nearby — used to populate the story-strip of DogGlyph chips
   // along the top of the feed per the Soi Sunset spec.
   const storyQ = useQuery({
-    queryKey: ["story-cats", coords?.latitude, coords?.longitude],
-    queryFn: () => fetchNearbyCats(coords!.latitude, coords!.longitude, 50_000, 8),
+    queryKey: ["story-dogs", coords?.latitude, coords?.longitude],
+    queryFn: () => fetchNearbyDogs(coords!.latitude, coords!.longitude, 50_000, 8),
     enabled: !!coords,
   });
 
@@ -41,11 +41,11 @@ export default function FeedTab() {
   });
   const pendingCount = pendingCountQ.data ?? 0;
 
-  // Cats with verified welfare flags within 50km. The pinned section at the
+  // Dogs with verified welfare flags within 50km. The pinned section at the
   // top of the feed comes from this — see BRIEF section 7.7.
   const helpQ = useQuery({
-    queryKey: ["cats-needing-help", coords?.latitude, coords?.longitude],
-    queryFn: () => fetchCatsNeedingHelp(coords?.latitude, coords?.longitude),
+    queryKey: ["dogs-needing-help", coords?.latitude, coords?.longitude],
+    queryFn: () => fetchDogsNeedingHelp(coords?.latitude, coords?.longitude),
   });
   const helpItems = helpQ.data ?? [];
 
@@ -71,7 +71,7 @@ export default function FeedTab() {
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
             <Text style={styles.greeting} numberOfLines={1}>
-              Hello, {profile.data?.handle ? `@${profile.data.handle}` : "cat lover"}
+              Hello, {profile.data?.handle ? `@${profile.data.handle}` : "soi soul"}
             </Text>
             <Text style={styles.brand}>{t("app.name")}</Text>
           </View>
@@ -86,7 +86,7 @@ export default function FeedTab() {
         </View>
       </View>
 
-      {/* Story strip — round CatGlyph chips for nearby cats. Tap → cat profile. */}
+      {/* Story strip — round DogGlyph chips for nearby dogs. Tap → dog profile. */}
       {(storyQ.data ?? []).length > 0 ? (
         <FlatList
           horizontal
@@ -95,11 +95,11 @@ export default function FeedTab() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.storyRow}
           renderItem={({ item }) => {
-            const pal = paletteForCat(item.primary_color);
+            const pal = paletteForDog(item.primary_color);
             return (
-              <Pressable onPress={() => router.push(`/cat/${item.id}`)} style={styles.storyItem}>
+              <Pressable onPress={() => router.push(`/dog/${item.id}`)} style={styles.storyItem}>
                 <View style={[styles.storyChip, { backgroundColor: pal.bg, borderColor: pal.accent }]}>
-                  <CatGlyph color={pal.accent} secondary={pal.bg === pal.accent ? pal.text : pal.bg} size={48} pose={poseForCat(item.id)} />
+                  <DogGlyph color={pal.accent} secondary={pal.bg === pal.accent ? pal.text : pal.bg} size={48} pose={poseForDog(item.id)} />
                 </View>
                 <Text numberOfLines={1} style={styles.storyName}>{item.name}</Text>
               </Pressable>
@@ -118,11 +118,11 @@ export default function FeedTab() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: spacing(4), gap: spacing(2) }}
             renderItem={({ item }) => (
-              <Pressable onPress={() => router.push(`/cat/${item.cat_id}`)} style={styles.needsHelpCard}>
+              <Pressable onPress={() => router.push(`/dog/${item.dog_id}`)} style={styles.needsHelpCard}>
                 <Text style={styles.needsHelpFlag}>
                   {item.flag_type === "deceased" ? "💔" : item.flag_type === "missing" ? "📍" : "🚑"}
                 </Text>
-                <Text style={styles.needsHelpName} numberOfLines={1}>{item.cat_name}</Text>
+                <Text style={styles.needsHelpName} numberOfLines={1}>{item.dog_name}</Text>
                 <Text style={styles.needsHelpType}>{item.flag_type}</Text>
               </Pressable>
             )}
@@ -162,8 +162,8 @@ export default function FeedTab() {
           renderItem={({ item }) => (
             <FeedItem
               sightingId={item.sighting_id}
-              catId={item.cat_id}
-              catName={item.cat_name}
+              dogId={item.dog_id}
+              dogName={item.dog_name}
               photoUrl={item.photo_url}
               caption={item.caption}
               photographerHandle={item.photographer_handle}

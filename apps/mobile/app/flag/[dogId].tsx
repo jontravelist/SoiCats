@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
 import { Chip } from "@/components/Chip";
-import { fetchCat, flagCat } from "@/lib/api";
+import { fetchDog, flagDog } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
@@ -19,17 +19,17 @@ const LABELS: Record<FlagType, string> = {
 };
 
 export default function FlagCat() {
-  const { catId } = useLocalSearchParams<{ catId: string }>();
+  const { dogId } = useLocalSearchParams<{ dogId: string }>();
   const router = useRouter();
   const session = useAuthStore((s) => s.session);
   const [type, setType] = useState<FlagType | null>(null);
   const [description, setDescription] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const catQ = useQuery({
-    queryKey: ["cat", catId],
-    queryFn: () => fetchCat(catId!),
-    enabled: !!catId,
+  const dogQ = useQuery({
+    queryKey: ["dog", dogId],
+    queryFn: () => fetchDog(dogId!),
+    enabled: !!dogId,
   });
 
   if (!session) {
@@ -42,7 +42,7 @@ export default function FlagCat() {
   }
 
   const submit = async () => {
-    if (!catId || !type) {
+    if (!dogId || !type) {
       Alert.alert("Pick a type", "Tap Injured, Missing, or Deceased before reporting.");
       return;
     }
@@ -52,10 +52,10 @@ export default function FlagCat() {
     }
     setBusy(true);
     try {
-      await flagCat({ catId, flagType: type, description: description.trim() });
+      await flagDog({ dogId, flagType: type, description: description.trim() });
       Alert.alert(
         "Report submitted",
-        "Thanks. If another person also reports it (or a Verified Feeder confirms), the cat will be marked needing help and shown on the Feed.",
+        "Thanks. If another person also reports it (or a Verified Feeder confirms), the dog will be marked needing help and shown on the Feed.",
       );
       router.back();
     } catch (e) {
@@ -69,7 +69,7 @@ export default function FlagCat() {
     <Screen scroll>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <Text style={styles.h1}>Report a welfare issue</Text>
-        {catQ.data ? <Text style={styles.subtitle}>For {catQ.data.name}</Text> : null}
+        {dogQ.data ? <Text style={styles.subtitle}>For {dogQ.data.name}</Text> : null}
 
         <Text style={styles.label}>What's the issue?</Text>
         <View style={styles.chipWrap}>

@@ -4,29 +4,29 @@ import { supabase } from "@/lib/supabase";
 import { env } from "@/lib/env";
 import type { Database } from "@shared/database.types";
 
-type NearbyCat = Database["public"]["Functions"]["nearby_cats"]["Returns"][number];
+type NearbyCat = Database["public"]["Functions"]["nearby_dogs"]["Returns"][number];
 type FeedItem  = Database["public"]["Functions"]["nearby_feed"]["Returns"][number];
 type Duplicate = Database["public"]["Functions"]["duplicate_candidates"]["Returns"][number];
 
-export async function fetchNearbyCats(
+export async function fetchNearbyDogs(
   lat: number,
   lng: number,
-  radius_m = env.NEARBY_CAT_RADIUS_M,
+  radius_m = env.NEARBY_DOG_RADIUS_M,
   max_rows = 8,
 ): Promise<NearbyCat[]> {
-  const { data, error } = await supabase.rpc("nearby_cats", {
+  const { data, error } = await supabase.rpc("nearby_dogs", {
     lat, lng, radius_m, max_rows,
   });
   if (error) throw error;
   return data ?? [];
 }
 
-// Returns up to `limit` cats with no distance filter (i.e. everywhere),
-// ordered by name. Used by the Cats browse tab as a fallback when we
+// Returns up to `limit` dogs with no distance filter (i.e. everywhere),
+// ordered by name. Used by the Dogs browse tab as a fallback when we
 // don't have a GPS reading.
-export async function fetchAllCats(limit = 200) {
+export async function fetchAllDogs(limit = 200) {
   const { data, error } = await supabase
-    .from("cats")
+    .from("dogs")
     .select("id, name, name_th, primary_color, pattern, status, last_seen_at, distinguishing_features, sex, age_guess")
     .order("name", { ascending: true })
     .limit(limit);
@@ -37,14 +37,14 @@ export async function fetchAllCats(limit = 200) {
 // The nearby_cats RPC doesn't return distinguishing_features / sex / age_guess
 // (would require a migration). Batch-fetch them for a list of IDs and return a
 // lookup map.
-export async function fetchExtrasByCatId(
-  catIds: string[],
+export async function fetchExtrasByDogId(
+  dogIds: string[],
 ): Promise<Record<string, { distinguishing_features: string | null; sex: string; age_guess: string | null }>> {
-  if (catIds.length === 0) return {};
+  if (dogIds.length === 0) return {};
   const { data, error } = await supabase
-    .from("cats")
+    .from("dogs")
     .select("id, distinguishing_features, sex, age_guess")
-    .in("id", catIds);
+    .in("id", dogIds);
   if (error) throw error;
   return Object.fromEntries(
     (data ?? []).map((r) => [
@@ -95,27 +95,27 @@ export async function fetchDuplicateCandidates(
   return data ?? [];
 }
 
-export async function fetchCat(catId: string) {
+export async function fetchDog(dogId: string) {
   const { data, error } = await supabase
-    .from("cats")
+    .from("dogs")
     .select("*, district:district_id(id, slug, name, name_th)")
-    .eq("id", catId)
+    .eq("id", dogId)
     .single();
   if (error) throw error;
   return data;
 }
 
-// Cat-level stat ratings (Chonk / Spice / Floof / Slink / Vibes).
-// Each user gets one score per stat per cat. Cats are persistent characters,
-// so the rating describes the cat as a whole — not a single photo of it.
-export type StatKey = "chonk" | "spice" | "floof" | "slink" | "vibes";
-export const STAT_KEYS: StatKey[] = ["chonk", "spice", "floof", "slink", "vibes"];
+// Dog-level stat ratings (Bork / Zoom / Floof / Chill / Guard).
+// Each user gets one score per stat per dog. Dogs are persistent characters,
+// so the rating describes the dog as a whole — not a single photo of it.
+export type StatKey = "bork" | "zoom" | "floof" | "chill" | "guard";
+export const STAT_KEYS: StatKey[] = ["bork", "zoom", "floof", "chill", "guard"];
 
-export async function rateCat(input: { catId: string; stat: StatKey; score: number }) {
+export async function rateDog(input: { dogId: string; stat: StatKey; score: number }) {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) throw new Error("Not signed in");
-  const { error } = await supabase.from("cat_ratings").upsert({
-    cat_id: input.catId,
+  const { error } = await supabase.from("dog_ratings").upsert({
+    dog_id: input.dogId,
     voter_id: user.user.id,
     stat: input.stat,
     score: input.score,
@@ -124,13 +124,13 @@ export async function rateCat(input: { catId: string; stat: StatKey; score: numb
   if (error) throw error;
 }
 
-export async function fetchMyCatRatings(catId: string): Promise<Partial<Record<StatKey, number>>> {
+export async function fetchMyDogRatings(dogId: string): Promise<Partial<Record<StatKey, number>>> {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) return {};
   const { data, error } = await supabase
-    .from("cat_ratings")
+    .from("dog_ratings")
     .select("stat, score")
-    .eq("cat_id", catId)
+    .eq("dog_id", dogId)
     .eq("voter_id", user.user.id);
   if (error) throw error;
   const out: Partial<Record<StatKey, number>> = {};
@@ -147,11 +147,11 @@ export async function fetchDistricts() {
   return data ?? [];
 }
 
-export async function fetchCatSightings(catId: string) {
+export async function fetchDogSightings(dogId: string) {
   const { data, error } = await supabase
     .from("sightings")
     .select("id, photo_url, caption, created_at, photographer_id, location")
-    .eq("cat_id", catId)
+    .eq("dog_id", dogId)
     .eq("status", "confirmed")
     .order("created_at", { ascending: false })
     .limit(60);
@@ -169,7 +169,7 @@ export async function fetchCurrentWeekTopPhotos(districtId: string, max = 10) {
   return data ?? [];
 }
 
-// Five-stat champion list for a district (Chonkiest, Spiciest, etc.).
+// Five-stat champion list for a district (Borkiest, Zoomiest, etc.).
 export async function fetchDistrictStatChampions(districtId: string) {
   const { data, error } = await supabase.rpc("district_stat_champions", {
     target_district: districtId,
@@ -178,10 +178,10 @@ export async function fetchDistrictStatChampions(districtId: string) {
   return data ?? [];
 }
 
-// Top N cats per single stat in a district. Powers the per-stat scroll.
+// Top N dogs per single stat in a district. Powers the per-stat scroll.
 export async function fetchStatChampionTop5(
   districtId: string,
-  stat: "chonk" | "spice" | "floof" | "slink" | "vibes",
+  stat: "bork" | "zoom" | "floof" | "chill" | "guard",
   max = 5,
 ) {
   const { data, error } = await supabase.rpc("stat_champion_top5", {
@@ -210,29 +210,29 @@ export async function fetchDistrictForPoint(lat: number, lng: number): Promise<s
   return (data as unknown as string) ?? null;
 }
 
-// Top photos of this cat by all-time likes — the per-cat Hall of Fame.
-export async function fetchCatTopPhotos(catId: string, max = 3) {
-  const { data, error } = await supabase.rpc("cat_top_photos", {
-    target_cat: catId,
+// Top photos of this dog by all-time likes — the per-dog Hall of Fame.
+export async function fetchDogTopPhotos(dogId: string, max = 3) {
+  const { data, error } = await supabase.rpc("dog_top_photos", {
+    target_dog: dogId,
     max_rows: max,
   });
   if (error) throw error;
   return data ?? [];
 }
 
-// Last 10 confirmed sighting locations for the territory map on cat profile.
+// Last 10 confirmed sighting locations for the territory map on dog profile.
 // Returns plain lng/lat columns so we don't have to parse PostGIS geography.
-export async function fetchCatSightingLocations(catId: string) {
-  const { data, error } = await supabase.rpc("cat_recent_sighting_pins", {
-    target_cat: catId,
+export async function fetchDogSightingLocations(dogId: string) {
+  const { data, error } = await supabase.rpc("dog_recent_sighting_pins", {
+    target_dog: dogId,
   });
   if (error) throw error;
   return data ?? [];
 }
 
-// Discoverer-only edits to a cat. RLS already restricts updates to fields
+// Discoverer-only edits to a dog. RLS already restricts updates to fields
 // that aren't welfare-related (those go through clinic_updates).
-export async function updateCat(catId: string, patch: {
+export async function updateDog(dogId: string, patch: {
   name?: string;
   name_th?: string | null;
   distinguishing_features?: string | null;
@@ -245,16 +245,16 @@ export async function updateCat(catId: string, patch: {
   if (patch.distinguishing_features !== undefined) update.distinguishing_features = patch.distinguishing_features;
   if (patch.age_guess !== undefined) update.age_guess = patch.age_guess;
   if (patch.sex !== undefined) update.sex = patch.sex;
-  const { error } = await supabase.from("cats").update(update).eq("id", catId);
+  const { error } = await supabase.from("dogs").update(update).eq("id", dogId);
   if (error) throw error;
 }
 
-// Search the cats table by name (case-insensitive, anywhere). For the merge
+// Search the dogs table by name (case-insensitive, anywhere). For the merge
 // target picker — keeps payload tiny, no thumbnails.
-export async function searchCatsByName(query: string, excludeId?: string, limit = 20) {
+export async function searchDogsByName(query: string, excludeId?: string, limit = 20) {
   if (!query.trim()) return [];
   let q = supabase
-    .from("cats")
+    .from("dogs")
     .select("id, name, primary_color, pattern")
     .ilike("name", `%${query.trim()}%`)
     .order("name")
@@ -267,13 +267,13 @@ export async function searchCatsByName(query: string, excludeId?: string, limit 
 
 // Submit a duplicate-merge request. Admin reviews in Studio; on approval the
 // SQL function reassigns every related row from source to target and deletes
-// the source cat.
-export async function requestCatMerge(input: { sourceCatId: string; targetCatId: string; reason: string }) {
+// the source dog.
+export async function requestDogMerge(input: { sourceDogId: string; targetDogId: string; reason: string }) {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) throw new Error("Not signed in");
-  const { error } = await supabase.from("cat_merge_requests").insert({
-    source_cat_id: input.sourceCatId,
-    target_cat_id: input.targetCatId,
+  const { error } = await supabase.from("dog_merge_requests").insert({
+    source_dog_id: input.sourceDogId,
+    target_dog_id: input.targetDogId,
     requested_by: user.user.id,
     reason: input.reason,
   });
@@ -333,11 +333,11 @@ export async function rejectFeederApplication(applicationId: string, why?: strin
 }
 
 // Feed-log helpers (verified feeders only — RLS enforces the role check).
-export async function logFeed(input: { catId: string; notes?: string | null; photoUrl?: string | null; lat?: number; lng?: number }) {
+export async function logFeed(input: { dogId: string; notes?: string | null; photoUrl?: string | null; lat?: number; lng?: number }) {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) throw new Error("Not signed in");
   const row: Record<string, unknown> = {
-    cat_id: input.catId,
+    dog_id: input.dogId,
     feeder_id: user.user.id,
     notes: input.notes ?? null,
     photo_url: input.photoUrl ?? null,
@@ -349,28 +349,28 @@ export async function logFeed(input: { catId: string; notes?: string | null; pho
   if (error) throw error;
 }
 
-export async function fetchRecentFeedsForCat(catId: string, limit = 10) {
+export async function fetchRecentFeedsForDog(dogId: string, limit = 10) {
   const { data, error } = await supabase
     .from("feed_logs")
     .select(`
       id, fed_at, notes, photo_url,
       feeder:feeder_id(handle, display_name, avatar_url)
     `)
-    .eq("cat_id", catId)
+    .eq("dog_id", dogId)
     .order("fed_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
   return data ?? [];
 }
 
-// Admin queue: open merge requests with both cats hydrated for display.
+// Admin queue: open merge requests with both dogs hydrated for display.
 export async function fetchOpenMergeRequests() {
   const { data, error } = await supabase
-    .from("cat_merge_requests")
+    .from("dog_merge_requests")
     .select(`
       id, reason, created_at, requested_by,
-      source:source_cat_id(id, name, primary_color, pattern, distinguishing_features),
-      target:target_cat_id(id, name, primary_color, pattern, distinguishing_features),
+      source:source_dog_id(id, name, primary_color, pattern, distinguishing_features),
+      target:target_dog_id(id, name, primary_color, pattern, distinguishing_features),
       requester:requested_by(handle)
     `)
     .eq("status", "open")
@@ -379,17 +379,17 @@ export async function fetchOpenMergeRequests() {
   return data ?? [];
 }
 
-export async function approveCatMerge(requestId: string) {
-  const { error } = await supabase.rpc("approve_cat_merge", { request_id: requestId });
+export async function approveDogMerge(requestId: string) {
+  const { error } = await supabase.rpc("approve_dog_merge", { request_id: requestId });
   if (error) throw error;
 }
 
-export async function rejectCatMerge(requestId: string) {
-  const { error } = await supabase.rpc("reject_cat_merge", { request_id: requestId });
+export async function rejectDogMerge(requestId: string) {
+  const { error } = await supabase.rpc("reject_dog_merge", { request_id: requestId });
   if (error) throw error;
 }
 
-export async function createCat(input: {
+export async function createDog(input: {
   name: string;
   primary_color: string;
   pattern: string;
@@ -403,13 +403,13 @@ export async function createCat(input: {
   if (!user.user) throw new Error("Not signed in");
 
   const { data, error } = await supabase
-    .from("cats")
+    .from("dogs")
     .insert({
       name: input.name,
       primary_color: input.primary_color,
       pattern: input.pattern,
-      age_guess: (input.age_guess as Database["public"]["Enums"]["cat_age_guess"]) ?? null,
-      sex: (input.sex as Database["public"]["Enums"]["cat_sex"]) ?? "unknown",
+      age_guess: (input.age_guess as Database["public"]["Enums"]["dog_age_guess"]) ?? null,
+      sex: (input.sex as Database["public"]["Enums"]["dog_sex"]) ?? "unknown",
       distinguishing_features: input.distinguishing_features ?? null,
       discovered_by_user_id: user.user.id,
       // PostGIS accepts WKT through PostgREST when sent as a string.
@@ -422,7 +422,7 @@ export async function createCat(input: {
 }
 
 export async function createSighting(input: {
-  cat_id: string | null;
+  dog_id: string | null;
   photo_url: string;
   lat: number;
   lng: number;
@@ -435,40 +435,40 @@ export async function createSighting(input: {
   const { data, error } = await supabase
     .from("sightings")
     .insert({
-      cat_id: input.cat_id,
+      dog_id: input.dog_id,
       photographer_id: user.user.id,
       photo_url: input.photo_url,
       location: `SRID=4326;POINT(${input.lng} ${input.lat})` as unknown as never,
       location_accuracy_m: input.accuracy ? Math.round(input.accuracy) : null,
       caption: input.caption ?? null,
-      status: input.cat_id ? "confirmed" : "pending_id",
+      status: input.dog_id ? "confirmed" : "pending_id",
     })
     .select("id, photo_url")
     .single();
   if (error) throw error;
 
-  // Notify everyone who's favourited this cat (other than the photographer).
-  if (input.cat_id) {
-    const { data: cat } = await supabase
-      .from("cats")
+  // Notify everyone who's favourited this dog (other than the photographer).
+  if (input.dog_id) {
+    const { data: dog } = await supabase
+      .from("dogs")
       .select("name")
-      .eq("id", input.cat_id)
+      .eq("id", input.dog_id)
       .single();
     const { data: favs } = await supabase
-      .from("user_favourite_cats")
+      .from("user_favourite_dogs")
       .select("user_id")
-      .eq("cat_id", input.cat_id);
+      .eq("dog_id", input.dog_id);
     const recipients = (favs ?? [])
       .map((f) => f.user_id)
       .filter((id) => id !== user.user.id);
-    if (recipients.length > 0 && cat) {
+    if (recipients.length > 0 && dog) {
       const { sendPush } = await import("./push");
       void sendPush({
         userIds: recipients,
-        title: `${cat.name} was just spotted`,
+        title: `${dog.name} was just spotted`,
         body: "Tap to see the new photo.",
-        category: "favourite_cat_photo",
-        data: { cat_id: input.cat_id, sighting_id: data.id },
+        category: "favourite_dog_photo",
+        data: { dog_id: input.dog_id, sighting_id: data.id },
       });
     }
   }
@@ -497,20 +497,20 @@ export async function computePhotoHash(sightingId: string, photoUrl: string) {
   if (error) console.warn("compute-phash failed", error);
 }
 
-export async function toggleFavourite(catId: string, on: boolean) {
+export async function toggleFavourite(dogId: string, on: boolean) {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) throw new Error("Not signed in");
   if (on) {
     const { error } = await supabase
-      .from("user_favourite_cats")
-      .insert({ user_id: user.user.id, cat_id: catId });
+      .from("user_favourite_dogs")
+      .insert({ user_id: user.user.id, dog_id: dogId });
     if (error && error.code !== "23505") throw error; // ignore unique violation
   } else {
     const { error } = await supabase
-      .from("user_favourite_cats")
+      .from("user_favourite_dogs")
       .delete()
       .eq("user_id", user.user.id)
-      .eq("cat_id", catId);
+      .eq("dog_id", dogId);
     if (error) throw error;
   }
 }
@@ -546,16 +546,16 @@ export async function postComment(sightingId: string, body: string) {
   // Best-effort push to the photo owner.
   const { data: sighting } = await supabase
     .from("sightings")
-    .select("photographer_id, cats(name), users:photographer_id(handle)")
+    .select("photographer_id, dogs(name), users:photographer_id(handle)")
     .eq("id", sightingId)
     .single();
   if (sighting && sighting.photographer_id !== user.user.id) {
-    const catName = (sighting as { cats?: { name?: string } | null }).cats?.name ?? "your photo";
+    const dogName = (sighting as { dogs?: { name?: string } | null }).dogs?.name ?? "your photo";
     const { sendPush } = await import("./push");
     void sendPush({
       userIds: [sighting.photographer_id],
       title: "New comment",
-      body: `Someone commented on your photo of ${catName}.`,
+      body: `Someone commented on your photo of ${dogName}.`,
       category: "comment_on_my_photo",
       data: { sighting_id: sightingId },
     });
@@ -572,10 +572,10 @@ export async function fetchComments(sightingId: string) {
   return data ?? [];
 }
 
-// Cats with an open verified welfare flag — what powers the 'Needs help'
+// Dogs with an open verified welfare flag — what powers the 'Needs help'
 // pinned section at the top of the Feed.
-export async function fetchCatsNeedingHelp(lat?: number, lng?: number) {
-  const { data, error } = await supabase.rpc("cats_needing_help", {
+export async function fetchDogsNeedingHelp(lat?: number, lng?: number) {
+  const { data, error } = await supabase.rpc("dogs_needing_help", {
     lat: lat ?? null,
     lng: lng ?? null,
     radius_m: 50_000,
@@ -585,24 +585,24 @@ export async function fetchCatsNeedingHelp(lat?: number, lng?: number) {
   return data ?? [];
 }
 
-export async function fetchLatestFlagForCat(catId: string) {
-  const { data, error } = await supabase.rpc("latest_flag_for_cat", { target_cat: catId });
+export async function fetchLatestFlagForDog(dogId: string) {
+  const { data, error } = await supabase.rpc("latest_flag_for_dog", { target_dog: dogId });
   if (error) throw error;
   return (data ?? [])[0] ?? null;
 }
 
 // Insert a welfare flag. The DB trigger immediately auto-verifies if the
 // flagger is a feeder/admin or there's already a corroborating open flag.
-export async function flagCat(input: {
-  catId: string;
+export async function flagDog(input: {
+  dogId: string;
   flagType: "injured" | "missing" | "deceased";
   description: string;
   photoUrl?: string | null;
 }) {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) throw new Error("Not signed in");
-  const { error } = await supabase.from("cat_health_flags").insert({
-    cat_id: input.catId,
+  const { error } = await supabase.from("dog_health_flags").insert({
+    dog_id: input.dogId,
     flagged_by: user.user.id,
     flag_type: input.flagType,
     description: input.description,
@@ -611,10 +611,10 @@ export async function flagCat(input: {
   if (error) throw error;
 }
 
-// Returns cats with their centroid lng/lat so the Map tab can pin markers
+// Returns dogs with their centroid lng/lat so the Map tab can pin markers
 // at the correct location instead of clustering them at the user's spot.
-export async function fetchCatsInRadius(lat: number, lng: number, radius_m = 50_000, max_rows = 500) {
-  const { data, error } = await supabase.rpc("cats_in_radius", {
+export async function fetchDogsInRadius(lat: number, lng: number, radius_m = 50_000, max_rows = 500) {
+  const { data, error } = await supabase.rpc("dogs_in_radius", {
     lat, lng, radius_m, max_rows,
   });
   if (error) throw error;
@@ -642,12 +642,12 @@ export async function fetchPendingIdentificationCount(lat?: number, lng?: number
   return (data as unknown as number) ?? 0;
 }
 
-// Cast a vote on a pending sighting. Either propose an existing cat or vote
-// 'this is a new cat'. The trigger on identification_votes auto-resolves
+// Cast a vote on a pending sighting. Either propose an existing dog or vote
+// 'this is a new dog'. The trigger on identification_votes auto-resolves
 // when thresholds are met.
 export async function castIdentificationVote(input: {
   sightingId: string;
-  proposedCatId?: string | null;
+  proposedDogId?: string | null;
   proposedNew?: boolean;
 }) {
   const { data: user } = await supabase.auth.getUser();
@@ -655,7 +655,7 @@ export async function castIdentificationVote(input: {
   const { error } = await supabase.from("identification_votes").insert({
     sighting_id: input.sightingId,
     voter_id: user.user.id,
-    proposed_cat_id: input.proposedCatId ?? null,
+    proposed_dog_id: input.proposedDogId ?? null,
     proposed_new: input.proposedNew ?? false,
   });
   if (error) throw error;
@@ -668,7 +668,7 @@ export async function fetchMyPosts() {
   if (!user.user) return [];
   const { data, error } = await supabase
     .from("sightings")
-    .select("id, photo_url, caption, status, created_at, cat_id, cats(name)")
+    .select("id, photo_url, caption, status, created_at, dog_id, dogs(name)")
     .eq("photographer_id", user.user.id)
     .order("created_at", { ascending: false })
     .limit(100);

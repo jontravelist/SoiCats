@@ -1,9 +1,9 @@
--- Soi Cats: RPC helpers used by the mobile app.
+-- Soi Dogs: RPC helpers used by the mobile app.
 
--- nearby_cats: cats whose territory centroid is within `radius_m` of (lng, lat),
+-- nearby_dogs: dogs whose territory centroid is within `radius_m` of (lng, lat),
 -- limited to active/injured/missing and seen in the last 90 days.
 -- Returns thumbnail (most recent confirmed sighting photo) for the picker UI.
-create or replace function public.nearby_cats(
+create or replace function public.nearby_dogs(
   lng       double precision,
   lat       double precision,
   radius_m  int default 150,
@@ -15,7 +15,7 @@ returns table (
   name_th         text,
   primary_color   text,
   pattern         text,
-  status          cat_status,
+  status          dog_status,
   distance_m      double precision,
   last_seen_at    timestamptz,
   thumbnail_url   text,
@@ -38,14 +38,14 @@ as $$
     c.last_seen_at,
     (
       select s.photo_url from public.sightings s
-       where s.cat_id = c.id and s.status = 'confirmed'
+       where s.dog_id = c.id and s.status = 'confirmed'
        order by s.created_at desc limit 1
     ) as thumbnail_url,
     (
       select count(*) from public.sightings s
-       where s.cat_id = c.id and s.status = 'confirmed'
+       where s.dog_id = c.id and s.status = 'confirmed'
     ) as photo_count
-  from public.cats c
+  from public.dogs c
   where st_dwithin(c.territory_centroid, (select g from origin), radius_m)
     and c.status in ('active', 'injured', 'missing')
     and c.last_seen_at > now() - interval '90 days'
@@ -63,8 +63,8 @@ create or replace function public.nearby_feed(
 )
 returns table (
   sighting_id     uuid,
-  cat_id          uuid,
-  cat_name        text,
+  dog_id          uuid,
+  dog_name        text,
   photographer_id uuid,
   photographer_handle text,
   photo_url       text,
@@ -82,7 +82,7 @@ as $$
   )
   select
     s.id,
-    s.cat_id,
+    s.dog_id,
     c.name,
     s.photographer_id,
     u.handle,
@@ -93,7 +93,7 @@ as $$
     (select count(*) from public.likes l where l.sighting_id = s.id) as like_count,
     (select count(*) from public.comments cm where cm.sighting_id = s.id) as comment_count
   from public.sightings s
-  left join public.cats  c on c.id = s.cat_id
+  left join public.dogs  c on c.id = s.dog_id
   left join public.users u on u.id = s.photographer_id
   where s.status = 'confirmed'
     and st_dwithin(s.location, (select g from origin), radius_m)
@@ -102,15 +102,15 @@ as $$
   limit max_rows;
 $$;
 
--- following_feed: sightings of cats the user has favourited or photographed.
+-- following_feed: sightings of dogs the user has favourited or photographed.
 create or replace function public.following_feed(
   max_rows  int default 50,
   before    timestamptz default null
 )
 returns table (
   sighting_id     uuid,
-  cat_id          uuid,
-  cat_name        text,
+  dog_id          uuid,
+  dog_name        text,
   photographer_id uuid,
   photographer_handle text,
   photo_url       text,
@@ -122,14 +122,14 @@ returns table (
 language sql
 stable
 as $$
-  with my_cats as (
-    select cat_id from public.user_favourite_cats where user_id = auth.uid()
+  with my_dogs as (
+    select dog_id from public.user_favourite_dogs where user_id = auth.uid()
     union
-    select cat_id from public.sightings where photographer_id = auth.uid() and cat_id is not null
+    select dog_id from public.sightings where photographer_id = auth.uid() and dog_id is not null
   )
   select
     s.id,
-    s.cat_id,
+    s.dog_id,
     c.name,
     s.photographer_id,
     u.handle,
@@ -139,8 +139,8 @@ as $$
     (select count(*) from public.likes l where l.sighting_id = s.id) as like_count,
     (select count(*) from public.comments cm where cm.sighting_id = s.id) as comment_count
   from public.sightings s
-  join my_cats m on m.cat_id = s.cat_id
-  left join public.cats  c on c.id = s.cat_id
+  join my_dogs m on m.dog_id = s.dog_id
+  left join public.dogs  c on c.id = s.dog_id
   left join public.users u on u.id = s.photographer_id
   where s.status = 'confirmed'
     and (before is null or s.created_at < before)
@@ -148,8 +148,8 @@ as $$
   limit max_rows;
 $$;
 
--- duplicate_candidates: cats within 80m with same primary_color + pattern.
--- Used by the "wait, could this be one of these?" interstitial when creating a new cat.
+-- duplicate_candidates: dogs within 80m with same primary_color + pattern.
+-- Used by the "wait, could this be one of these?" interstitial when creating a new dog.
 create or replace function public.duplicate_candidates(
   lng           double precision,
   lat           double precision,
@@ -174,10 +174,10 @@ as $$
     st_distance(c.territory_centroid, (select g from origin)),
     (
       select s.photo_url from public.sightings s
-       where s.cat_id = c.id and s.status = 'confirmed'
+       where s.dog_id = c.id and s.status = 'confirmed'
        order by s.created_at desc limit 1
     )
-  from public.cats c
+  from public.dogs c
   where st_dwithin(c.territory_centroid, (select g from origin), 80)
     and c.primary_color = duplicate_candidates.primary_color
     and c.pattern       = duplicate_candidates.pattern

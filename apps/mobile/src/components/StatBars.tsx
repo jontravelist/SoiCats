@@ -3,7 +3,7 @@ import { typography } from "@/lib/theme";
 import { STAT_COLORS, STAT_META } from "@/lib/stats";
 import type { StatKey } from "@/lib/api";
 
-const ROWS: StatKey[] = ["chonk", "spice", "floof", "slink", "vibes"];
+const ROWS: StatKey[] = ["bork", "zoom", "floof", "chill", "guard"];
 
 interface Props {
   values: Partial<Record<StatKey, number | null>>;
@@ -12,8 +12,8 @@ interface Props {
 }
 
 // Pokemon-style horizontal stat bars, one per stat, each tinted with the
-// stat's signature colour from the Soi Sunset palette (Chonk mango, Spice
-// pink, Floof teal, Slink charcoal, Vibes papaya).
+// stat's signature colour from the Soi Sunset palette (Bork pink, Zoom mango. Colours pulled from Soi Sunset (Bork
+// pink, Floof teal, Chill charcoal, Guard papaya).
 export function StatBars({ values, trackColor, textColor }: Props) {
   return (
     <View style={styles.wrap}>

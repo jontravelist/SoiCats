@@ -9,19 +9,19 @@ import { Chip } from "@/components/Chip";
 import {
   awardPoints,
   computePhotoHash,
-  createCat,
+  createDog,
   createSighting,
   fetchDuplicateCandidates,
 } from "@/lib/api";
-import { CatCard } from "@/components/CatCard";
+import { DogCard } from "@/components/DogCard";
 import { useUploadStore } from "@/stores/upload";
 import { useAuthStore } from "@/stores/auth";
 import { colors, spacing, typography } from "@/lib/theme";
-import { AGE_GUESSES, PATTERNS, PRIMARY_COLOURS, SEXES, SUGGESTED_CAT_NAMES } from "@shared/cat-names";
+import { AGE_GUESSES, PATTERNS, PRIMARY_COLOURS, SEXES, SUGGESTED_DOG_NAMES } from "@shared/dog-names";
 
 type Duplicate = { id: string; name: string; distance_m: number; thumbnail_url: string | null };
 
-export default function NewCatScreen() {
+export default function NewDogScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const session = useAuthStore((s) => s.session);
@@ -70,7 +70,7 @@ export default function NewCatScreen() {
     if (!pending?.remoteUrl || !pending.lat || !pending.lng) return;
     setBusy(true);
     try {
-      const cat = await createCat({
+      const dog = await createDog({
         name: name.trim(),
         primary_color: color!,
         pattern: pattern!,
@@ -81,7 +81,7 @@ export default function NewCatScreen() {
         lng: pending.lng,
       });
       const sighting = await createSighting({
-        cat_id: cat.id,
+        dog_id: dog.id,
         photo_url: pending.remoteUrl,
         lat: pending.lat,
         lng: pending.lng,
@@ -90,7 +90,7 @@ export default function NewCatScreen() {
       await computePhotoHash(sighting.id, sighting.photo_url);
       await awardPoints(sighting.id);
       useUploadStore.getState().setPending(null);
-      router.replace(`/cat/${cat.id}`);
+      router.replace(`/dog/${dog.id}`);
     } catch (e) {
       Alert.alert(t("common.error"), e instanceof Error ? e.message : String(e));
     } finally {
@@ -106,31 +106,31 @@ export default function NewCatScreen() {
     >
     <Screen scroll>
       <View style={styles.container}>
-        <Text style={styles.h1}>{t("newCat.title")}</Text>
+        <Text style={styles.h1}>{t("newDog.title")}</Text>
 
-        <Text style={styles.label}>{t("newCat.namePlaceholder")}</Text>
+        <Text style={styles.label}>{t("newDog.namePlaceholder")}</Text>
         <TextInput value={name} onChangeText={setName} style={styles.input} maxLength={40} />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-          {SUGGESTED_CAT_NAMES.map((n) => (
+          {SUGGESTED_DOG_NAMES.map((n) => (
             <Chip key={n} label={n} selected={name === n} onPress={() => setName(n)} />
           ))}
         </ScrollView>
 
-        <Text style={styles.label}>{t("newCat.patternLabel")}</Text>
+        <Text style={styles.label}>{t("newDog.patternLabel")}</Text>
         <View style={styles.chipWrap}>
           {PATTERNS.map((p) => (
             <Chip key={p} label={t(`patterns.${p}`)} selected={pattern === p} onPress={() => setPattern(p)} />
           ))}
         </View>
 
-        <Text style={styles.label}>{t("newCat.colorLabel")}</Text>
+        <Text style={styles.label}>{t("newDog.colorLabel")}</Text>
         <View style={styles.chipWrap}>
           {PRIMARY_COLOURS.map((c) => (
             <Chip key={c} label={c} selected={color === c} onPress={() => setColor(c)} />
           ))}
         </View>
 
-        <Text style={styles.label}>{t("newCat.ageLabel")}</Text>
+        <Text style={styles.label}>{t("newDog.ageLabel")}</Text>
         <View style={styles.chipWrap}>
           {AGE_GUESSES.map((a) => (
             <Chip key={a} label={t(`ages.${a}`)} selected={age === a} onPress={() => setAge(a)} />
@@ -144,7 +144,7 @@ export default function NewCatScreen() {
           ))}
         </View>
 
-        <Text style={styles.label}>{t("newCat.featuresLabel")}</Text>
+        <Text style={styles.label}>{t("newDog.featuresLabel")}</Text>
         <TextInput value={features} onChangeText={setFeatures} style={styles.input} multiline />
 
         {duplicates && duplicates.length > 0 ? (
@@ -152,7 +152,7 @@ export default function NewCatScreen() {
             <Text style={styles.warn}>{t("post.duplicateInterstitial")}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
               {duplicates.map((d) => (
-                <CatCard
+                <DogCard
                   key={d.id}
                   name={d.name}
                   thumbnailUrl={d.thumbnail_url}
@@ -164,7 +164,7 @@ export default function NewCatScreen() {
             <Button label={t("post.stillNew")} onPress={save} loading={busy} />
           </View>
         ) : (
-          <Button label={t("newCat.save")} onPress={trySave} loading={busy} style={{ marginTop: spacing(3) }} />
+          <Button label={t("newDog.save")} onPress={trySave} loading={busy} style={{ marginTop: spacing(3) }} />
         )}
       </View>
     </Screen>

@@ -10,7 +10,7 @@ interface Props {
   selected?: boolean;
 }
 
-export function CatCard({ name, thumbnailUrl, subtitle, onPress, selected }: Props) {
+export function DogCard({ name, thumbnailUrl, subtitle, onPress, selected }: Props) {
   return (
     <Pressable onPress={onPress} style={[styles.card, selected && styles.selected]}>
       <View style={styles.thumbWrap}>
@@ -18,7 +18,7 @@ export function CatCard({ name, thumbnailUrl, subtitle, onPress, selected }: Pro
           <Image source={thumbnailUrl} style={styles.thumb} contentFit="cover" />
         ) : (
           <View style={[styles.thumb, styles.placeholder]}>
-            <Text style={styles.placeholderText}>🐈</Text>
+            <Text style={styles.placeholderText}>🐕</Text>
           </View>
         )}
       </View>

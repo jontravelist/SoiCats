@@ -26,7 +26,7 @@ async function ensurePermission(mode: "camera" | "library"): Promise<boolean> {
   const what = mode === "camera" ? "Camera" : "Photos";
   Alert.alert(
     `${what} permission needed`,
-    `Soi Cats needs ${what} access to add photos. Open Settings → Expo Go and turn ${what} on.`,
+    `Soi Dogs needs ${what} access to add photos. Open Settings → Expo Go and turn ${what} on.`,
     [
       { text: "Cancel", style: "cancel" },
       { text: "Open Settings", onPress: () => Linking.openSettings() },
@@ -41,7 +41,7 @@ export default function PostTab() {
   const { t } = useTranslation();
   const router = useRouter();
   // Deliberately not gating on auth here. Letting people pick a photo
-  // first (and reach the cat-picker) makes sign-in feel like a small
+  // first (and reach the dog-picker) makes sign-in feel like a small
   // step rather than a wall. The actual post requires auth — that
   // prompt sits on the next screen so the photo isn't lost.
   const session = useAuthStore((s) => s.session);
@@ -62,7 +62,7 @@ export default function PostTab() {
       if (result.canceled) return;
       const asset = result.assets[0];
 
-      // Prefer the photo's own GPS metadata (e.g. a library photo of a cat
+      // Prefer the photo's own GPS metadata (e.g. a library photo of a dog
       // taken at the right place yesterday). Fall back to the user's current
       // GPS for camera shots and for library photos with no embedded location.
       const exifGps = extractGpsFromExif(asset.exif as Record<string, unknown> | undefined);
@@ -83,12 +83,12 @@ export default function PostTab() {
         locationSource: haveExif ? "photo" : "device",
       });
 
-      // Push to cat-picker immediately. Upload runs in the background and the
+      // Push to dog-picker immediately. Upload runs in the background and the
       // picker waits for `remoteUrl` before submitting.
       router.push("/post/identify");
 
       // The upload itself only works if signed in (storage RLS). If they're
-      // not signed in we skip it; the cat-picker shows a sign-in banner and
+      // not signed in we skip it; the dog-picker shows a sign-in banner and
       // re-attempts the upload after auth via the same store-based flow.
       if (session) {
         const url = await uploadSightingPhoto(prepared.uri, session.user.id);

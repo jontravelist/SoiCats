@@ -6,9 +6,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
 import { Chip } from "@/components/Chip";
-import { fetchCat, updateCat } from "@/lib/api";
+import { fetchDog, updateDog } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
-import { AGE_GUESSES, SEXES } from "@shared/cat-names";
+import { AGE_GUESSES, SEXES } from "@shared/dog-names";
 import { useTranslation } from "react-i18next";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
@@ -19,7 +19,7 @@ export default function EditCat() {
   const qc = useQueryClient();
   const { t } = useTranslation();
 
-  const catQ = useQuery({ queryKey: ["cat", id], queryFn: () => fetchCat(id!), enabled: !!id });
+  const dogQ = useQuery({ queryKey: ["dog", id], queryFn: () => fetchDog(id!), enabled: !!id });
 
   const [name, setName] = useState("");
   const [nameTh, setNameTh] = useState("");
@@ -29,23 +29,23 @@ export default function EditCat() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!catQ.data) return;
-    setName(catQ.data.name ?? "");
-    setNameTh(catQ.data.name_th ?? "");
-    setFeatures(catQ.data.distinguishing_features ?? "");
-    setAge(catQ.data.age_guess ?? null);
-    setSex(catQ.data.sex ?? "unknown");
-  }, [catQ.data]);
+    if (!dogQ.data) return;
+    setName(dogQ.data.name ?? "");
+    setNameTh(dogQ.data.name_th ?? "");
+    setFeatures(dogQ.data.distinguishing_features ?? "");
+    setAge(dogQ.data.age_guess ?? null);
+    setSex(dogQ.data.sex ?? "unknown");
+  }, [dogQ.data]);
 
-  if (!catQ.data) {
+  if (!dogQ.data) {
     return <Screen><Text style={styles.loading}>Loading…</Text></Screen>;
   }
 
-  const isDiscoverer = session?.user.id && session.user.id === catQ.data.discovered_by_user_id;
+  const isDiscoverer = session?.user.id && session.user.id === dogQ.data.discovered_by_user_id;
   if (!isDiscoverer) {
     return (
       <Screen style={styles.center}>
-        <Text style={styles.body}>Only the person who discovered this cat can edit it.</Text>
+        <Text style={styles.body}>Only the person who discovered this dog can edit it.</Text>
         <Button label="Back" variant="secondary" onPress={() => router.back()} />
       </Screen>
     );
@@ -53,19 +53,19 @@ export default function EditCat() {
 
   const save = async () => {
     if (!name.trim()) {
-      Alert.alert("Name required", "Give the cat a name.");
+      Alert.alert("Name required", "Give the dog a name.");
       return;
     }
     setBusy(true);
     try {
-      await updateCat(id!, {
+      await updateDog(id!, {
         name: name.trim(),
         name_th: nameTh.trim() || null,
         distinguishing_features: features.trim() || null,
         age_guess: age,
         sex,
       });
-      await qc.invalidateQueries({ queryKey: ["cat", id] });
+      await qc.invalidateQueries({ queryKey: ["dog", id] });
       router.back();
     } catch (e) {
       Alert.alert("Couldn't save", e instanceof Error ? e.message : String(e));
@@ -82,7 +82,7 @@ export default function EditCat() {
     >
       <Screen scroll>
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <Text style={styles.h1}>Edit cat</Text>
+          <Text style={styles.h1}>Edit dog</Text>
 
           <Text style={styles.label}>Name</Text>
           <TextInput value={name} onChangeText={setName} style={styles.input} maxLength={40} />

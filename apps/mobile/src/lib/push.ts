@@ -87,7 +87,7 @@ export async function sendPush(input: {
 // Settings keys that match notification_settings columns and the category
 // gate inside the send-push edge function.
 export interface NotificationCategoryMap {
-  favourite_cat_photo: boolean;
+  favourite_dog_photo: boolean;
   injured_or_missing: boolean;
   sticker_unlocked: boolean;
   comment_on_my_photo: boolean;

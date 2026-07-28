@@ -1,27 +1,27 @@
 {
   "expo": {
-    "name": "เติมแมว",
-    "slug": "soi-cats",
-    "scheme": "soicats",
+    "name": "หมาซอย",
+    "slug": "soi-dogs",
+    "scheme": "soidogs",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "co.soicats.app",
+      "bundleIdentifier": "co.soidogs.app",
       "config": {
         "googleMapsApiKey": "$EXPO_PUBLIC_GOOGLE_MAPS_API_KEY"
       },
       "infoPlist": {
-        "NSCameraUsageDescription": "Soi Cats uses your camera so you can photograph cats you meet.",
-        "NSPhotoLibraryAddUsageDescription": "Soi Cats saves stickers you unlock to your camera roll.",
-        "NSLocationWhenInUseUsageDescription": "Soi Cats uses your location to identify which neighbourhood cat you've spotted.",
+        "NSCameraUsageDescription": "Soi Dogs uses your camera so you can photograph dogs you meet.",
+        "NSPhotoLibraryAddUsageDescription": "Soi Dogs saves stickers you unlock to your camera roll.",
+        "NSLocationWhenInUseUsageDescription": "Soi Dogs uses your location to identify which neighbourhood dog you've spotted.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "co.soicats.app",
+      "package": "co.soidogs.app",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -41,19 +41,19 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow Soi Cats to use the camera so you can photograph cats."
+          "cameraPermission": "Allow Soi Dogs to use the camera so you can photograph dogs."
         }
       ],
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Soi Cats uses your location to identify nearby cats."
+          "locationWhenInUsePermission": "Soi Dogs uses your location to identify nearby dogs."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Soi Cats needs access to your photos so you can pick cat photos to upload."
+          "photosPermission": "Soi Dogs needs access to your photos so you can pick dog photos to upload."
         }
       ],
       "expo-secure-store"

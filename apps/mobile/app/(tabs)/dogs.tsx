@@ -7,13 +7,13 @@ import { useTranslation } from "react-i18next";
 import { Screen } from "@/components/Screen";
 import { SignInPill } from "@/components/SignInPill";
 import { PokedexCard } from "@/components/PokedexCard";
-import { fetchNearbyCats, fetchAllCats, fetchExtrasByCatId } from "@/lib/api";
+import { fetchNearbyDogs, fetchAllDogs, fetchExtrasByDogId } from "@/lib/api";
 import { useLocation } from "@/hooks/useLocation";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
 type Sort = "near" | "name";
 
-// Cats tab — a searchable directory of every neighbourhood cat.
+// Dogs tab — a searchable directory of every neighbourhood dog.
 // Defaults to nearest-first when location is available, A-Z otherwise.
 export default function CatsTab() {
   const { t } = useTranslation();
@@ -25,14 +25,14 @@ export default function CatsTab() {
   // Pull a generous radius so the list isn't empty for users in low-density
   // areas. 50km easily covers all of greater Bangkok.
   const nearQ = useQuery({
-    queryKey: ["browse-cats-near", coords?.latitude, coords?.longitude],
-    queryFn: () => fetchNearbyCats(coords!.latitude, coords!.longitude, 50_000, 200),
+    queryKey: ["browse-dogs-near", coords?.latitude, coords?.longitude],
+    queryFn: () => fetchNearbyDogs(coords!.latitude, coords!.longitude, 50_000, 200),
     enabled: sort === "near" && !!coords,
   });
 
   const nameQ = useQuery({
-    queryKey: ["browse-cats-name"],
-    queryFn: () => fetchAllCats(200),
+    queryKey: ["browse-dogs-name"],
+    queryFn: () => fetchAllDogs(200),
     enabled: sort === "name" || !coords,
   });
 
@@ -41,7 +41,7 @@ export default function CatsTab() {
   const nearbyIds = (nearQ.data ?? []).map((r) => r.id);
   const extrasQ = useQuery({
     queryKey: ["extras-by-id", nearbyIds.join(",")],
-    queryFn: () => fetchExtrasByCatId(nearbyIds),
+    queryFn: () => fetchExtrasByDogId(nearbyIds),
     enabled: nearbyIds.length > 0,
   });
 
@@ -84,7 +84,7 @@ export default function CatsTab() {
     <Screen>
       <SignInPill />
       <View style={styles.header}>
-        <Text style={styles.brand}>Cats</Text>
+        <Text style={styles.brand}>Dogs</Text>
         <Text style={styles.tagline}>{t("app.tagline")}</Text>
       </View>
 
@@ -108,7 +108,7 @@ export default function CatsTab() {
       ) : filtered.length === 0 ? (
         <View style={styles.center}>
           <Text style={styles.empty}>
-            {search.trim() ? "No cats match that name yet." : "No cats here yet — be the first to add one."}
+            {search.trim() ? "No dogs match that name yet." : "No dogs here yet — be the first to add one."}
           </Text>
         </View>
       ) : (
@@ -119,12 +119,12 @@ export default function CatsTab() {
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
             <PokedexCard
-              catId={item.id}
+              dogId={item.id}
               name={item.name}
               primaryColor={item.primary_color}
               pattern={item.pattern}
               thumbnailUrl={item.thumbnail_url}
-              onPress={() => router.push(`/cat/${item.id}`)}
+              onPress={() => router.push(`/dog/${item.id}`)}
             />
           )}
         />

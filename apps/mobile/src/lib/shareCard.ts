@@ -6,7 +6,7 @@ import type { RefObject } from "react";
 import type { View } from "react-native";
 
 // Capture a View at 3x its on-screen size to land on the BRIEF-spec
-// 1080x1080 PNG, then hand to native share sheet. Used by the cat share
+// 1080x1080 PNG, then hand to native share sheet. Used by the dog share
 // card screen.
 export async function captureAndShareCard(ref: RefObject<View>, filenameHint = "soicats-card") {
   if (!ref.current) throw new Error("Card not mounted");

@@ -9,8 +9,8 @@
 -- you can invoke it manually:
 --    select freeze_weekly_winners();
 --
--- BRIEF section 10.6: photos are excluded from leaderboards if their cat
--- has a verified, unresolved injured/missing/deceased flag, or the cat's
+-- BRIEF section 10.6: photos are excluded from leaderboards if their dog
+-- has a verified, unresolved injured/missing/deceased flag, or the dog's
 -- own status is set to one of those.
 
 create table public.weekly_leaderboard_winners (
@@ -20,7 +20,7 @@ create table public.weekly_leaderboard_winners (
   rank            int  not null check (rank in (1, 2, 3)),
   sighting_id     uuid not null references public.sightings (id) on delete cascade,
   photographer_id uuid not null references public.users (id) on delete cascade,
-  cat_id          uuid not null references public.cats (id) on delete cascade,
+  dog_id          uuid not null references public.dogs (id) on delete cascade,
   like_count      int  not null,
   points_awarded  int  not null,
   created_at      timestamptz not null default now(),
@@ -50,8 +50,8 @@ returns table (
   photo_url           text,
   caption             text,
   like_count          int,
-  cat_id              uuid,
-  cat_name            text,
+  dog_id              uuid,
+  dog_name            text,
   photographer_id     uuid,
   photographer_handle text,
   created_at          timestamptz
@@ -69,27 +69,27 @@ as $$
       s.photo_url,
       s.caption,
       s.like_count,
-      s.cat_id,
+      s.dog_id,
       c.name,
       s.photographer_id,
       u.handle,
       s.created_at
     from public.sightings s
-    join public.cats c on c.id = s.cat_id
+    join public.dogs c on c.id = s.dog_id
     left join public.users u on u.id = s.photographer_id
     where s.status = 'confirmed'
       and s.district_id = target_district
       and s.created_at >= (select week_start from bounds)
       and c.status not in ('injured', 'missing', 'deceased')
       and not exists (
-        select 1 from public.cat_health_flags f
-         where f.cat_id = s.cat_id
+        select 1 from public.dog_health_flags f
+         where f.dog_id = s.dog_id
            and f.status = 'verified'
            and f.flag_type in ('injured', 'missing', 'deceased')
            and f.resolved_at is null
       )
   )
-  select rank, id, photo_url, caption, like_count, cat_id, name, photographer_id, handle, created_at
+  select rank, id, photo_url, caption, like_count, dog_id, name, photographer_id, handle, created_at
     from ranked
    where rank <= max_rows;
 $$;
@@ -104,8 +104,8 @@ returns table (
   rank                int,
   sighting_id         uuid,
   photo_url           text,
-  cat_id              uuid,
-  cat_name            text,
+  dog_id              uuid,
+  dog_name            text,
   photographer_id     uuid,
   photographer_handle text,
   like_count          int
@@ -125,7 +125,7 @@ as $$
     w.rank,
     w.sighting_id,
     s.photo_url,
-    w.cat_id,
+    w.dog_id,
     c.name,
     w.photographer_id,
     u.handle,
@@ -133,7 +133,7 @@ as $$
   from public.weekly_leaderboard_winners w
   join last_weeks lw on lw.week_start = w.week_start
   left join public.sightings s on s.id = w.sighting_id
-  left join public.cats     c on c.id = w.cat_id
+  left join public.dogs     c on c.id = w.dog_id
   left join public.users    u on u.id = w.photographer_id
   where w.district_id = target_district
   order by w.week_start desc, w.rank asc;
@@ -164,22 +164,22 @@ begin
         s.district_id,
         s.id as sighting_id,
         s.photographer_id,
-        s.cat_id,
+        s.dog_id,
         s.like_count,
         row_number() over (
           partition by s.district_id
           order by s.like_count desc, s.created_at asc
         ) as rnk
       from public.sightings s
-      join public.cats c on c.id = s.cat_id
+      join public.dogs c on c.id = s.dog_id
       where s.status = 'confirmed'
         and s.district_id is not null
         and s.created_at >= prev_start
         and s.created_at <  prev_end
         and c.status not in ('injured', 'missing', 'deceased')
         and not exists (
-          select 1 from public.cat_health_flags f
-           where f.cat_id = s.cat_id
+          select 1 from public.dog_health_flags f
+           where f.dog_id = s.dog_id
              and f.status = 'verified'
              and f.flag_type in ('injured', 'missing', 'deceased')
              and f.resolved_at is null
@@ -191,11 +191,11 @@ begin
 
     insert into public.weekly_leaderboard_winners (
       week_start, district_id, rank,
-      sighting_id, photographer_id, cat_id,
+      sighting_id, photographer_id, dog_id,
       like_count, points_awarded
     ) values (
       prev_start::date, rec.district_id, rec.rnk,
-      rec.sighting_id, rec.photographer_id, rec.cat_id,
+      rec.sighting_id, rec.photographer_id, rec.dog_id,
       rec.like_count, pts
     )
     on conflict (week_start, district_id, rank) do nothing;

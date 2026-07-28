@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
-import { approveCatMerge, fetchOpenMergeRequests, rejectCatMerge } from "@/lib/api";
+import { approveDogMerge, fetchOpenMergeRequests, rejectDogMerge } from "@/lib/api";
 import { useTimeAgo } from "@/hooks/useTimeAgo";
 import { useProfile } from "@/hooks/useProfile";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
@@ -41,11 +41,11 @@ export default function MergeQueue() {
   });
 
   const approveMut = useMutation({
-    mutationFn: (id: string) => approveCatMerge(id),
+    mutationFn: (id: string) => approveDogMerge(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-open-merges"] }),
   });
   const rejectMut = useMutation({
-    mutationFn: (id: string) => rejectCatMerge(id),
+    mutationFn: (id: string) => rejectDogMerge(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-open-merges"] }),
   });
 
@@ -112,10 +112,10 @@ export default function MergeQueue() {
             </Text>
 
             <View style={styles.compareRow}>
-              <Pressable style={styles.catSide} onPress={() => router.push(`/cat/${row.source.id}`)}>
+              <Pressable style={styles.dogSide} onPress={() => router.push(`/dog/${row.source.id}`)}>
                 <Text style={styles.label}>From (will be deleted)</Text>
-                <Text style={styles.catName}>{row.source.name}</Text>
-                <Text style={styles.catMeta}>
+                <Text style={styles.dogName}>{row.source.name}</Text>
+                <Text style={styles.dogMeta}>
                   {row.source.primary_color} · {row.source.pattern}
                 </Text>
                 {row.source.distinguishing_features ? (
@@ -125,10 +125,10 @@ export default function MergeQueue() {
 
               <Text style={styles.arrow}>→</Text>
 
-              <Pressable style={styles.catSide} onPress={() => router.push(`/cat/${row.target.id}`)}>
+              <Pressable style={styles.dogSide} onPress={() => router.push(`/dog/${row.target.id}`)}>
                 <Text style={styles.label}>Into (will survive)</Text>
-                <Text style={styles.catName}>{row.target.name}</Text>
-                <Text style={styles.catMeta}>
+                <Text style={styles.dogName}>{row.target.name}</Text>
+                <Text style={styles.dogMeta}>
                   {row.target.primary_color} · {row.target.pattern}
                 </Text>
                 {row.target.distinguishing_features ? (
@@ -177,12 +177,12 @@ const styles = StyleSheet.create({
   meta: { ...typography.small, color: colors.textDim },
 
   compareRow: { flexDirection: "row", alignItems: "stretch", gap: spacing(2), marginVertical: spacing(2) },
-  catSide: { flex: 1, padding: spacing(2), borderRadius: radius.md, backgroundColor: colors.bg, gap: 2 },
+  dogSide: { flex: 1, padding: spacing(2), borderRadius: radius.md, backgroundColor: colors.bg, gap: 2 },
   arrow: { fontSize: 24, color: colors.primary, fontWeight: "900", alignSelf: "center" },
 
   label: { ...typography.label, color: colors.textDim },
-  catName: { ...typography.h3, color: colors.text },
-  catMeta: { ...typography.small, color: colors.textDim },
+  dogName: { ...typography.h3, color: colors.text },
+  dogMeta: { ...typography.small, color: colors.textDim },
   feat: { ...typography.small, color: colors.text, fontStyle: "italic", marginTop: 2 },
 
   reasonBox: { padding: spacing(2), backgroundColor: colors.accentSoft, borderRadius: radius.md },

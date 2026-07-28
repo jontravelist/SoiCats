@@ -6,21 +6,21 @@ import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
-import { CatCard } from "@/components/CatCard";
+import { DogCard } from "@/components/DogCard";
 import { Button } from "@/components/Button";
 import {
   awardPoints,
   computePhotoHash,
   createSighting,
-  fetchNearbyCats,
+  fetchNearbyDogs,
 } from "@/lib/api";
 import { uploadSightingPhoto } from "@/lib/photo";
 import { useUploadStore } from "@/stores/upload";
 import { useAuthStore } from "@/stores/auth";
 import { colors, spacing, typography } from "@/lib/theme";
 
-// Cat-picker step in the upload flow.
-// User has just taken/selected a photo; we show nearby cats and let them
+// Dog-picker step in the upload flow.
+// User has just taken/selected a photo; we show nearby dogs and let them
 // pick existing, create new, or send to the "not sure" queue.
 export default function IdentifyScreen() {
   const { t } = useTranslation();
@@ -32,7 +32,7 @@ export default function IdentifyScreen() {
 
   const nearbyQ = useQuery({
     queryKey: ["nearby-for-id", pending?.lat, pending?.lng],
-    queryFn: () => fetchNearbyCats(pending!.lat!, pending!.lng!),
+    queryFn: () => fetchNearbyDogs(pending!.lat!, pending!.lng!),
     enabled: !!pending?.lat && !!pending?.lng,
   });
 
@@ -59,7 +59,7 @@ export default function IdentifyScreen() {
     );
   }
 
-  const submitWithCat = async (catId: string | null, status: "confirmed" | "pending_id") => {
+  const submitWithCat = async (dogId: string | null, status: "confirmed" | "pending_id") => {
     if (!session) {
       // Don't drop the photo. Push to /auth — Zustand keeps `pending` in
       // memory and the user lands back on this exact screen after sign-in.
@@ -77,7 +77,7 @@ export default function IdentifyScreen() {
     setSubmitting(true);
     try {
       const sighting = await createSighting({
-        cat_id: status === "confirmed" ? catId : null,
+        dog_id: status === "confirmed" ? dogId : null,
         photo_url: pending.remoteUrl,
         lat: pending.lat,
         lng: pending.lng,
@@ -91,8 +91,8 @@ export default function IdentifyScreen() {
         await awardPoints(sighting.id);
       }
       useUploadStore.getState().setPending(null);
-      if (catId) {
-        router.replace(`/cat/${catId}`);
+      if (dogId) {
+        router.replace(`/dog/${dogId}`);
       } else {
         // 'Not sure' path: photo goes into the community ID queue. Tell the
         // user where it went so it doesn't feel like the photo vanished.
@@ -142,22 +142,22 @@ export default function IdentifyScreen() {
         </View>
       ) : null}
 
-      <Text style={styles.h2}>{t("post.whichCat")}</Text>
+      <Text style={styles.h2}>{t("post.whichDog")}</Text>
 
       {nearbyQ.isLoading ? (
         <ActivityIndicator />
       ) : (nearbyQ.data ?? []).length === 0 ? (
         <View style={styles.emptyCard}>
-          <Text style={styles.emptyTitle}>No cats spotted here yet</Text>
+          <Text style={styles.emptyTitle}>No dogs spotted here yet</Text>
           <Text style={styles.emptyBody}>
-            Be the first — tap "New cat" below to give them a name. Or "Not sure"
+            Be the first — tap "New dog" below to give them a name. Or "Not sure"
             to send the photo to the community ID queue.
           </Text>
         </View>
       ) : (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardRow}>
           {(nearbyQ.data ?? []).map((c) => (
-            <CatCard
+            <DogCard
               key={c.id}
               name={c.name}
               thumbnailUrl={c.thumbnail_url}
@@ -170,8 +170,8 @@ export default function IdentifyScreen() {
 
       <View style={styles.actions}>
         <Button
-          label={t("post.newCat")}
-          onPress={() => router.push({ pathname: "/post/new-cat" })}
+          label={t("post.newDog")}
+          onPress={() => router.push({ pathname: "/post/new-dog" })}
           variant="secondary"
         />
         <Button

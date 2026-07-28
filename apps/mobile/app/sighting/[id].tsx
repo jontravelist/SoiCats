@@ -25,7 +25,7 @@ export default function SightingDetail() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sightings")
-        .select("*, users:photographer_id(handle, avatar_url), cats(id, name)")
+        .select("*, users:photographer_id(handle, avatar_url), dogs(id, name)")
         .eq("id", id!)
         .single();
       if (error) throw error;
@@ -82,12 +82,12 @@ export default function SightingDetail() {
       <Image source={s.photo_url} style={styles.photo} contentFit="cover" />
       <View style={styles.body}>
         <Pressable
-          onPress={() => s.cat_id && router.push(`/cat/${s.cat_id}`)}
-          style={({ pressed }) => [pressed && s.cat_id && { opacity: 0.7 }]}
+          onPress={() => s.dog_id && router.push(`/dog/${s.dog_id}`)}
+          style={({ pressed }) => [pressed && s.dog_id && { opacity: 0.7 }]}
         >
-          <Text style={styles.cat}>
-            {s.cats?.name ?? "—"}
-            {s.cat_id ? <Text style={styles.linkArrow}>  ›</Text> : null}
+          <Text style={styles.dog}>
+            {s.dogs?.name ?? "—"}
+            {s.dog_id ? <Text style={styles.linkArrow}>  ›</Text> : null}
           </Text>
         </Pressable>
         <Text style={styles.meta}>
@@ -137,7 +137,7 @@ export default function SightingDetail() {
 const styles = StyleSheet.create({
   photo: { width: "100%", aspectRatio: 1, backgroundColor: colors.border },
   body: { padding: spacing(4) },
-  cat: { ...typography.h2 },
+  dog: { ...typography.h2 },
   linkArrow: { color: colors.primary, fontWeight: "900" },
   meta: { ...typography.small, color: colors.textDim, marginTop: 4 },
   caption: { ...typography.body, marginTop: spacing(2) },

@@ -14,14 +14,14 @@ import { adminClient, HttpError, requireUser } from "../_shared/supabase.ts";
 import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
 
 type Category =
-  | "favourite_cat_photo"
+  | "favourite_dog_photo"
   | "injured_or_missing"
   | "sticker_unlocked"
   | "comment_on_my_photo"
   | "identify_resolved";
 
 const CATEGORY_COLUMNS: Record<Category, string> = {
-  favourite_cat_photo: "favourite_cat_photo",
+  favourite_dog_photo: "favourite_dog_photo",
   injured_or_missing:  "injured_or_missing",
   sticker_unlocked:    "sticker_unlocked",
   comment_on_my_photo: "comment_on_my_photo",

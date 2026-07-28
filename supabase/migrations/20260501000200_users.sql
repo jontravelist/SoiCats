@@ -1,4 +1,4 @@
--- Soi Cats: users
+-- Soi Dogs: users
 -- Mirrors auth.users 1:1 via id. A trigger creates a row on signup.
 
 create table public.users (

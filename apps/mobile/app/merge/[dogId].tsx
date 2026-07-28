@@ -5,26 +5,26 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
-import { fetchCat, requestCatMerge, searchCatsByName } from "@/lib/api";
+import { fetchDog, requestDogMerge, searchDogsByName } from "@/lib/api";
 import { useAuthStore } from "@/stores/auth";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
-// Lets a user flag this cat (the source) as a duplicate of another (the target).
-// Lands in cat_merge_requests for an admin to approve in Studio.
+// Lets a user flag this dog (the source) as a duplicate of another (the target).
+// Lands in dog_merge_requests for an admin to approve in Studio.
 export default function MergeRequest() {
-  const { catId } = useLocalSearchParams<{ catId: string }>();
+  const { dogId } = useLocalSearchParams<{ dogId: string }>();
   const router = useRouter();
   const session = useAuthStore((s) => s.session);
 
-  const sourceQ = useQuery({ queryKey: ["cat", catId], queryFn: () => fetchCat(catId!), enabled: !!catId });
+  const sourceQ = useQuery({ queryKey: ["dog", dogId], queryFn: () => fetchDog(dogId!), enabled: !!dogId });
   const [search, setSearch] = useState("");
   const [target, setTarget] = useState<{ id: string; name: string } | null>(null);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
 
   const matchesQ = useQuery({
-    queryKey: ["search-cats", search, catId],
-    queryFn: () => searchCatsByName(search, catId),
+    queryKey: ["search-dogs", search, dogId],
+    queryFn: () => searchDogsByName(search, dogId),
     enabled: search.trim().length >= 2 && !target,
   });
 
@@ -38,17 +38,17 @@ export default function MergeRequest() {
   }
 
   const submit = async () => {
-    if (!catId || !target) {
-      Alert.alert("Pick a cat", "Search for the cat you think this is the same as.");
+    if (!dogId || !target) {
+      Alert.alert("Pick a dog", "Search for the dog you think this is the same as.");
       return;
     }
     if (!reason.trim()) {
-      Alert.alert("Add a reason", "Tell the admin why you think these are the same cat.");
+      Alert.alert("Add a reason", "Tell the admin why you think these are the same dog.");
       return;
     }
     setBusy(true);
     try {
-      await requestCatMerge({ sourceCatId: catId, targetCatId: target.id, reason: reason.trim() });
+      await requestDogMerge({ sourceDogId: dogId, targetDogId: target.id, reason: reason.trim() });
       Alert.alert(
         "Request submitted",
         `Thanks. An admin will review the merge of ${sourceQ.data?.name} into ${target.name}.`,
@@ -76,10 +76,10 @@ export default function MergeRequest() {
         <View style={styles.container}>
           <Text style={styles.h1}>Mark as duplicate</Text>
           {sourceQ.data ? (
-            <Text style={styles.subtitle}>This cat: {sourceQ.data.name}</Text>
+            <Text style={styles.subtitle}>This dog: {sourceQ.data.name}</Text>
           ) : null}
 
-          <Text style={styles.label}>Same as which cat?</Text>
+          <Text style={styles.label}>Same as which dog?</Text>
           {target ? (
             <View style={styles.targetCard}>
               <Text style={styles.targetName}>{target.name}</Text>
@@ -133,7 +133,7 @@ export default function MergeRequest() {
           <View style={styles.note}>
             <Text style={styles.noteText}>
               An admin reviews every merge before any data moves. Approving merges
-              the source cat's photos, favourites and flags into the target cat
+              the source dog's photos, favourites and flags into the target dog
               and removes the duplicate.
             </Text>
           </View>

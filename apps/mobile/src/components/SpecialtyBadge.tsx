@@ -11,7 +11,7 @@ interface Props {
 export function SpecialtyBadge({ stat, score }: Props) {
   const meta = STAT_META[stat];
   const bg = STAT_COLORS[stat];
-  // Slink is charcoal — needs a lighter inner shadow accent.
+  // Chill is charcoal — needs a lighter inner shadow accent.
   return (
     <View style={[styles.wrap, { backgroundColor: bg }]}>
       <Text style={styles.emoji}>{meta.icon}</Text>

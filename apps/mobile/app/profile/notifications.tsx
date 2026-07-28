@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
 interface Settings {
-  favourite_cat_photo: boolean;
+  favourite_dog_photo: boolean;
   injured_or_missing: boolean;
   sticker_unlocked: boolean;
   comment_on_my_photo: boolean;
@@ -17,7 +17,7 @@ interface Settings {
 }
 
 const DEFAULTS: Settings = {
-  favourite_cat_photo: true,
+  favourite_dog_photo: true,
   injured_or_missing:  true,
   sticker_unlocked:    true,
   comment_on_my_photo: false,
@@ -25,8 +25,8 @@ const DEFAULTS: Settings = {
 };
 
 const ROWS: Array<{ key: keyof Settings; title: string; body: string }> = [
-  { key: "favourite_cat_photo", title: "Favourite cats",       body: "When a cat you favourited gets a new photo." },
-  { key: "injured_or_missing",  title: "Injured or missing",   body: "When a flag is verified for a cat near you." },
+  { key: "favourite_dog_photo", title: "Favourite dogs",       body: "When a dog you favourited gets a new photo." },
+  { key: "injured_or_missing",  title: "Injured or missing",   body: "When a flag is verified for a dog near you." },
   { key: "sticker_unlocked",    title: "Sticker unlocks",      body: "When you cross a points threshold." },
   { key: "identify_resolved",   title: "ID queue resolved",    body: "When the community identifies your photo." },
   { key: "comment_on_my_photo", title: "Comments on my photo", body: "When someone comments on your photo." },

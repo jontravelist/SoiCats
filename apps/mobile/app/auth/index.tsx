@@ -6,7 +6,7 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import Constants from "expo-constants";
 
 import { Button } from "@/components/Button";
-import { CatGlyph } from "@/components/CatGlyph";
+import { DogGlyph } from "@/components/DogGlyph";
 import { supabase } from "@/lib/supabase";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
@@ -86,17 +86,17 @@ export default function AuthScreen() {
         {step === "welcome" ? (
           <View style={styles.hero}>
             <Text style={styles.title}>{t("app.name")}</Text>
-            <Text style={styles.tagline}>Every cat in your neighbourhood, named.</Text>
+            <Text style={styles.tagline}>Every dog in your neighbourhood, named.</Text>
 
             <View style={styles.mascots}>
-              <View style={[styles.cat, styles.cat1]}>
-                <CatGlyph color={colors.accent} secondary={colors.text} size={120} pose={0} />
+              <View style={[styles.dog, styles.dog1]}>
+                <DogGlyph color={colors.accent} secondary={colors.text} size={120} pose={0} />
               </View>
-              <View style={[styles.cat, styles.cat2]}>
-                <CatGlyph color={colors.primary} secondary={colors.text} size={130} pose={2} />
+              <View style={[styles.dog, styles.dog2]}>
+                <DogGlyph color={colors.primary} secondary={colors.text} size={130} pose={2} />
               </View>
-              <View style={[styles.cat, styles.cat3]}>
-                <CatGlyph color={colors.secondary} secondary="#FFFFFF" size={110} pose={1} />
+              <View style={[styles.dog, styles.dog3]}>
+                <DogGlyph color={colors.secondary} secondary="#FFFFFF" size={110} pose={1} />
               </View>
             </View>
           </View>
@@ -174,7 +174,7 @@ export default function AuthScreen() {
         )}
 
         <Text style={styles.terms}>By continuing you agree to the Terms and Privacy Policy.</Text>
-        <Text style={styles.footerStrip}>Made in Bangkok · 4,200 cats logged</Text>
+        <Text style={styles.footerStrip}>Made in Bangkok · 4,200 dogs logged</Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -191,10 +191,10 @@ const styles = StyleSheet.create({
   titleCompact: { fontSize: 36, fontWeight: "900", color: colors.text, letterSpacing: -1 },
 
   mascots: { height: 260, width: "100%", alignItems: "center", justifyContent: "center", marginTop: spacing(4), position: "relative" },
-  cat: { position: "absolute" },
-  cat1: { left: 10, top: 0, transform: [{ rotate: "-12deg" }] },
-  cat2: { right: 16, top: 30, transform: [{ rotate: "10deg" }] },
-  cat3: { bottom: 0, alignSelf: "center" },
+  dog: { position: "absolute" },
+  dog1: { left: 10, top: 0, transform: [{ rotate: "-12deg" }] },
+  dog2: { right: 16, top: 30, transform: [{ rotate: "10deg" }] },
+  dog3: { bottom: 0, alignSelf: "center" },
 
   actions: { gap: spacing(3), marginTop: spacing(6) },
   cta: {

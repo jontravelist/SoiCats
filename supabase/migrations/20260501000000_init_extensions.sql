@@ -1,4 +1,4 @@
--- Soi Cats: extensions
+-- Soi Dogs: extensions
 -- PostGIS for geo queries, pgcrypto for gen_random_uuid, vector for future ML hook.
 
 create extension if not exists postgis;

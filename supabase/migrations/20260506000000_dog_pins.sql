@@ -1,8 +1,8 @@
--- Recent sighting pins for the territory map on a cat profile.
+-- Recent sighting pins for the territory map on a dog profile.
 -- Returns lng/lat as plain doubles so the client doesn't need to parse PostGIS.
 
-create or replace function public.cat_recent_sighting_pins(
-  target_cat uuid,
+create or replace function public.dog_recent_sighting_pins(
+  target_dog uuid,
   max_rows   int default 10
 )
 returns table (
@@ -22,7 +22,7 @@ as $$
     s.created_at,
     s.photo_url
   from public.sightings s
-  where s.cat_id = target_cat
+  where s.dog_id = target_dog
     and s.status = 'confirmed'
   order by s.created_at desc
   limit max_rows;

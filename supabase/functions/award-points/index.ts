@@ -4,7 +4,7 @@
 //
 // Server-side enforcement of the points rules (Section 9 of BRIEF.md):
 // - Daily cap of 100 points per user.
-// - Same-cat-same-place farming: 0 points if same user posted same cat within 50m in last 4h.
+// - Same-dog-same-place farming: 0 points if same user posted same dog within 50m in last 4h.
 // - Duplicate photo (pHash within Hamming distance 5 in last 30 days): 0 points.
 // - Account age gate for discoverer + welfare check bonuses.
 // - "Help identify" delayed awards happen via verify-flag/queue-resolution path.
@@ -59,17 +59,17 @@ Deno.serve(async (req) => {
     }
 
     // 2. Pending ID sightings don't award yet — that happens at queue resolution.
-    if (sighting.status === "pending_id" || sighting.cat_id === null) {
+    if (sighting.status === "pending_id" || sighting.dog_id === null) {
       return jsonResponse({ awarded: 0, reason: "pending_id" });
     }
 
-    // 3. Farming check: same user, same cat, within FARMING_RADIUS_M, in last
+    // 3. Farming check: same user, same dog, within FARMING_RADIUS_M, in last
     //    FARMING_WINDOW_HOURS. Done via a SQL RPC because PostgREST cannot
     //    express ST_DWithin against a column the way we want here.
     const since = new Date(Date.now() - FARMING_WINDOW_HOURS * 3_600_000).toISOString();
     const { data: farmingHit } = await admin.rpc("recent_close_sighting", {
       photographer: userId,
-      target_cat: sighting.cat_id,
+      target_dog: sighting.dog_id,
       exclude_id: sighting.id,
       radius_m: FARMING_RADIUS_M,
       since,
@@ -100,33 +100,33 @@ Deno.serve(async (req) => {
     let actionType: string;
     let points: number;
 
-    // Was this user the discoverer (the cat row references them and this is the
-    // first sighting of that cat)?
-    const { data: cat } = await admin
-      .from("cats")
+    // Was this user the discoverer (the dog row references them and this is the
+    // first sighting of that dog)?
+    const { data: dog } = await admin
+      .from("dogs")
       .select("discovered_by_user_id, last_seen_at, created_at")
-      .eq("id", sighting.cat_id)
+      .eq("id", sighting.dog_id)
       .single();
 
     const { count: priorCount } = await admin
       .from("sightings")
       .select("id", { count: "exact", head: true })
-      .eq("cat_id", sighting.cat_id)
+      .eq("dog_id", sighting.dog_id)
       .lt("created_at", sighting.created_at);
 
     const isFirstEverPhoto = (priorCount ?? 0) === 0;
 
     if (
       isFirstEverPhoto &&
-      cat?.discovered_by_user_id === userId &&
+      dog?.discovered_by_user_id === userId &&
       accountAgeHours >= ACCOUNT_AGE_GATE_HOURS
     ) {
       actionType = "discoverer_bonus";
       points = NEW_CAT_BONUS;
     } else {
-      // Welfare check bonus — cat unseen for >= 14 days before this sighting.
-      const lastSeenBeforeMs = cat?.last_seen_at
-        ? new Date(cat.last_seen_at).getTime()
+      // Welfare check bonus — dog unseen for >= 14 days before this sighting.
+      const lastSeenBeforeMs = dog?.last_seen_at
+        ? new Date(dog.last_seen_at).getTime()
         : 0;
       const gapDays = (Date.now() - lastSeenBeforeMs) / 86_400_000;
       if (gapDays >= 14 && accountAgeHours >= ACCOUNT_AGE_GATE_HOURS) {

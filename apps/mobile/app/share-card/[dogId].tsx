@@ -5,34 +5,34 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
-import { CatShareCard } from "@/components/ShareCards/CatShareCard";
-import { fetchCat, fetchCatSightings } from "@/lib/api";
+import { DogShareCard } from "@/components/ShareCards/DogShareCard";
+import { fetchDog, fetchDogSightings } from "@/lib/api";
 import { captureAndSaveCard, captureAndShareCard } from "@/lib/shareCard";
 import { colors, spacing, typography } from "@/lib/theme";
 
-// Modal screen showing the cat's share card preview + Share / Save buttons.
+// Modal screen showing the dog's share card preview + Share / Save buttons.
 // The card itself is captured via react-native-view-shot at 1080x1080 px
 // (3x the on-screen 360dp render).
 export default function ShareCardScreen() {
-  const { catId } = useLocalSearchParams<{ catId: string }>();
+  const { dogId } = useLocalSearchParams<{ dogId: string }>();
   const router = useRouter();
   const cardRef = useRef<View>(null);
 
-  const catQ = useQuery({
-    queryKey: ["cat", catId],
-    queryFn: () => fetchCat(catId!),
-    enabled: !!catId,
+  const dogQ = useQuery({
+    queryKey: ["dog", dogId],
+    queryFn: () => fetchDog(dogId!),
+    enabled: !!dogId,
   });
   const sightingsQ = useQuery({
-    queryKey: ["cat-sightings", catId],
-    queryFn: () => fetchCatSightings(catId!),
-    enabled: !!catId,
+    queryKey: ["dog-sightings", dogId],
+    queryFn: () => fetchDogSightings(dogId!),
+    enabled: !!dogId,
   });
 
-  if (catQ.isLoading || !catQ.data) {
+  if (dogQ.isLoading || !dogQ.data) {
     return <Screen><ActivityIndicator style={{ flex: 1 }} /></Screen>;
   }
-  const cat = catQ.data;
+  const dog = dogQ.data;
   const heroSighting = (sightingsQ.data ?? [])[0];
 
   return (
@@ -42,10 +42,10 @@ export default function ShareCardScreen() {
         <Text style={styles.body}>Square 1080×1080 image — drops into Instagram Stories, LINE, WhatsApp.</Text>
 
         <View style={styles.cardWrap}>
-          <CatShareCard
+          <DogShareCard
             ref={cardRef}
-            cat={cat}
-            districtName={(cat as { district?: { name?: string } | null }).district?.name ?? null}
+            dog={dog}
+            districtName={(dog as { district?: { name?: string } | null }).district?.name ?? null}
             heroPhotoUrl={heroSighting?.photo_url ?? null}
           />
         </View>
@@ -53,7 +53,7 @@ export default function ShareCardScreen() {
         <View style={styles.actions}>
           <Button
             label="Share"
-            onPress={() => captureAndShareCard(cardRef as React.RefObject<View>, `${cat.name} stat card`)}
+            onPress={() => captureAndShareCard(cardRef as React.RefObject<View>, `${dog.name} stat card`)}
           />
           <Button
             label="Save to camera roll"

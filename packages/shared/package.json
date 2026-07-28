@@ -1,5 +1,5 @@
 {
-  "name": "@soicats/shared",
+  "name": "@soidogs/shared",
   "version": "0.1.0",
   "private": true,
   "main": "./database.types.ts",

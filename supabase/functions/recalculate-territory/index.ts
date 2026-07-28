@@ -1,6 +1,6 @@
 // Edge Function: recalculate-territory
 // POST /functions/v1/recalculate-territory
-// body: { cat_id: uuid }
+// body: { dog_id: uuid }
 //
 // Manual trigger for the territory recalculation. The DB trigger on sightings
 // already handles the common case; this endpoint is for admin use after bulk
@@ -14,8 +14,8 @@ Deno.serve(async (req) => {
 
   try {
     const { id: caller } = await requireUser(req);
-    const { cat_id } = await req.json();
-    if (!cat_id) throw new HttpError(400, "cat_id required");
+    const { dog_id } = await req.json();
+    if (!dog_id) throw new HttpError(400, "dog_id required");
 
     const admin = adminClient();
     const { data: callerUser } = await admin
@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
       throw new HttpError(403, "Admin only");
     }
 
-    const { error } = await admin.rpc("recalculate_territory", { target_cat_id: cat_id });
+    const { error } = await admin.rpc("recalculate_territory", { target_dog_id: dog_id });
     if (error) throw new HttpError(500, error.message);
     return jsonResponse({ ok: true });
   } catch (err) {

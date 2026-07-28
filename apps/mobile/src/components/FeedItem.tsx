@@ -8,8 +8,8 @@ import { useTimeAgo } from "@/hooks/useTimeAgo";
 
 export interface FeedItemProps {
   sightingId: string;
-  catId: string | null;
-  catName: string | null;
+  dogId: string | null;
+  dogName: string | null;
   photoUrl: string;
   caption: string | null;
   photographerHandle: string | null;
@@ -22,7 +22,7 @@ export interface FeedItemProps {
 
 // Feed card per the Soi Sunset spec:
 //   - Aspect-1/1 photo top, time-ago overlay top-right
-//   - Body: cat name (h3) with arrow, district + sighter handle (small dim)
+//   - Body: dog name (h3) with arrow, district + sighter handle (small dim)
 //   - Footer row: pin + meters · ♥ likes · 💬 comments · share
 export function FeedItem(props: FeedItemProps) {
   const { t } = useTranslation();
@@ -39,12 +39,12 @@ export function FeedItem(props: FeedItemProps) {
       </Pressable>
 
       <Pressable
-        onPress={() => props.catId && router.push(`/cat/${props.catId}`)}
-        style={({ pressed }) => [styles.body, pressed && props.catId && { opacity: 0.7 }]}
+        onPress={() => props.dogId && router.push(`/dog/${props.dogId}`)}
+        style={({ pressed }) => [styles.body, pressed && props.dogId && { opacity: 0.7 }]}
       >
-        <Text style={styles.catName} numberOfLines={1}>
-          {props.catName ?? "Unknown cat"}
-          {props.catId ? <Text style={styles.linkArrow}>  ›</Text> : null}
+        <Text style={styles.dogName} numberOfLines={1}>
+          {props.dogName ?? "Unknown dog"}
+          {props.dogId ? <Text style={styles.linkArrow}>  ›</Text> : null}
         </Text>
         <Text style={styles.meta}>
           {props.districtName ? `${props.districtName} · ` : ""}@{props.photographerHandle ?? "anon"}
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   timePillText: { color: "#fff", fontSize: 11, fontWeight: "700", letterSpacing: 0.3 },
 
   body: { paddingHorizontal: spacing(3), paddingTop: spacing(3), paddingBottom: spacing(1) },
-  catName: { ...typography.h3, color: colors.text },
+  dogName: { ...typography.h3, color: colors.text },
   linkArrow: { color: colors.primary, fontWeight: "900" },
   meta: { ...typography.small, color: colors.textDim, marginTop: 2 },
 

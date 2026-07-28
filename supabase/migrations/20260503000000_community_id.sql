@@ -1,7 +1,7 @@
 -- Community identification: queue RPC + auto-resolve trigger.
 
 -- pending_identifications: sightings the caller has neither posted nor voted
--- on yet, returned with the same nearby-cat suggestions the photographer saw.
+-- on yet, returned with the same nearby-dog suggestions the photographer saw.
 create or replace function public.pending_identifications(
   lng       double precision default null,
   lat       double precision default null,
@@ -42,7 +42,7 @@ as $$
   from public.sightings s
   left join public.users u on u.id = s.photographer_id
   where s.status = 'pending_id'
-    and s.cat_id is null
+    and s.dog_id is null
     and (auth.uid() is null or s.photographer_id <> auth.uid())
     and not exists (
       select 1 from public.identification_votes v
@@ -55,7 +55,7 @@ as $$
   limit max_rows;
 $$;
 
--- maybe_resolve_identification: pick a cat that crosses either threshold
+-- maybe_resolve_identification: pick a dog that crosses either threshold
 -- (>= 3 votes from users with > 50 points, OR >= 1 vote from a verified
 -- feeder / app admin) and confirm the sighting + award delayed +10 points.
 -- BRIEF section 8.4.
@@ -66,33 +66,33 @@ security definer
 set search_path = public
 as $$
 declare
-  resolution_cat_id uuid;
+  resolution_dog_id uuid;
   photographer      uuid;
 begin
-  select v.proposed_cat_id
-    into resolution_cat_id
+  select v.proposed_dog_id
+    into resolution_dog_id
   from public.identification_votes v
   join public.users u on u.id = v.voter_id
   where v.sighting_id = target_sighting
-    and v.proposed_cat_id is not null
-  group by v.proposed_cat_id
+    and v.proposed_dog_id is not null
+  group by v.proposed_dog_id
   having count(*) filter (where u.points > 50) >= 3
       or count(*) filter (where u.role in ('feeder', 'app_admin')) >= 1
   order by count(*) desc
   limit 1;
 
-  if resolution_cat_id is null then
+  if resolution_dog_id is null then
     return;
   end if;
 
   update public.sightings
-     set cat_id = resolution_cat_id,
+     set dog_id = resolution_dog_id,
          status = 'confirmed'
    where id = target_sighting
      and status = 'pending_id'
   returning photographer_id into photographer;
 
-  -- Delayed photo-of-existing-cat points (BRIEF section 9).
+  -- Delayed photo-of-existing-dog points (BRIEF section 9).
   if photographer is not null then
     insert into public.points_log (user_id, action_type, points, related_entity_id, related_entity_type)
     values (photographer, 'help_identify_resolved', 10, target_sighting, 'sighting');
@@ -135,7 +135,7 @@ as $$
   select count(*)::int
     from public.sightings s
    where s.status = 'pending_id'
-     and s.cat_id is null
+     and s.dog_id is null
      and (auth.uid() is null or s.photographer_id <> auth.uid())
      and not exists (
        select 1 from public.identification_votes v

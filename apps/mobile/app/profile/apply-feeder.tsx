@@ -83,7 +83,7 @@ export default function ApplyFeeder() {
           <Text style={styles.intro}>
             Verified Feeders can log feeds, and their welfare flags trigger
             community alerts immediately. We approve people who actually
-            feed cats in the area, regularly.
+            feed dogs in the area, regularly.
           </Text>
 
           {existing && existing.status === "rejected" ? (
@@ -121,7 +121,7 @@ export default function ApplyFeeder() {
               <TextInput
                 value={bio}
                 onChangeText={setBio}
-                placeholder="How long have you been feeding? Roughly how many cats? Anything else we should know?"
+                placeholder="How long have you been feeding? Roughly how many dogs? Anything else we should know?"
                 placeholderTextColor={colors.textDim}
                 multiline
                 maxLength={1000}

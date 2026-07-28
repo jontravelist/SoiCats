@@ -8,7 +8,7 @@
 --      that polygon and no curated district matches; otherwise leaves
 --      district_id NULL.
 --
--- Result: cats photographed outside Bangkok show no district chip and
+-- Result: dogs photographed outside Bangkok show no district chip and
 -- don't pollute Bangkok leaderboards.
 
 update public.districts
@@ -48,7 +48,7 @@ begin
 end;
 $$;
 
-create or replace function public.assign_cat_district()
+create or replace function public.assign_dog_district()
 returns trigger
 language plpgsql
 as $$
@@ -100,7 +100,7 @@ update public.sightings s
    )
  where s.location is not null;
 
-update public.cats c
+update public.dogs c
    set district_id = (
      case
        when public.find_district_for_point(st_x(c.territory_centroid::geometry), st_y(c.territory_centroid::geometry)) is not null

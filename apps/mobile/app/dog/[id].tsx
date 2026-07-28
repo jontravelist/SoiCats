@@ -10,17 +10,17 @@ import { Button } from "@/components/Button";
 import { StatBars } from "@/components/StatBars";
 import { StatRater } from "@/components/StatRater";
 import { SpecialtyBadge } from "@/components/SpecialtyBadge";
-import { fetchCat, fetchCatSightingLocations, fetchCatSightings, fetchCatTopPhotos, fetchLatestFlagForCat, fetchRecentFeedsForCat, toggleFavourite } from "@/lib/api";
+import { fetchDog, fetchDogSightingLocations, fetchDogSightings, fetchDogTopPhotos, fetchLatestFlagForDog, fetchRecentFeedsForDog, toggleFavourite } from "@/lib/api";
 import { useProfile } from "@/hooks/useProfile";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth";
 import { useTimeAgo } from "@/hooks/useTimeAgo";
-import { CatGlyph } from "@/components/CatGlyph";
+import { DogGlyph } from "@/components/DogGlyph";
 import { TradingCard } from "@/components/TradingCard";
-import { paletteForCat, pokedexNumber, poseForCat } from "@/lib/catTheme";
+import { paletteForDog, pokedexNumber, poseForDog } from "@/lib/dogTheme";
 import { colors, radius, shadow, spacing, typography } from "@/lib/theme";
 
-export default function CatProfile() {
+export default function DogProfile() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t } = useTranslation();
   const router = useRouter();
@@ -28,30 +28,30 @@ export default function CatProfile() {
   const timeAgo = useTimeAgo();
   const qc = useQueryClient();
 
-  const catQ = useQuery({ queryKey: ["cat", id], queryFn: () => fetchCat(id!), enabled: !!id });
+  const dogQ = useQuery({ queryKey: ["dog", id], queryFn: () => fetchDog(id!), enabled: !!id });
   const sightingsQ = useQuery({
-    queryKey: ["cat-sightings", id],
-    queryFn: () => fetchCatSightings(id!),
+    queryKey: ["dog-sightings", id],
+    queryFn: () => fetchDogSightings(id!),
     enabled: !!id,
   });
   const pinsQ = useQuery({
-    queryKey: ["cat-pins", id],
-    queryFn: () => fetchCatSightingLocations(id!),
+    queryKey: ["dog-pins", id],
+    queryFn: () => fetchDogSightingLocations(id!),
     enabled: !!id,
   });
   const flagQ = useQuery({
     queryKey: ["latest-flag", id],
-    queryFn: () => fetchLatestFlagForCat(id!),
+    queryFn: () => fetchLatestFlagForDog(id!),
     enabled: !!id,
   });
   const topQ = useQuery({
-    queryKey: ["cat-top-photos", id],
-    queryFn: () => fetchCatTopPhotos(id!, 3),
+    queryKey: ["dog-top-photos", id],
+    queryFn: () => fetchDogTopPhotos(id!, 3),
     enabled: !!id,
   });
   const feedsQ = useQuery({
     queryKey: ["recent-feeds", id],
-    queryFn: () => fetchRecentFeedsForCat(id!),
+    queryFn: () => fetchRecentFeedsForDog(id!),
     enabled: !!id,
   });
   const profile = useProfile();
@@ -61,9 +61,9 @@ export default function CatProfile() {
     queryFn: async () => {
       if (!session) return false;
       const { count } = await supabase
-        .from("user_favourite_cats")
+        .from("user_favourite_dogs")
         .select("user_id", { count: "exact", head: true })
-        .eq("cat_id", id!)
+        .eq("dog_id", id!)
         .eq("user_id", session.user.id);
       return (count ?? 0) > 0;
     },
@@ -75,20 +75,20 @@ export default function CatProfile() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["fav", id] }),
   });
 
-  if (catQ.isLoading || !catQ.data) {
+  if (dogQ.isLoading || !dogQ.data) {
     return <Screen><ActivityIndicator style={{ flex: 1 }} /></Screen>;
   }
-  const cat = catQ.data;
+  const dog = dogQ.data;
   const sightings = sightingsQ.data ?? [];
   const pins = pinsQ.data ?? [];
   const hero = sightings[0]?.photo_url;
   const lastPin = pins[0];
 
-  // Open native maps app with directions to the cat's last sighting.
+  // Open native maps app with directions to the dog's last sighting.
   // iOS handles maps:// links natively (Apple Maps); Google handles geo:.
   const openDirections = () => {
     if (!lastPin) return;
-    const label = encodeURIComponent(cat.name);
+    const label = encodeURIComponent(dog.name);
     const url = Platform.OS === "ios"
       ? `maps://?daddr=${lastPin.lat},${lastPin.lng}&q=${label}`
       : `geo:${lastPin.lat},${lastPin.lng}?q=${lastPin.lat},${lastPin.lng}(${label})`;
@@ -98,41 +98,41 @@ export default function CatProfile() {
     );
   };
 
-  // Pokedex-card palette derived from the cat's primary colour.
-  const pal = paletteForCat(cat.primary_color);
-  const ratings = (cat as { stats_rating_count?: number }).stats_rating_count ?? 0;
-  const photoCount = (cat as { stats_photo_count?: number }).stats_photo_count ?? 0;
+  // Pokedex-card palette derived from the dog's primary colour.
+  const pal = paletteForDog(dog.primary_color);
+  const ratings = (dog as { stats_rating_count?: number }).stats_rating_count ?? 0;
+  const photoCount = (dog as { stats_photo_count?: number }).stats_photo_count ?? 0;
   // Show stats as soon as any rating exists. The five-rating threshold
   // earlier discounted single voters as 'unreliable' but felt punishing on
-  // newly-discovered cats. Score volatility is fine — the radar will just
+  // newly-discovered dogs. Score volatility is fine — the radar will just
   // shift as more votes come in.
   const statsReady = ratings >= 1;
   const stats = {
-    chonk: (cat as { stat_chonk: number | null }).stat_chonk,
-    spice: (cat as { stat_spice: number | null }).stat_spice,
-    floof: (cat as { stat_floof: number | null }).stat_floof,
-    slink: (cat as { stat_slink: number | null }).stat_slink,
-    vibes: (cat as { stat_vibes: number | null }).stat_vibes,
+    bork: (dog as { stat_bork: number | null }).stat_bork,
+    zoom: (dog as { stat_zoom: number | null }).stat_zoom,
+    floof: (dog as { stat_floof: number | null }).stat_floof,
+    chill: (dog as { stat_chill: number | null }).stat_chill,
+    guard: (dog as { stat_guard: number | null }).stat_guard,
   };
-  const specialty = (cat as { specialty_stat?: "chonk" | "spice" | "floof" | "slink" | "vibes" | null }).specialty_stat ?? null;
+  const specialty = (dog as { specialty_stat?: "bork" | "zoom" | "floof" | "chill" | "guard" | null }).specialty_stat ?? null;
   const specialtyScore = specialty ? stats[specialty] ?? null : null;
-  const district = (cat as { district?: { name?: string } | null }).district;
+  const district = (dog as { district?: { name?: string } | null }).district;
 
   return (
     <Screen scroll>
       {/* Pokémon trading-card hero — see src/components/TradingCard.tsx
           for the layout spec from the Soi Sunset design handoff. */}
       <TradingCard
-        cat={cat}
+        dog={dog}
         heroPhotoUrl={hero ?? null}
         photographerHandle={(sightings[0] as { users?: { handle?: string } } | undefined)?.users?.handle}
-        lastSeen={timeAgo(cat.last_seen_at)}
+        lastSeen={timeAgo(dog.last_seen_at)}
         photoCount={sightings.length}
       />
 
       <View style={styles.statusRow}>
-        <View style={[styles.statusBadge, statusStyle(cat.status)]}>
-          <Text style={styles.statusText}>{cat.status}</Text>
+        <View style={[styles.statusBadge, statusStyle(dog.status)]}>
+          <Text style={styles.statusText}>{dog.status}</Text>
         </View>
         {district?.name ? (
           <Text style={styles.districtText}>📍 {district.name}</Text>
@@ -152,17 +152,17 @@ export default function CatProfile() {
           <SpecialtyBadge stat={specialty} score={specialtyScore ?? undefined} />
         ) : null}
 
-        {/* Rate-the-cat panel — anyone signed in can score the five stats.
-            Hidden when the cat is deceased (RIP, no posthumous opinions). */}
-        {cat.status !== "deceased" ? <StatRater catId={cat.id} /> : null}
+        {/* Rate-the-dog panel — anyone signed in can score the five stats.
+            Hidden when the dog is deceased (RIP, no posthumous opinions). */}
+        {dog.status !== "deceased" ? <StatRater dogId={dog.id} /> : null}
 
-        {(cat.tnr_status !== "unknown" || cat.vaccination_status !== "unknown") ? (
+        {(dog.tnr_status !== "unknown" || dog.vaccination_status !== "unknown") ? (
           <View style={styles.welfare}>
-            {cat.tnr_status !== "unknown" ? (
-              <Text style={styles.welfareItem}>{t(`cat.welfare.tnr.${cat.tnr_status}`)}</Text>
+            {dog.tnr_status !== "unknown" ? (
+              <Text style={styles.welfareItem}>{t(`dog.welfare.tnr.${dog.tnr_status}`)}</Text>
             ) : null}
-            {cat.vaccination_status !== "unknown" ? (
-              <Text style={styles.welfareItem}>{t(`cat.welfare.vaccination.${cat.vaccination_status}`)}</Text>
+            {dog.vaccination_status !== "unknown" ? (
+              <Text style={styles.welfareItem}>{t(`dog.welfare.vaccination.${dog.vaccination_status}`)}</Text>
             ) : null}
           </View>
         ) : null}
@@ -184,7 +184,7 @@ export default function CatProfile() {
 
         <View style={styles.actions}>
           <Button
-            label={favQ.data ? t("cat.actions.unfavourite") : t("cat.actions.favourite")}
+            label={favQ.data ? t("dog.actions.unfavourite") : t("dog.actions.favourite")}
             onPress={() => session ? favMut.mutate() : router.push("/auth")}
             variant={favQ.data ? "secondary" : "primary"}
           />
@@ -196,17 +196,17 @@ export default function CatProfile() {
             variant="secondary"
             onPress={() => router.push(`/share-card/${id}`)}
           />
-          {cat.status !== "deceased" ? (
+          {dog.status !== "deceased" ? (
             <Button
               label="Report welfare issue"
               variant="ghost"
               onPress={() => session ? router.push(`/flag/${id}`) : router.push("/auth")}
             />
           ) : null}
-          {session && session.user.id === cat.discovered_by_user_id ? (
-            <Button label="Edit cat" variant="ghost" onPress={() => router.push(`/edit-cat/${id}`)} />
+          {session && session.user.id === dog.discovered_by_user_id ? (
+            <Button label="Edit dog" variant="ghost" onPress={() => router.push(`/edit-dog/${id}`)} />
           ) : null}
-          {isFeeder && cat.status !== "deceased" ? (
+          {isFeeder && dog.status !== "deceased" ? (
             <Button label="🍚 Log feed" variant="accent" onPress={() => router.push(`/log-feed/${id}`)} />
           ) : null}
           {session ? (

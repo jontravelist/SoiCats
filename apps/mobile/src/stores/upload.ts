@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 // Holds the in-flight photo upload state across the post screens
-// (camera → cat-picker → caption → submit). This avoids prop-drilling
+// (camera → dog-picker → caption → submit). This avoids prop-drilling
 // big payloads through expo-router params.
 
 export interface PendingUpload {

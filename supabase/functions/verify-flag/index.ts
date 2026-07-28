@@ -2,12 +2,12 @@
 // POST /functions/v1/verify-flag
 // body: { flag_id: uuid }
 //
-// Decides whether a cat_health_flags row crosses the verification threshold.
+// Decides whether a dog_health_flags row crosses the verification threshold.
 // Verification rule from BRIEF Section 7.7:
 //  - Verified-feeder flag = auto-verified.
-//  - Standard-user flag = needs a second open flag for the same cat or admin review.
+//  - Standard-user flag = needs a second open flag for the same dog or admin review.
 // On verification:
-//  - cats.status updated.
+//  - dogs.status updated.
 //  - 30-point bonus written for the original flagger.
 //  - Push notification fan-out queued (Expo Push call would happen here in prod;
 //    we leave a stub log).
@@ -25,7 +25,7 @@ Deno.serve(async (req) => {
 
     const admin = adminClient();
     const { data: flag, error } = await admin
-      .from("cat_health_flags")
+      .from("dog_health_flags")
       .select("*")
       .eq("id", flag_id)
       .single();
@@ -55,9 +55,9 @@ Deno.serve(async (req) => {
       shouldVerify = true;
     } else {
       const { count } = await admin
-        .from("cat_health_flags")
+        .from("dog_health_flags")
         .select("id", { count: "exact", head: true })
-        .eq("cat_id", flag.cat_id)
+        .eq("dog_id", flag.dog_id)
         .eq("flag_type", flag.flag_type)
         .neq("id", flag.id)
         .in("status", ["open", "verified"]);
@@ -70,15 +70,15 @@ Deno.serve(async (req) => {
 
     // Apply the verification.
     await admin
-      .from("cat_health_flags")
+      .from("dog_health_flags")
       .update({ status: "verified", verified_at: new Date().toISOString(), verified_by: caller })
       .eq("id", flag.id);
 
-    const newCatStatus =
+    const newDogStatus =
       flag.flag_type === "deceased" ? "deceased"
       : flag.flag_type === "missing" ? "missing"
       : "injured";
-    await admin.from("cats").update({ status: newCatStatus }).eq("id", flag.cat_id);
+    await admin.from("dogs").update({ status: newDogStatus }).eq("id", flag.dog_id);
 
     // 30-point bonus to the original flagger.
     await admin.from("points_log").insert({
@@ -86,11 +86,11 @@ Deno.serve(async (req) => {
       action_type: "flag_verified",
       points: 30,
       related_entity_id: flag.id,
-      related_entity_type: "cat_health_flag",
+      related_entity_type: "dog_health_flag",
     });
 
     // TODO: fan out push notifications via Expo Push:
-    //  - users within 1km of the cat's territory_centroid
+    //  - users within 1km of the dog's territory_centroid
     //  - feeders within 2km
     // We stub this by logging. The actual Expo Push call belongs in a
     // dedicated `notify` function so it can be retried independently.

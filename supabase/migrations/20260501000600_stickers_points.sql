@@ -1,4 +1,4 @@
--- Soi Cats: sticker packs, points log, device tokens
+-- Soi Dogs: sticker packs, points log, device tokens
 
 create table public.sticker_packs (
   id                  uuid primary key default gen_random_uuid(),
@@ -86,7 +86,7 @@ create index device_tokens_user_idx on public.device_tokens (user_id);
 
 create table public.notification_settings (
   user_id              uuid primary key references public.users (id) on delete cascade,
-  favourite_cat_photo  boolean not null default true,
+  favourite_dog_photo  boolean not null default true,
   injured_or_missing   boolean not null default true,
   sticker_unlocked     boolean not null default true,
   comment_on_my_photo  boolean not null default false,

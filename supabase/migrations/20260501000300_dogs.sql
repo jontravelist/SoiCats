@@ -1,4 +1,4 @@
--- Soi Cats: cats and clinics
+-- Soi Dogs: dogs and clinics
 
 create table public.clinics (
   id              uuid primary key default gen_random_uuid(),
@@ -14,7 +14,7 @@ create table public.clinics (
 
 create index clinics_location_idx on public.clinics using gist (location);
 
-create table public.cats (
+create table public.dogs (
   id                       uuid primary key default gen_random_uuid(),
   name                     text not null,
   name_th                  text,
@@ -23,10 +23,10 @@ create table public.cats (
   primary_color            text not null,
   pattern                  text not null,
   distinguishing_features  text,
-  age_guess                cat_age_guess,
+  age_guess                dog_age_guess,
   territory_centroid       geography(Point, 4326) not null,
   last_seen_at             timestamptz not null default now(),
-  status                   cat_status not null default 'active',
+  status                   dog_status not null default 'active',
   tnr_status               tnr_status not null default 'unknown',
   tnr_confirmed_at         timestamptz,
   tnr_confirmed_by_clinic  uuid references public.clinics (id),
@@ -35,6 +35,6 @@ create table public.cats (
   created_at               timestamptz not null default now()
 );
 
-create index cats_territory_idx on public.cats using gist (territory_centroid);
-create index cats_status_last_seen_idx on public.cats (status, last_seen_at desc);
-create index cats_discovered_by_idx on public.cats (discovered_by_user_id);
+create index dogs_territory_idx on public.dogs using gist (territory_centroid);
+create index dogs_status_last_seen_idx on public.dogs (status, last_seen_at desc);
+create index dogs_discovered_by_idx on public.dogs (discovered_by_user_id);

@@ -1,15 +1,15 @@
-# Soi Cats — MVP Build Brief
+# Soi Dogs — MVP Build Brief
 
 **For:** Claude Code
 **Owner:** Jon Lister
 **Status:** v1.1, ready to build (adds stat ratings, district leaderboards, share cards)
-**Working name:** Soi Cats (placeholder, finalise before launch)
+**Working name:** Soi Dogs (placeholder, finalise before launch)
 
 ---
 
 ## 1. Project summary
 
-A mobile app for Thailand where users photograph stray cats they encounter, name them, and build a community-curated record of every cat in their neighbourhood. Cats become recurring characters with profiles, photo histories, territories, welfare status, and Pokemon-style stat ratings (Chonk, Spice, Floof, Slink, Vibes). Users earn points for contributing, compete on weekly district leaderboards, and unlock sticker packs designed by local Thai artists.
+A mobile app for Thailand where users photograph soi dogs they encounter, name them, and build a community-curated record of every dog in their neighbourhood. Dogs become recurring characters with profiles, photo histories, territories, welfare status, and Pokemon-style stat ratings (Bork, Zoom, Floof, Chill, Guard). Users earn points for contributing, compete on weekly district leaderboards, and unlock sticker packs designed by local Thai artists.
 
 Launch market: **Bangkok only**. Launch language: **English only** (architected for Thai second).
 
@@ -19,7 +19,7 @@ The app is **community first**. A welfare layer (verified feeders, injured/missi
 
 ## 2. Vision and positioning
 
-Think Strava for stray cats: an Instagram-style feed that doubles as a longitudinal welfare record. The community-app side drives daily engagement; the welfare layer gives it civic purpose and protects it from being a vanity feed.
+Think Strava for soi dogs: an Instagram-style feed that doubles as a longitudinal welfare record. The community-app side drives daily engagement; the welfare layer gives it civic purpose and protects it from being a vanity feed.
 
 The emotional hook is **recognition**. The first time a user opens the app on their street and sees that the tabby they feed every morning is already named "Khao Niao" with 47 photos and a known territory, the app has won.
 
@@ -29,7 +29,7 @@ The emotional hook is **recognition**. The first time a user opens the app on th
 
 | Decision | Choice |
 |---|---|
-| Cat identification | Geofence-first (Option 3). Light ML later. |
+| Dog identification | Geofence-first (Option 3). Light ML later. |
 | Stack | React Native (Expo) + Supabase (Postgres + PostGIS + Auth + Storage + Edge Functions + Realtime) |
 | Launch scope | Bangkok only |
 | Language | English first; i18n-ready architecture |
@@ -45,7 +45,7 @@ Explicitly **not** building in the MVP. Do not architect around them, but do not
 
 - Donations, payments, recurring sponsorship
 - Thai language UI (architecture must support i18n; copy is English only)
-- ML-based cat re-identification (geofence + user confirmation only)
+- ML-based dog re-identification (geofence + user confirmation only)
 - Sticker artist marketplace or revenue share
 - Cross-city expansion outside Bangkok
 - In-app messaging between users
@@ -84,10 +84,10 @@ Explicitly **not** building in the MVP. Do not architect around them, but do not
 
 | Role | Capabilities | How granted |
 |---|---|---|
-| Anonymous | Browse public feed, view cat profiles | Default, no signup |
+| Anonymous | Browse public feed, view dog profiles | Default, no signup |
 | User | All anonymous + upload, comment, like, earn points, unlock stickers | Sign up |
 | Verified Feeder | All user + log feeds, flag injured/missing with higher trust weight | Manual approval by app admin (apply via in-app form) |
-| Clinic Admin | Update vaccination, sterilisation, ear-tip, health check records on cat profiles | Manual verification by app admin |
+| Clinic Admin | Update vaccination, sterilisation, ear-tip, health check records on dog profiles | Manual verification by app admin |
 | App Admin | All of the above + moderation, clinic verification, sticker management | Internal only, set via DB |
 
 Anonymous browsing is important. Friction at signup kills photo apps. Let people scroll the local feed first; gate the upload action behind signup.
@@ -99,27 +99,27 @@ Anonymous browsing is important. Friction at signup kills photo apps. Let people
 ### 7.1 Onboarding
 
 1. App opens to nearby feed (no auth required).
-2. User scrolls, taps a cat, sees a profile.
+2. User scrolls, taps a dog, sees a profile.
 3. User taps "+" to add a photo. Auth sheet appears.
 4. Sign up via Apple, Google, or email. Pick handle, optional avatar.
-5. One-screen tutorial: "Photograph cats, name them, earn stickers."
+5. One-screen tutorial: "Photograph dogs, name them, earn stickers."
 6. Drop into camera.
 
-### 7.2 Photo upload + cat ID (the core flow, see Section 8 for ID logic detail)
+### 7.2 Photo upload + dog ID (the core flow, see Section 8 for ID logic detail)
 
 1. User taps "+" → camera opens (with library fallback).
 2. Take photo. Local resize to 2048px max edge, EXIF stripped.
 3. App requests GPS (must be ≥50m accuracy; if worse, prompt user to step into open sky or tag location manually on a map).
-4. While photo uploads to Storage in background, app queries cats with territory within 150m of user.
-5. Screen shows: **"Which cat is this?"** with horizontal scroll of nearby cat cards (thumbnail, name, "23 photos"). Plus two buttons: **"New cat"** and **"Not sure"**.
+4. While photo uploads to Storage in background, app queries dogs with territory within 150m of user.
+5. Screen shows: **"Which dog is this?"** with horizontal scroll of nearby dog cards (thumbnail, name, "23 photos"). Plus two buttons: **"New dog"** and **"Not sure"**.
 6. User picks one of three paths:
-   - **Existing cat:** photo posts to that cat. Points awarded. Cat's territory centroid updated.
-   - **New cat:** form for name (suggested Thai cat names + custom field), pattern tags (chips: tabby, tortie, calico, tuxedo, solid black, solid white, ginger, grey, pointed), distinguishing features (free text), optional age guess (kitten / young / adult / senior).
-   - **Not sure:** photo enters a "Help identify" community queue. No points awarded yet. Photo is not on a cat profile until resolved. Other users can vote on which cat it is, or confirm it is new.
+   - **Existing dog:** photo posts to that dog. Points awarded. Dog's territory centroid updated.
+   - **New dog:** form for name (suggested Thai dog names + custom field), pattern tags (chips: solid, spotted, brindle, patched, sable, merle, black & tan, tricolour, shaggy), distinguishing features (free text), optional age guess (puppy / young / adult / senior).
+   - **Not sure:** photo enters a "Help identify" community queue. No points awarded yet. Photo is not on a dog profile until resolved. Other users can vote on which dog it is, or confirm it is new.
 7. Caption field (optional, 280 chars).
 8. Post.
 
-### 7.3 Cat profile
+### 7.3 Dog profile
 
 Top: hero photo (most-liked recent), name, status badge (active / missing / injured / deceased).
 
@@ -139,15 +139,15 @@ Welfare strip (only shows what is known):
 
 Photos grid: chronological, most recent first.
 
-Action bar: ❤️ favourite this cat (adds to user's "my cats" list and triggers push notifications when others post photos), 📍 directions to last sighting (opens external maps).
+Action bar: ❤️ favourite this dog (adds to user's "my dogs" list and triggers push notifications when others post photos), 📍 directions to last sighting (opens external maps).
 
 ### 7.4 Feed
 
 Two tabs:
 - **Nearby:** sightings within 5km of user, chronological.
-- **Following:** sightings of cats the user has favourited, plus cats they have photographed.
+- **Following:** sightings of dogs the user has favourited, plus dogs they have photographed.
 
-Each feed item: photo, cat name (tappable to profile), photographer handle, distance from user, time, like count, comment count.
+Each feed item: photo, dog name (tappable to profile), photographer handle, distance from user, time, like count, comment count.
 
 Pull to refresh. Infinite scroll. Realtime updates when a new sighting drops (subtle "3 new photos" pill at top).
 
@@ -162,26 +162,26 @@ Sticker drawer accessible from profile: grid of unlocked stickers, tap any to:
 
 ### 7.6 Verified feeder: feed log (Phase 1.5)
 
-Verified feeders see an extra "🍚 Log feed" button on cat profiles. Tap → quick form (time defaults to now, optional notes, optional photo). Logged feed appears on cat profile timeline as a non-photo event.
+Verified feeders see an extra "🍚 Log feed" button on dog profiles. Tap → quick form (time defaults to now, optional notes, optional photo). Logged feed appears on dog profile timeline as a non-photo event.
 
 ### 7.7 Injured / missing flag (Phase 1.5)
 
-Any user can flag a cat. Verified feeders' flags carry more weight (auto-trigger alerts; standard user flags require either a second flag or admin review).
+Any user can flag a dog. Verified feeders' flags carry more weight (auto-trigger alerts; standard user flags require either a second flag or admin review).
 
 Flag form: type (injured / missing / deceased), description, optional photo.
 
 When a flag is verified:
-- Cat status changes
+- Dog status changes
 - Push notification fires to all users within 1km, and to verified feeders within 2km
-- Cat appears in a "Needs help" pinned section of nearby feed
+- Dog appears in a "Needs help" pinned section of nearby feed
 
-Resolution: cat photographed again healthy = community can mark resolved; clinic admin can also resolve. Deceased status is permanent (cat profile becomes a memorial; no new photos accepted).
+Resolution: dog photographed again healthy = community can mark resolved; clinic admin can also resolve. Deceased status is permanent (dog profile becomes a memorial; no new photos accepted).
 
 ---
 
-## 8. Cat identification logic (Option 3 in detail)
+## 8. Dog identification logic (Option 3 in detail)
 
-This is the most important system in the app. Get it wrong and either every photo creates a duplicate cat (chaos) or every photo gets misattributed (worse than chaos).
+This is the most important system in the app. Get it wrong and either every photo creates a duplicate dog (chaos) or every photo gets misattributed (worse than chaos).
 
 ### 8.1 Lookup query
 
@@ -191,8 +191,8 @@ When user opens the upload flow, after photo capture, fire this query:
 SELECT
   id, name, primary_color, pattern,
   ST_Distance(territory_centroid, $user_location) AS distance_m,
-  (SELECT photo_url FROM sightings WHERE cat_id = cats.id ORDER BY created_at DESC LIMIT 1) AS thumbnail
-FROM cats
+  (SELECT photo_url FROM sightings WHERE dog_id = dogs.id ORDER BY created_at DESC LIMIT 1) AS thumbnail
+FROM dogs
 WHERE ST_DWithin(territory_centroid, $user_location, 150)
   AND status IN ('active', 'injured', 'missing')
   AND last_seen_at > NOW() - INTERVAL '90 days'
@@ -204,28 +204,28 @@ Radius is 150m by default. Make this a configurable env var; we will tune it.
 
 ### 8.2 Territory centroid
 
-Each cat has a `territory_centroid` (PostGIS `geography(Point)`). On every confirmed sighting:
+Each dog has a `territory_centroid` (PostGIS `geography(Point)`). On every confirmed sighting:
 
-- Recalculate centroid as the geometric mean of the cat's last 10 sighting locations.
-- This makes territories drift naturally if a cat moves.
+- Recalculate centroid as the geometric mean of the dog's last 10 sighting locations.
+- This makes territories drift naturally if a dog moves.
 
-### 8.3 New cat creation
+### 8.3 New dog creation
 
-When user picks "New cat":
+When user picks "New dog":
 - Required: name, pattern tag, primary colour
 - Optional: age guess, distinguishing features
-- The first sighting becomes the cat's territory centroid
-- User who created the cat is `discovered_by_user_id`
+- The first sighting becomes the dog's territory centroid
+- User who created the dog is `discovered_by_user_id`
 
-Name collisions are allowed (two cats can both be "Mango"); we disambiguate by territory.
+Name collisions are allowed (two dogs can both be "Mango"); we disambiguate by territory.
 
 ### 8.4 "Not sure" queue
 
 Photos in the "Help identify" queue are visible only on a dedicated screen. They show:
 - Photo
 - Location pin on small map
-- Up to 8 nearby cat suggestions
-- "This is [cat name]" buttons + "New cat" + "Skip"
+- Up to 8 nearby dog suggestions
+- "This is [dog name]" buttons + "New dog" + "Skip"
 
 Resolution rule: 3 matching votes from users with > 50 points = auto-confirm. 1 vote from a verified feeder = auto-confirm. App admin override available.
 
@@ -233,7 +233,7 @@ Once resolved, the original photographer earns their points (delayed).
 
 ### 8.5 Anti-duplication
 
-When user creates "New cat", before saving, check: are there cats within 80m with the same primary_color and pattern? If yes, show a "Wait — could this be one of these?" interstitial with those cats. User can confirm new or pick existing.
+When user creates "New dog", before saving, check: are there dogs within 80m with the same primary_color and pattern? If yes, show a "Wait — could this be one of these?" interstitial with those dogs. User can confirm new or pick existing.
 
 ### 8.6 Future ML hook (do not build, do leave the seam)
 
@@ -241,21 +241,21 @@ Add a `photo_embedding` vector column on sightings, nullable. Add a `model_versi
 
 ---
 
-## 9. Cat stat ratings
+## 9. Dog stat ratings
 
-Pokemon-style five-stat system. Every cat has emergent personality stats that come from community voting on photos.
+Pokemon-style five-stat system. Every dog has emergent personality stats that come from community voting on photos.
 
 ### 9.1 The five stats
 
 | Stat | What it measures | Low-end framing | High-end framing |
 |---|---|---|---|
-| **Chonk** | Body presence, fluff, fullness | Lean machine | Absolute unit |
-| **Spice** | Sass, hiss-energy, attitude | Soft soul | Spicy queen |
-| **Floof** | Fur volume, fluffiness | Sleek | Cloud cat |
-| **Slink** | Stealth, ninja moves, poise | Solid presence | Pure shadow |
-| **Vibes** | Chill, zen, dignity | Chaos energy | Buddha cat |
+| **Bork** | Body presence, fluff, fullness | Lean machine | Absolute unit |
+| **Zoom** | Sass, hiss-energy, attitude | Soft soul | Spicy queen |
+| **Floof** | Fur volume, fluffiness | Sleek | Cloud dog |
+| **Chill** | Stealth, ninja moves, poise | Solid presence | Pure shadow |
+| **Guard** | Chill, zen, dignity | Chaos energy | Buddha dog |
 
-**Core principle:** every stat must read positive at both ends. Soi cats are scrappy; a "1 chonk" cat is celebrated as lean, not shamed. No "cuteness" or "ugliness" stats — every cat must score high somewhere.
+**Core principle:** every stat must read positive at both ends. Soi dogs are scrappy; a "1 bork" dog is celebrated as lean, not shamed. No "cuteness" or "ugliness" stats — every dog must score high somewhere.
 
 ### 9.2 How rating works
 
@@ -267,19 +267,19 @@ After uploading a photo, the user sees an **optional** rating step:
 
 A user can also rate any photo from the feed by long-pressing. Same five sliders.
 
-### 9.3 How cat-level stats are computed
+### 9.3 How dog-level stats are computed
 
-Each rating is a row in `photo_ratings` (per photo, per stat, per voter). The cat's displayed stat is a weighted average across all ratings for all photos of that cat:
+Each rating is a row in `photo_ratings` (per photo, per stat, per voter). The dog's displayed stat is a weighted average across all ratings for all photos of that dog:
 
 - Recent photos weighted higher (decay over 90 days)
 - Verified feeders' votes weighted 1.5x
 - A user can only rate a single photo once per stat (updates allowed)
-- Cat stats only "lock in" once the cat has at least 5 ratings on at least 2 photos. Below that threshold, show "Stats coming soon" instead of unreliable averages.
+- Dog stats only "lock in" once the dog has at least 5 ratings on at least 2 photos. Below that threshold, show "Stats coming soon" instead of unreliable averages.
 
 ### 9.4 Display
 
-On cat profile:
-- **Specialty badge** at top: highest-scoring stat in big type ("MAXIMUM SPICE", "PEAK CHONK"). If two stats tie, show both.
+On dog profile:
+- **Specialty badge** at top: highest-scoring stat in big type ("PEAK ZOOM", "MAX BORK"). If two stats tie, show both.
 - **Radar chart** showing all five stats, 1-5 scale
 - Tap any stat to see the framing label ("Mango: Spicy queen — 4.7/5")
 - Below radar: "Rated by 23 users across 12 photos"
@@ -288,14 +288,14 @@ On photo cards in the feed: small chip showing the photo's individual stat score
 
 ### 9.5 Stat champions
 
-Per district (see Section 10), maintain a "Bangkok's Chonkiest Cat", "Spiciest Cat", etc. Top of each stat per district, updated nightly via a scheduled Edge Function.
+Per district (see Section 10), maintain a "Bangkok's Borkiest Dog", "Zoomiest Dog", etc. Top of each stat per district, updated nightly via a scheduled Edge Function.
 
-A user whose photo pushed a cat into a stat champion title earns a bonus (see Section 11).
+A user whose photo pushed a dog into a stat champion title earns a bonus (see Section 11).
 
 ### 9.6 Anti-abuse
 
 - One vote per user per photo per stat (upserted)
-- Votes by accounts < 24h old are excluded from cat-level averages until the account is 7 days old (votes still recorded for backfill)
+- Votes by accounts < 24h old are excluded from dog-level averages until the account is 7 days old (votes still recorded for backfill)
 - Admin can purge votes from suspended accounts
 - Stat manipulation by coordinated voting flagged when standard deviation across recent voters drops below threshold (build flag, not auto-action)
 
@@ -343,28 +343,28 @@ Display in the app:
 - Below current week: last week's frozen top 3 with winner badges
 - Tappable archive: every previous week's winners
 
-### 10.3 Cat-level Hall of Fame
+### 10.3 Dog-level Hall of Fame
 
-On every cat profile, show top 3 photos of that cat by all-time like count. Updates live. No weekly reset; this is a forever leaderboard for each cat. Highly competitive territory once a cat has a regular photographer following.
+On every dog profile, show top 3 photos of that dog by all-time like count. Updates live. No weekly reset; this is a forever leaderboard for each dog. Highly competitive territory once a dog has a regular photographer following.
 
 ### 10.4 Stat champion leaderboards
 
-Per district, per stat, top 5 cats by stat score. So per district there are five small leaderboards: Chonkiest, Spiciest, Floofiest, Slinkiest, Best Vibes.
+Per district, per stat, top 5 dogs by stat score. So per district there are five small leaderboards: Borkiest, Zoomiest, Floofiest, Chilliest, Best Guard.
 
-City-wide also shown ("Bangkok's Spiciest Cat") but secondary to district view.
+City-wide also shown ("Bangkok's Zoomiest Dog") but secondary to district view.
 
 ### 10.5 User leaderboards (lightweight)
 
 Per district:
 - Most photos this week
-- Most cats discovered this month
+- Most dogs discovered this month
 - Highest-rated photo this week
 
-Keep these understated; the focus is cats, not users. But surface them in the leaderboard tab.
+Keep these understated; the focus is dogs, not users. But surface them in the leaderboard tab.
 
 ### 10.6 Welfare exclusion (important)
 
-Photos flagged as injured / missing / deceased are excluded from all leaderboards. Cats with current injured/missing status are excluded from stat champion leaderboards until status is resolved.
+Photos flagged as injured / missing / deceased are excluded from all leaderboards. Dogs with current injured/missing status are excluded from stat champion leaderboards until status is resolved.
 
 Reason: do not create incentive to skip welfare photos because they "won't win." Welfare is the moral backbone of the app. Ratings and leaderboards are the game on top, not the game itself.
 
@@ -372,18 +372,18 @@ Reason: do not create incentive to skip welfare photos because they "won't win."
 
 ## 11. Share cards
 
-The viral loop. Every cat profile and every weekly winner can be exported as a 1080x1080 stat card image users share to Instagram, LINE, WhatsApp.
+The viral loop. Every dog profile and every weekly winner can be exported as a 1080x1080 stat card image users share to Instagram, LINE, WhatsApp.
 
-### 11.1 Cat stat card
+### 11.1 Dog stat card
 
 Composition (1080x1080 PNG):
-- Hero photo (most-liked recent photo of the cat) as background, slightly desaturated with dark gradient overlay at bottom
-- Cat name in display type, top-left
+- Hero photo (most-liked recent photo of the dog) as background, slightly desaturated with dark gradient overlay at bottom
+- Dog name in display type, top-left
 - District tag below name ("Phrom Phong")
-- Specialty badge in centre-right ("MAXIMUM SPICE" with stat value)
+- Specialty badge in centre-right ("PEAK ZOOM" with stat value)
 - Radar chart bottom-left showing all 5 stats
-- Stats list bottom-right: "Chonk 4.2 / Spice 4.7 / Floof 3.1 / Slink 2.8 / Vibes 4.0"
-- "Soi Cats" wordmark + small cat icon, bottom-centre, with `soicats.app` URL or whatever the final domain is
+- Stats list bottom-right: "Bork 4.2 / Zoom 4.7 / Floof 3.1 / Chill 2.8 / Guard 4.0"
+- "Soi Dogs" wordmark + small dog icon, bottom-centre, with `soidogs.app` URL or whatever the final domain is
 - Photo credit: "📷 @photographer" small, top-right
 
 Generate with `react-native-view-shot`. Render an off-screen React component, capture as PNG, hand to native share sheet.
@@ -392,15 +392,15 @@ Generate with `react-native-view-shot`. Render an off-screen React component, ca
 
 When a user's photo wins weekly Top 3 in their district:
 - Push notification: "Your photo of Mango won 2nd place in Phrom Phong this week"
-- Tap → share card with: the photo full-bleed, "WEEK X WINNER — PHROM PHONG" banner, cat name, photographer credit, ranking medal, Soi Cats wordmark
+- Tap → share card with: the photo full-bleed, "WEEK X WINNER — PHROM PHONG" banner, dog name, photographer credit, ranking medal, Soi Dogs wordmark
 - One-tap share to Instagram Stories
 
 ### 11.3 Stat champion card
 
-When a cat takes a stat champion title in its district:
-- Push to all users who have photographed that cat
-- Share card: "MANGO IS NOW PHROM PHONG'S SPICIEST CAT 🌶️"
-- Hero photo, big stat readout, district tag, Soi Cats wordmark
+When a dog takes a stat champion title in its district:
+- Push to all users who have photographed that dog
+- Share card: "MANGO IS NOW PHROM PHONG'S SPICIEST DOG 🌶️"
+- Hero photo, big stat readout, district tag, Soi Dogs wordmark
 
 ### 11.4 Implementation notes
 
@@ -412,7 +412,7 @@ When a cat takes a stat champion title in its district:
 
 ### 11.5 Watermarking
 
-Every share card has the Soi Cats wordmark and URL. Non-removable, baked into the render. This is the marketing engine; do not let users export "clean" versions.
+Every share card has the Soi Dogs wordmark and URL. Non-removable, baked into the render. This is the marketing engine; do not let users export "clean" versions.
 
 ---
 
@@ -420,11 +420,11 @@ Every share card has the Soi Cats wordmark and URL. Non-removable, baked into th
 
 | Action | Points | Notes |
 |---|---|---|
-| Photo of existing cat | 10 | First photo of that cat by this user this week |
-| First-ever photo of a new cat | 25 | "Discoverer" bonus |
-| Photo of a cat unseen for 14+ days | 15 | "Welfare check" bonus |
+| Photo of existing dog | 10 | First photo of that dog by this user this week |
+| First-ever photo of a new dog | 25 | "Discoverer" bonus |
+| Photo of a dog unseen for 14+ days | 15 | "Welfare check" bonus |
 | Photo confirmed via "Help identify" queue | 10 (delayed) | Awarded on resolution |
-| Logging a feed (verified feeders only) | 5 | Max 3 per cat per day |
+| Logging a feed (verified feeders only) | 5 | Max 3 per dog per day |
 | Verified injured/missing flag | 30 | Awarded on verification, not on submission |
 | Comment on a sighting | 1 | Max 10/day |
 | Receiving a like on your photo | 1 | Max 20/day |
@@ -432,8 +432,8 @@ Every share card has the Soi Cats wordmark and URL. Non-removable, baked into th
 | Weekly Top 3 photo: 1st place | 100 | District leaderboard, awarded Monday 00:00 |
 | Weekly Top 3 photo: 2nd place | 50 | District leaderboard |
 | Weekly Top 3 photo: 3rd place | 25 | District leaderboard |
-| Photo that pushes a cat to a new stat champion title | 50 | Per district, per stat, one-time per title change |
-| First photo on a brand new cat profile to receive 5+ stat ratings | 20 | Encourages early rating activity on new cats |
+| Photo that pushes a dog to a new stat champion title | 50 | Per district, per stat, one-time per title change |
+| First photo on a brand new dog profile to receive 5+ stat ratings | 20 | Encourages early rating activity on new dogs |
 
 **Daily cap:** 100 points per user per day. Hard cap. (Weekly leaderboard bonuses bypass the daily cap because they are awarded on Mondays for the previous week's accumulated activity.)
 
@@ -451,7 +451,7 @@ All point awards write to a `points_log` table for audit and recalculation. Neve
 |---|---|---|
 | 1 | 100 | "Soi Starter" — 6 stickers |
 | 2 | 500 | "Neighbourhood Regular" — 8 stickers |
-| 3 | 1,500 | "Cat Whisperer" — 10 stickers |
+| 3 | 1,500 | "Dog Whisperer" — 10 stickers |
 | 4 | 5,000 | "Soi Legend" — 12 stickers |
 
 Each pack designed by a different local artist. Artist credit is mandatory and displayed on every sticker preview.
@@ -480,15 +480,15 @@ The gamification will be gamed. Build the rate limits into Edge Functions, not c
 | Rule | Implementation |
 |---|---|
 | Daily points cap (100) | Edge function checks `points_log` sum for today before awarding |
-| Same-cat, same-place farming | If user uploaded a photo of the same cat within 50m in the last 4 hours, photo posts but no points |
+| Same-dog, same-place farming | If user uploaded a photo of the same dog within 50m in the last 4 hours, photo posts but no points |
 | Duplicate photo detection | Compute pHash on upload via Edge Function. If pHash matches any photo by this user in last 30 days (Hamming distance < 5), no points |
 | GPS spoofing | Require `accuracy <= 50m` from device. Reject if accuracy worse without manual map confirmation |
 | Account age | Discoverer + welfare bonuses gated to account age > 24h |
-| New cat spam | Max 5 new cats per user per day |
+| New dog spam | Max 5 new dogs per user per day |
 | Comment spam | Max 30 comments per user per day, max 10 on a single sighting |
-| Stat rating spam | Max 15 rating-action points per day; votes from accounts < 7 days old excluded from cat-level averages |
+| Stat rating spam | Max 15 rating-action points per day; votes from accounts < 7 days old excluded from dog-level averages |
 | Self-vote prevention | A user cannot rate their own photos for any stat |
-| Coordinated voting | Detect when stat ratings on a single cat come from accounts that vote together repeatedly; flag for admin review |
+| Coordinated voting | Detect when stat ratings on a single dog come from accounts that vote together repeatedly; flag for admin review |
 | Report and block | Any user can report content; admin queue handles |
 
 Soft-fail on points: when a rule trips, the photo still posts (silent on the user side), it just doesn't earn. We do not want users to feel punished for ambiguous behaviour. They will figure out the rules.
@@ -513,7 +513,7 @@ created_at      timestamptz
 last_active_at  timestamptz
 ```
 
-### cats
+### dogs
 ```
 id                       uuid PK
 name                     text
@@ -523,7 +523,7 @@ discovered_at            timestamptz
 primary_color            text
 pattern                  text
 distinguishing_features  text nullable
-age_guess                enum('kitten','young','adult','senior') nullable
+age_guess                enum('puppy','young','adult','senior') nullable
 territory_centroid       geography(Point)
 last_seen_at             timestamptz
 status                   enum('active','injured','missing','deceased') default 'active'
@@ -534,14 +534,14 @@ vaccination_status       enum('unknown','partial','fully_vaccinated') default 'u
 last_vaccination_at      timestamptz nullable
 
 -- Stat aggregates (cached from photo_ratings, recomputed nightly + on-write)
-stat_chonk               numeric(3,2) nullable
-stat_spice               numeric(3,2) nullable
+stat_bork               numeric(3,2) nullable
+stat_zoom               numeric(3,2) nullable
 stat_floof               numeric(3,2) nullable
-stat_slink               numeric(3,2) nullable
-stat_vibes               numeric(3,2) nullable
+stat_chill               numeric(3,2) nullable
+stat_guard               numeric(3,2) nullable
 stats_rating_count       int default 0
 stats_last_computed_at   timestamptz nullable
-specialty_stat           text nullable  -- the highest stat name; 'spice' / 'chonk' / etc.
+specialty_stat           text nullable  -- the highest stat name; 'zoom' / 'bork' / etc.
 
 district_id              uuid FK districts nullable  -- inferred from territory_centroid
 created_at               timestamptz
@@ -554,7 +554,7 @@ INDEX on district_id, specialty_stat
 ### sightings
 ```
 id                uuid PK
-cat_id            uuid FK cats nullable (null while in "not sure" queue)
+dog_id            uuid FK dogs nullable (null while in "not sure" queue)
 photographer_id   uuid FK users
 photo_url         text
 photo_hash        text (perceptual hash, 16-char hex)
@@ -570,14 +570,14 @@ status            enum('confirmed','pending_id','rejected') default 'confirmed'
 created_at        timestamptz
 
 INDEX on location (GIST)
-INDEX on cat_id, created_at DESC
+INDEX on dog_id, created_at DESC
 INDEX on photographer_id, created_at DESC
 INDEX on status
 INDEX on district_id, created_at DESC
 INDEX on district_id, like_count DESC  -- weekly leaderboard queries
 ```
 
-### cat_health_flags, feed_logs, comments, likes, user_favourite_cats, sticker_packs, stickers, user_stickers, clinics, clinic_updates, points_log, identification_votes
+### dog_health_flags, feed_logs, comments, likes, user_favourite_cats, sticker_packs, stickers, user_stickers, clinics, clinic_updates, points_log, identification_votes
 (unchanged from v1.0 — see migrations for full definitions)
 
 ### districts
@@ -601,7 +601,7 @@ Seed with curated Bangkok districts (see Section 10.1). Boundaries can be source
 id            uuid PK
 sighting_id   uuid FK sightings
 voter_id      uuid FK users
-stat          enum('chonk','spice','floof','slink','vibes')
+stat          enum('bork','zoom','floof','chill','guard')
 score         int CHECK (score BETWEEN 1 AND 5)
 created_at    timestamptz
 updated_at    timestamptz
@@ -611,7 +611,7 @@ INDEX on sighting_id
 INDEX on voter_id, created_at
 ```
 
-A trigger on insert/update recalculates the parent cat's stat aggregates (debounced — write to a job queue, process every 30s in batch to avoid hot-row contention on popular cats).
+A trigger on insert/update recalculates the parent dog's stat aggregates (debounced — write to a job queue, process every 30s in batch to avoid hot-row contention on popular dogs).
 
 ### weekly_leaderboard_winners
 ```
@@ -621,7 +621,7 @@ district_id     uuid FK districts
 rank            int CHECK (rank IN (1,2,3))
 sighting_id     uuid FK sightings
 photographer_id uuid FK users
-cat_id          uuid FK cats
+dog_id          uuid FK dogs
 like_count      int  -- frozen at award time
 points_awarded  int
 created_at      timestamptz
@@ -637,23 +637,23 @@ Populated every Monday 00:00 ICT by a scheduled Edge Function.
 ```
 id              uuid PK
 district_id     uuid FK districts
-stat            enum('chonk','spice','floof','slink','vibes')
-cat_id          uuid FK cats
+stat            enum('bork','zoom','floof','chill','guard')
+dog_id          uuid FK dogs
 score           numeric(3,2)
 held_since      timestamptz
 last_computed_at timestamptz
 
 UNIQUE (district_id, stat)
-INDEX on cat_id
+INDEX on dog_id
 ```
 
-One row per district per stat (5 stats x ~15 districts = 75 rows). Recomputed nightly. When a cat takes a title from another, write a `points_log` entry for the photographer whose recent rating tipped the balance, and fire a push notification.
+One row per district per stat (5 stats x ~15 districts = 75 rows). Recomputed nightly. When a dog takes a title from another, write a `points_log` entry for the photographer whose recent rating tipped the balance, and fire a push notification.
 
 ### share_card_renders
 ```
 id              uuid PK
-card_type       enum('cat_profile','photo_winner','stat_champion')
-target_id       uuid  -- cat_id or sighting_id depending on card_type
+card_type       enum('dog_profile','photo_winner','stat_champion')
+target_id       uuid  -- dog_id or sighting_id depending on card_type
 rendered_url    text  -- Supabase Storage URL
 rendered_at     timestamptz
 expires_at      timestamptz  -- regenerate after this
@@ -670,10 +670,10 @@ All tables get RLS policies. Sketch:
 - Read: most tables public read (this is a community app)
 - Write: users can only insert their own rows; updates/deletes restricted to owner or admin
 - `clinic_updates` insert restricted to `clinic_admin` role
-- `cats.tnr_status`, `vaccination_status`, `last_vaccination_at` updateable only via clinic_updates trigger or admin
+- `dogs.tnr_status`, `vaccination_status`, `last_vaccination_at` updateable only via clinic_updates trigger or admin
 - `photo_ratings`: insert/update restricted to authenticated users; cannot rate own photos (enforced by RLS check against `sightings.photographer_id != auth.uid()`)
 - `weekly_leaderboard_winners`, `stat_champions`: read-only for all users; writes only by Edge Functions (service role)
-- `cats` stat columns updateable only via the rating-aggregation trigger or admin
+- `dogs` stat columns updateable only via the rating-aggregation trigger or admin
 
 ---
 
@@ -683,14 +683,14 @@ Use Expo Push. Store device tokens in a `device_tokens` table linked to user.
 
 | Trigger | Audience | Body |
 |---|---|---|
-| New photo of a favourited cat | Users who favourited that cat | "Mango was just spotted by @user near Soi 11" |
+| New photo of a favourited dog | Users who favourited that dog | "Mango was just spotted by @user near Soi 11" |
 | Verified injured/missing flag | Users within 1km, feeders within 2km | "Mango may be injured near Soi 11. Tap to help." |
 | Sticker tier unlocked | Affected user | "You hit 500 points! New pack unlocked." |
 | Comment on your photo | Photo owner | "@user commented on your photo of Mango" |
 | Help identify resolved | Original photographer | "Your photo was identified as Mango. +10 points." |
 | Weekly Top 3 winner | Photographer | "Your photo of Mango won 2nd place in Phrom Phong this week 🥈" |
-| Stat champion title taken | Users who photographed that cat | "Mango is now Phrom Phong's Spiciest Cat 🌶️" |
-| Stat champion title lost | Photographer who held it | "Khao Niao just took the Chonkiest title from Mango" (optional, off by default) |
+| Stat champion title taken | Users who photographed that dog | "Mango is now Phrom Phong's Zoomiest Dog 🌶️" |
+| Stat champion title lost | Photographer who held it | "Khao Niao just took the Borkiest title from Mango" (optional, off by default) |
 
 User notification settings screen: toggle each category. Default all on except comments and stat-champion-lost (can be noisy or sad).
 
@@ -702,9 +702,9 @@ English only at launch, but architected for Thai second.
 
 - Use `i18n-js` or `react-i18next`. All UI strings in `locales/en.json`.
 - No string literals in JSX. Lint rule to enforce.
-- Cat names: store both `name` (Latin script) and `name_th` (Thai). UI shows `name_th` first when locale is `th`, falls back to `name`.
+- Dog names: store both `name` (Latin script) and `name_th` (Thai). UI shows `name_th` first when locale is `th`, falls back to `name`.
 - Sticker pack names and artist credits also localizable.
-- Stat names and framing labels ("Chonk / Spice / Floof / Slink / Vibes") need careful Thai localization — these are English jokes that need Thai equivalents that land. Flag for native speaker review when Thai is added.
+- Stat names and framing labels ("Bork / Zoom / Floof / Chill / Guard") need careful Thai localization — these are English jokes that need Thai equivalents that land. Flag for native speaker review when Thai is added.
 - District names: use Thai names primarily for `th` locale (เขตวัฒนา for Watthana etc.), with romanised fallback.
 - Date and number formatting via `Intl` APIs with locale.
 
@@ -720,7 +720,7 @@ Out of scope for the mobile app build. For MVP, admins use the **Supabase dashbo
 - Seed district polygons
 
 Clinics need a way to log vaccinations. Two options for MVP:
-- **A:** Clinics use the mobile app, log in as `clinic_admin`, and get an extra "Update record" button on cat profiles.
+- **A:** Clinics use the mobile app, log in as `clinic_admin`, and get an extra "Update record" button on dog profiles.
 - **B:** Clinics submit updates via a Google Form that an admin transcribes.
 
 Recommend **A** for MVP. It is cheaper to build (one extra button + form) than to build a separate web portal, and clinics will already be on phones.
@@ -733,20 +733,20 @@ Recommend **A** for MVP. It is cheaper to build (one extra button + form) than t
 - Auth (Apple, Google, email)
 - Profile screen, handle, avatar
 - Camera + upload + GPS capture
-- Geofence-based cat ID flow
-- New cat creation
-- Cat profile with photos grid and territory map
-- **Cat stat ratings (Chonk / Spice / Floof / Slink / Vibes) — voting + aggregation + radar display + specialty badge**
+- Geofence-based dog ID flow
+- New dog creation
+- Dog profile with photos grid and territory map
+- **Dog stat ratings (Bork / Zoom / Floof / Chill / Guard) — voting + aggregation + radar display + specialty badge**
 - **District assignment for sightings (PostGIS)**
 - **Weekly district leaderboards (top 3 photos per district)**
-- **Cat-level Hall of Fame (top 3 photos per cat)**
+- **Dog-level Hall of Fame (top 3 photos per dog)**
 - **Stat champion leaderboards per district**
-- **Share card rendering (cat profile, photo winner, stat champion)**
+- **Share card rendering (dog profile, photo winner, stat champion)**
 - Feed (Nearby + Following tabs)
 - Comments and likes
 - Points system + daily cap + anti-abuse
 - Sticker tiers + unlock + share
-- Push notifications (favourited cat, sticker unlock, comment, weekly winner, stat champion)
+- Push notifications (favourited dog, sticker unlock, comment, weekly winner, stat champion)
 - "Not sure" queue + community ID voting
 
 ### Phase 1.5: Welfare layer (target: +3 weeks)
@@ -755,8 +755,8 @@ Recommend **A** for MVP. It is cheaper to build (one extra button + form) than t
 - Injured / missing / deceased flagging
 - Proximity push alerts on verified flags
 - "Needs help" pinned section in feed
-- Clinic admin role + cat record update UI
-- TNR and vaccination status display on cat profiles
+- Clinic admin role + dog record update UI
+- TNR and vaccination status display on dog profiles
 - Welfare exclusion enforced on leaderboards and stat champions
 
 ### Phase 2: Donations (separate brief)
@@ -768,14 +768,14 @@ Recommend **A** for MVP. It is cheaper to build (one extra button + form) than t
 ## 20. Repo structure
 
 ```
-soi-cats/
+soi-dogs/
 ├── apps/
 │   └── mobile/                    # Expo app
 │       ├── src/
 │       │   ├── screens/
 │       │   ├── components/
 │       │   │   └── ShareCards/    # off-screen render targets for share images
-│       │   ├── features/          # feature-sliced (cats, sightings, feed, ratings, leaderboards, etc.)
+│       │   ├── features/          # feature-sliced (dogs, sightings, feed, ratings, leaderboards, etc.)
 │       │   ├── lib/
 │       │   ├── hooks/
 │       │   ├── stores/            # Zustand
@@ -789,7 +789,7 @@ soi-cats/
 │   │   ├── compute-phash/
 │   │   ├── verify-flag/
 │   │   ├── recalculate-territory/
-│   │   ├── recompute-cat-stats/        # debounced rating aggregation
+│   │   ├── recompute-dog-stats/        # debounced rating aggregation
 │   │   ├── compute-weekly-winners/     # cron, Monday 00:00 ICT
 │   │   ├── recompute-stat-champions/   # nightly cron
 │   │   └── render-share-card/          # serverless image composition fallback
@@ -812,10 +812,10 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=
 EXPO_PUBLIC_SENTRY_DSN=
 EXPO_PUBLIC_POSTHOG_KEY=
 EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=
-EXPO_PUBLIC_NEARBY_CAT_RADIUS_M=150
+EXPO_PUBLIC_NEARBY_DOG_RADIUS_M=150
 EXPO_PUBLIC_NEARBY_FEED_RADIUS_M=5000
 EXPO_PUBLIC_STAT_MIN_RATINGS_FOR_DISPLAY=5
-EXPO_PUBLIC_SHARE_CARD_DOMAIN=soicats.app
+EXPO_PUBLIC_SHARE_CARD_DOMAIN=soidogs.app
 
 # Edge Function secrets (server-side only)
 SUPABASE_SERVICE_ROLE_KEY=
@@ -830,7 +830,7 @@ These are intentionally left open so Claude Code can pick the best implementatio
 
 - Exact image upload flow (direct to Storage from client vs through Edge Function for hashing first)
 - Comment threading depth (recommend flat for MVP)
-- Realtime channel subscription patterns (per cat? per feed area?)
+- Realtime channel subscription patterns (per dog? per feed area?)
 - Map provider abstraction (so we can swap Google for Mapbox later)
 - Form library (recommend `react-hook-form` + `zod`)
 - Test framework setup (recommend Vitest for units, Detox for E2E if time)
@@ -842,36 +842,36 @@ These are intentionally left open so Claude Code can pick the best implementatio
 
 ## 23. Things to ask Jon before deciding
 
-- Final app name (Soi Cats is placeholder)
+- Final app name (Soi Dogs is placeholder)
 - App icon and primary brand colour
-- Curated Thai cat name list (Khao Niao, Mango, Som Tam, etc., need a starter list of 30-40)
+- Curated Thai dog name list (Khao Niao, Mango, Som Tam, etc., need a starter list of 30-40)
 - First sticker pack artist (commission ahead of build completion)
 - Bangkok launch districts: confirm the 12-15 district list in Section 10.1
 - District boundary source (recommend OSM admin level 8 polygons; may need light cleanup)
-- Stat name finals: Chonk / Spice / Floof / Slink / Vibes locked, but framing labels at each end of each scale need a copywriter pass
+- Stat name finals: Bork / Zoom / Floof / Chill / Guard locked, but framing labels at each end of each scale need a copywriter pass
 - Specialty badge typography: which display font carries the Pokemon-card energy (consider commissioning a custom wordmark)
 - Privacy policy and ToS copy (legal, before TestFlight)
 - Apple Developer + Google Play accounts (under which entity? Listed Creative or new?)
-- Final share card URL domain (placeholder is `soicats.app`)
+- Final share card URL domain (placeholder is `soidogs.app`)
 
 ---
 
 ## 24. Definition of done for Phase 1
 
-- [ ] User can sign up, take a photo, identify or create a cat, and post in under 60 seconds
-- [ ] Two cats with overlapping territories can be distinguished without confusion
+- [ ] User can sign up, take a photo, identify or create a dog, and post in under 60 seconds
+- [ ] Two dogs with overlapping territories can be distinguished without confusion
 - [ ] Points award correctly and daily cap enforced
 - [ ] At least one sticker pack unlockable end-to-end
 - [ ] Push notifications firing reliably
 - [ ] App passes Apple and Google review
 - [ ] No P0 bugs in Sentry over 7 days of internal testing
 - [ ] Loads to first interactive screen in under 2 seconds on a mid-range Android
-- [ ] User can rate any photo on five stats; cat profile shows aggregated radar + specialty badge once threshold is met
+- [ ] User can rate any photo on five stats; dog profile shows aggregated radar + specialty badge once threshold is met
 - [ ] District is correctly assigned to every sighting at upload via PostGIS
 - [ ] Weekly leaderboards compute correctly on Monday cron and award points to winners
 - [ ] Stat champion titles compute correctly and notifications fire on title changes
-- [ ] Share card renders for cat profiles, photo winners, and stat champions; image is properly watermarked and shareable to Instagram, LINE, WhatsApp via native share sheet
-- [ ] Welfare-flagged photos and cats are excluded from all leaderboards and champion calculations
+- [ ] Share card renders for dog profiles, photo winners, and stat champions; image is properly watermarked and shareable to Instagram, LINE, WhatsApp via native share sheet
+- [ ] Welfare-flagged photos and dogs are excluded from all leaderboards and champion calculations
 
 ---
 

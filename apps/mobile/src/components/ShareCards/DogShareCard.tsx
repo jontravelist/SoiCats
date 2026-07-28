@@ -4,20 +4,20 @@ import { StyleSheet, Text, View } from "react-native";
 import type { ViewProps } from "react-native";
 
 import { StatRadar } from "@/components/StatRadar";
-import { paletteForCat, pokedexNumber } from "@/lib/catTheme";
+import { paletteForDog, pokedexNumber } from "@/lib/dogTheme";
 import type { StatKey } from "@/lib/api";
 
 interface Props extends ViewProps {
-  cat: {
+  dog: {
     id: string;
     name: string;
     primary_color: string;
     pattern: string;
-    stat_chonk: number | null;
-    stat_spice: number | null;
+    stat_bork: number | null;
+    stat_zoom: number | null;
     stat_floof: number | null;
-    stat_slink: number | null;
-    stat_vibes: number | null;
+    stat_chill: number | null;
+    stat_guard: number | null;
     specialty_stat: StatKey | null;
   };
   districtName?: string | null;
@@ -26,67 +26,63 @@ interface Props extends ViewProps {
 }
 
 const SPECIALTY_TITLE: Record<StatKey, string> = {
-  chonk: "PEAK CHONK",
-  spice: "MAXIMUM SPICE",
+  bork:  "MAX BORK",
+  zoom:  "PEAK ZOOM",
   floof: "TOTAL FLOOF",
-  slink: "PURE SLINK",
-  vibes: "BEST VIBES",
+  chill: "PURE CHILL",
+  guard: "BEST GUARD",
 };
 
 // 1080x1080 share card. Rendered at 360dp on screen; the captureRef call
 // uses a 3x pixel ratio to produce a 1080x1080 PNG, the size BRIEF section
-// 11.1 specifies for cat stat cards.
-export const CatShareCard = forwardRef<View, Props>(function CatShareCard(
-  { cat, districtName, heroPhotoUrl, photographerHandle, ...rest },
+// 11.1 specifies for dog stat cards.
+export const DogShareCard = forwardRef<View, Props>(function DogShareCard(
+  { dog, districtName, heroPhotoUrl, photographerHandle, ...rest },
   ref,
 ) {
-  const pal = paletteForCat(cat.primary_color);
+  const pal = paletteForDog(dog.primary_color);
   const stats: Record<StatKey, number | null> = {
-    chonk: cat.stat_chonk,
-    spice: cat.stat_spice,
-    floof: cat.stat_floof,
-    slink: cat.stat_slink,
-    vibes: cat.stat_vibes,
+    bork:  dog.stat_bork,
+    zoom:  dog.stat_zoom,
+    floof: dog.stat_floof,
+    chill: dog.stat_chill,
+    guard: dog.stat_guard,
   };
-  const specialty = cat.specialty_stat;
+  const specialty = dog.specialty_stat;
   const specialtyScore = specialty ? stats[specialty] : null;
 
   return (
     <View ref={ref} {...rest} collapsable={false} style={[styles.card, { backgroundColor: pal.bg }]}>
-      {/* Hero photo as desaturated background */}
       {heroPhotoUrl ? (
         <Image source={heroPhotoUrl} style={styles.heroBg} contentFit="cover" />
       ) : null}
       <View style={styles.heroOverlay} />
 
-      {/* Top row */}
       <View style={styles.topRow}>
         <View>
-          <Text style={[styles.brand, { color: pal.text }]}>เติมแมว</Text>
-          <Text style={[styles.subtitle, { color: pal.textDim }]}>N°{pokedexNumber(cat.id)}</Text>
+          <Text style={[styles.brand, { color: pal.text }]}>หมาซอย</Text>
+          <Text style={[styles.subtitle, { color: pal.textDim }]}>N°{pokedexNumber(dog.id)}</Text>
         </View>
         {photographerHandle ? (
           <Text style={[styles.credit, { color: pal.text }]}>📷 @{photographerHandle}</Text>
         ) : null}
       </View>
 
-      {/* Title block */}
       <View style={styles.titleBlock}>
-        <Text style={[styles.name, { color: pal.text }]} numberOfLines={1}>{cat.name}</Text>
+        <Text style={[styles.name, { color: pal.text }]} numberOfLines={1}>{dog.name}</Text>
         {districtName ? (
           <Text style={[styles.district, { color: pal.textDim }]}>{districtName}</Text>
         ) : null}
         <View style={styles.typesRow}>
           <View style={[styles.typePill, { backgroundColor: pal.light }]}>
-            <Text style={[styles.typeText, { color: pal.text }]}>{cat.primary_color}</Text>
+            <Text style={[styles.typeText, { color: pal.text }]}>{dog.primary_color}</Text>
           </View>
           <View style={[styles.typePill, { backgroundColor: pal.light }]}>
-            <Text style={[styles.typeText, { color: pal.text }]}>{cat.pattern}</Text>
+            <Text style={[styles.typeText, { color: pal.text }]}>{dog.pattern}</Text>
           </View>
         </View>
       </View>
 
-      {/* Stats area: radar left, list right */}
       <View style={styles.statsArea}>
         <View style={styles.radarSlot}>
           <StatRadar
@@ -106,7 +102,6 @@ export const CatShareCard = forwardRef<View, Props>(function CatShareCard(
         </View>
       </View>
 
-      {/* Specialty badge */}
       {specialty && specialtyScore != null ? (
         <View style={[styles.specialty, { backgroundColor: pal.accent }]}>
           <Text style={styles.specialtyTitle}>{SPECIALTY_TITLE[specialty]}</Text>
@@ -114,9 +109,8 @@ export const CatShareCard = forwardRef<View, Props>(function CatShareCard(
         </View>
       ) : null}
 
-      {/* Footer */}
       <View style={styles.footer}>
-        <Text style={[styles.footerText, { color: pal.textDim }]}>soicats.app</Text>
+        <Text style={[styles.footerText, { color: pal.textDim }]}>soidogs.app</Text>
       </View>
     </View>
   );

@@ -6,19 +6,19 @@ import Svg, { Path } from "react-native-svg";
 import { useQuery } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
-import { CatGlyph } from "@/components/CatGlyph";
+import { DogGlyph } from "@/components/DogGlyph";
 import { useLocation } from "@/hooks/useLocation";
-import { fetchCatsInRadius } from "@/lib/api";
-import { paletteForCat, poseForCat } from "@/lib/catTheme";
+import { fetchDogsInRadius } from "@/lib/api";
+import { paletteForDog, poseForDog } from "@/lib/dogTheme";
 import { colors, radius, shadow } from "@/lib/theme";
 
 const DEFAULT = { latitude: 13.7384, longitude: 100.5697, latitudeDelta: 0.04, longitudeDelta: 0.04 };
 
-// Custom Marker contents — teardrop with a CatGlyph face inside, tinted
-// per the cat's type palette. Spec lives in the Soi Sunset README:
-//   "Pins are CatGlyph heads inside a teardrop with paletteForCat bg."
-function PinTeardrop({ catId, primaryColor }: { catId: string; primaryColor: string }) {
-  const pal = paletteForCat(primaryColor);
+// Custom Marker contents — teardrop with a DogGlyph face inside, tinted
+// per the dog's type palette. Spec lives in the Soi Sunset README:
+//   "Pins are DogGlyph heads inside a teardrop with paletteForDog bg."
+function PinTeardrop({ dogId, primaryColor }: { dogId: string; primaryColor: string }) {
+  const pal = paletteForDog(primaryColor);
   const w = 44;
   const h = 55;
   return (
@@ -32,11 +32,11 @@ function PinTeardrop({ catId, primaryColor }: { catId: string; primaryColor: str
         />
       </Svg>
       <View style={{ position: "absolute", top: 6, alignItems: "center", justifyContent: "center", width: w, height: 32 }}>
-        <CatGlyph
+        <DogGlyph
           color={pal.accent}
           secondary={pal.bg === pal.accent ? pal.text : pal.bg}
           size={28}
-          pose={poseForCat(catId)}
+          pose={poseForDog(dogId)}
         />
       </View>
     </View>
@@ -53,16 +53,16 @@ export default function MapTab() {
     ? { lat: coords.latitude, lng: coords.longitude }
     : { lat: DEFAULT.latitude, lng: DEFAULT.longitude };
 
-  const { data: cats } = useQuery({
-    queryKey: ["map-cats-radius", origin.lat, origin.lng],
-    queryFn: () => fetchCatsInRadius(origin.lat, origin.lng, 20_000_000, 1000),
+  const { data: dogs } = useQuery({
+    queryKey: ["map-dogs-radius", origin.lat, origin.lng],
+    queryFn: () => fetchDogsInRadius(origin.lat, origin.lng, 20_000_000, 1000),
   });
 
   const region = coords
     ? { latitude: coords.latitude, longitude: coords.longitude, latitudeDelta: 0.02, longitudeDelta: 0.02 }
     : DEFAULT;
 
-  const filtered = (cats ?? []).filter((c) =>
+  const filtered = (dogs ?? []).filter((c) =>
     !search.trim() ? true : c.name.toLowerCase().includes(search.trim().toLowerCase()),
   );
 
@@ -94,9 +94,9 @@ export default function MapTab() {
             title={c.name}
             description={`${c.primary_color} · ${c.pattern}`}
             anchor={{ x: 0.5, y: 1 }}
-            onCalloutPress={() => router.push(`/cat/${c.id}`)}
+            onCalloutPress={() => router.push(`/dog/${c.id}`)}
           >
-            <PinTeardrop catId={c.id} primaryColor={c.primary_color} />
+            <PinTeardrop dogId={c.id} primaryColor={c.primary_color} />
           </Marker>
         ))}
       </MapView>

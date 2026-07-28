@@ -32,7 +32,7 @@ export default function MyPosts() {
   if (items.length === 0) {
     return (
       <Screen style={styles.center}>
-        <Text style={styles.empty}>No posts yet. Snap a cat to start.</Text>
+        <Text style={styles.empty}>No posts yet. Snap a dog to start.</Text>
       </Screen>
     );
   }
@@ -44,7 +44,7 @@ export default function MyPosts() {
         keyExtractor={(s) => s.id}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => {
-          const cat = (item as { cats?: { name?: string } | null }).cats;
+          const dog = (item as { dogs?: { name?: string } | null }).dogs;
           const isPending = item.status === "pending_id";
           return (
             <Pressable
@@ -53,7 +53,7 @@ export default function MyPosts() {
             >
               <Image source={item.photo_url} style={styles.thumb} contentFit="cover" />
               <View style={styles.rowText}>
-                <Text style={styles.name}>{cat?.name ?? "Awaiting ID"}</Text>
+                <Text style={styles.name}>{dog?.name ?? "Awaiting ID"}</Text>
                 <Text style={styles.meta}>{timeAgo(item.created_at)}</Text>
                 {isPending ? (
                   <View style={styles.badge}>

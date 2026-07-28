@@ -1,7 +1,7 @@
 {
   "app": {
-    "name": "เติมแมว",
-    "tagline": "Every cat in your neighbourhood, named."
+    "name": "หมาซอย",
+    "tagline": "Every soi dog in your neighbourhood, named."
   },
   "tabs": {
     "feed": "Feed",
@@ -27,8 +27,8 @@
     "tabs": { "nearby": "Nearby", "favourites": "Favourites" },
     "newAbove": "{{count}} new photo",
     "newAbove_other": "{{count}} new photos",
-    "empty": "No cats spotted nearby yet. Be the first.",
-    "emptyFavourites": "Favourite a cat to see their photos here.",
+    "empty": "No dogs spotted nearby yet. Be the first.",
+    "emptyFavourites": "Favourite a dog to see their photos here.",
     "distance_m": "{{m}} m away",
     "distance_km": "{{km}} km away",
     "timeAgo": "{{time}} ago"
@@ -39,39 +39,39 @@
     "openLibrary": "Choose from library",
     "locating": "Locating you…",
     "lowAccuracy": "GPS is weak. Step into the open or set the location on the map.",
-    "whichCat": "Which cat is this?",
-    "newCat": "New cat",
+    "whichDog": "Which dog is this?",
+    "newDog": "New dog",
     "notSure": "Not sure",
     "captionPlaceholder": "Say something (optional)",
     "post": "Post",
     "posting": "Posting…",
     "duplicateInterstitial": "Wait — could this be one of these?",
-    "stillNew": "Still a new cat"
+    "stillNew": "Still a new dog"
   },
-  "newCat": {
-    "title": "Name this cat",
-    "namePlaceholder": "e.g. Mango",
-    "patternLabel": "Pattern",
+  "newDog": {
+    "title": "Name this dog",
+    "namePlaceholder": "e.g. Khao Niao",
+    "patternLabel": "Coat pattern",
     "colorLabel": "Primary colour",
     "ageLabel": "Approximate age",
     "featuresLabel": "Distinguishing features (optional)",
     "save": "Save"
   },
   "patterns": {
-    "tabby": "Tabby",
-    "tortie": "Tortie",
-    "calico": "Calico",
-    "tuxedo": "Tuxedo",
-    "solid_black": "Solid black",
-    "solid_white": "Solid white",
-    "ginger": "Ginger",
-    "grey": "Grey",
-    "pointed": "Pointed"
+    "solid":     "Solid",
+    "spotted":   "Spotted",
+    "brindle":   "Brindle",
+    "patched":   "Patched",
+    "sable":     "Sable",
+    "merle":     "Merle",
+    "black_tan": "Black & tan",
+    "tricolour": "Tricolour",
+    "shaggy":    "Shaggy"
   },
   "ages": {
-    "kitten": "Kitten",
-    "young": "Young",
-    "adult": "Adult",
+    "puppy":  "Puppy",
+    "young":  "Young",
+    "adult":  "Adult",
     "senior": "Senior"
   },
   "sexes": {
@@ -79,7 +79,7 @@
     "female": "Female",
     "unknown": "Unknown"
   },
-  "cat": {
+  "dog": {
     "discoveredBy": "Discovered by {{handle}} on {{date}}",
     "lastSeen": "Last seen {{time}}",
     "stats": {
@@ -90,23 +90,23 @@
     },
     "welfare": {
       "tnr": {
-        "unknown": "TNR status unknown",
-        "intact": "Intact",
-        "ear_tipped": "Ear-tipped",
-        "sterilised": "Sterilised"
+        "unknown":     "Sterilisation unknown",
+        "intact":      "Intact",
+        "ear_tipped":  "Ear-tipped",
+        "sterilised":  "Sterilised"
       },
       "vaccination": {
-        "unknown": "Vaccination unknown",
-        "partial": "Partially vaccinated",
+        "unknown":          "Vaccination unknown",
+        "partial":          "Partially vaccinated",
         "fully_vaccinated": "Fully vaccinated"
       },
       "verifiedBy": "verified by {{clinic}}"
     },
     "actions": {
-      "favourite": "Favourite",
+      "favourite":   "Favourite",
       "unfavourite": "Favourited",
-      "directions": "Directions to last sighting",
-      "flag": "Report welfare issue"
+      "directions":  "Directions to last sighting",
+      "flag":        "Report welfare issue"
     }
   },
   "flag": {
@@ -118,7 +118,7 @@
   "stickers": {
     "title": "Stickers",
     "progress": "{{points}} / {{next}} points to {{packName}}",
-    "unlockedAll": "You've unlocked every pack. Cat Whisperer status confirmed.",
+    "unlockedAll": "You've unlocked every pack. Dog Whisperer status confirmed.",
     "unlocked": "Unlocked",
     "locked": "Locked",
     "tierUnlockedTitle": "New stickers unlocked",
@@ -132,7 +132,7 @@
     "points": "{{count}} point",
     "points_other": "{{count}} points",
     "edit": "Edit profile",
-    "myCats": "My cats",
+    "myDogs": "My dogs",
     "myPhotos": "My photos",
     "settings": "Settings",
     "signOut": "Sign out",

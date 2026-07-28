@@ -1,7 +1,7 @@
-# Soi Cats
+# Soi Dogs
 
-Mobile app for Thailand where users photograph stray cats, name them, and build
-a community-curated record of every cat in their neighbourhood.
+Mobile app for Thailand where users photograph soi dogs, name them, and build
+a community-curated record of every dog in their neighbourhood.
 
 See `BRIEF.md` for full product spec.
 
@@ -18,7 +18,7 @@ See `BRIEF.md` for full product spec.
 ## Repo layout
 
 ```
-soi-cats/
+soi-dogs/
 ├── apps/mobile/             # Expo app
 ├── supabase/
 │   ├── migrations/          # SQL migrations (PostGIS, schema, RLS)
@@ -42,7 +42,7 @@ supabase start
 # Apply migrations
 supabase db reset
 
-# Seed sticker packs and Bangkok demo cats
+# Seed sticker packs and Bangkok demo dogs
 psql "$(supabase status -o env | grep DB_URL | cut -d= -f2-)" -f supabase/seed.sql
 
 # Deploy Edge Functions to your project
@@ -69,7 +69,7 @@ npx supabase gen types typescript --local > packages/shared/database.types.ts
 
 ## Build phases
 
-- **Phase 1 (6 weeks):** Auth, camera, geofence cat ID, profiles, feed, points, stickers, push.
+- **Phase 1 (6 weeks):** Auth, camera, geofence dog ID, profiles, feed, points, stickers, push.
 - **Phase 1.5 (+3 weeks):** Verified feeders, feed logs, injured/missing flags, clinic admin.
 - **Phase 2:** Donations.
 - **Phase 3:** Thai localization, ML re-ID, sticker marketplace.

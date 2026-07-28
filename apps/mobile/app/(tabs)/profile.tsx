@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Screen } from "@/components/Screen";
 import { Button } from "@/components/Button";
-import { CatGlyph } from "@/components/CatGlyph";
+import { DogGlyph } from "@/components/DogGlyph";
 import { useAuthStore } from "@/stores/auth";
 import { useProfile } from "@/hooks/useProfile";
 import { fetchMyPosts, fetchStickerPacks, fetchUserStickers } from "@/lib/api";
@@ -34,11 +34,11 @@ export default function ProfileTab() {
   if (!session) {
     return (
       <Screen style={styles.center}>
-        <CatGlyph color={colors.primary} secondary={colors.text} size={140} pose={2} />
+        <DogGlyph color={colors.primary} secondary={colors.text} size={140} pose={2} />
         <Text style={styles.h1}>{t("app.name")}</Text>
         <Text style={styles.tagline}>{t("app.tagline")}</Text>
         <Text style={styles.body}>
-          Sign in to photograph cats, name them, and unlock sticker packs from local artists.
+          Sign in to photograph dogs, name them, and unlock sticker packs from local artists.
         </Text>
         <Button label="Sign in or sign up" onPress={() => router.push("/auth")} style={{ minWidth: 240 }} />
       </Screen>
@@ -60,7 +60,7 @@ export default function ProfileTab() {
           <Image source={profile.avatar_url} style={styles.avatar} />
         ) : (
           <View style={[styles.avatar, styles.avatarPlaceholder]}>
-            <CatGlyph color={colors.accent} secondary={colors.text} size={64} pose={0} />
+            <DogGlyph color={colors.accent} secondary={colors.text} size={64} pose={0} />
           </View>
         )}
         <Text style={styles.handle}>@{profile.handle ?? "anon"}</Text>
@@ -71,10 +71,10 @@ export default function ProfileTab() {
       </View>
 
       {/* Stat strip per the Soi Sunset profile spec. Counts are placeholders
-          until we wire actual aggregations (cats spotted, feeds logged,
+          until we wire actual aggregations (dogs spotted, feeds logged,
           streak). For MVP they pull from data we already have. */}
       <View style={styles.statStrip}>
-        <StatCell label="Cats spotted" value={(myPostsQ.data ?? []).length} />
+        <StatCell label="Dogs spotted" value={(myPostsQ.data ?? []).length} />
         <StatCell label="Stickers"     value={(ownedQ.data ?? []).length} />
         <StatCell label="Points"       value={profile.points} />
       </View>

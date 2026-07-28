@@ -1,11 +1,11 @@
--- Wave 3 of v1.1: Hall of Fame on cat profiles + denormalised like_count.
+-- Wave 3 of v1.1: Hall of Fame on dog profiles + denormalised like_count.
 --
 -- The like_count column was added in Wave 1 (districts) so the index
 -- (district_id, like_count desc) could be created. Now we wire up:
 --   - Trigger on public.likes that increments/decrements
 --     sightings.like_count.
 --   - Backfill of existing likes.
---   - cat_top_photos RPC powering the per-cat Hall of Fame.
+--   - dog_top_photos RPC powering the per-dog Hall of Fame.
 
 create or replace function public.sighting_likes_after_change()
 returns trigger
@@ -36,12 +36,12 @@ create trigger likes_update_count
 update public.sightings s
    set like_count = (select count(*) from public.likes l where l.sighting_id = s.id);
 
--- cat_top_photos: top N photos for a cat by all-time like count.
+-- dog_top_photos: top N photos for a dog by all-time like count.
 -- Per BRIEF section 10.3 this is a forever leaderboard, no weekly reset.
--- Welfare-flagged cats still show their Hall of Fame on their own profile
+-- Welfare-flagged dogs still show their Hall of Fame on their own profile
 -- (the global leaderboard exclusion is for district / city-wide boards).
-create or replace function public.cat_top_photos(
-  target_cat uuid,
+create or replace function public.dog_top_photos(
+  target_dog uuid,
   max_rows   int default 3
 )
 returns table (
@@ -66,7 +66,7 @@ as $$
     u.handle
   from public.sightings s
   left join public.users u on u.id = s.photographer_id
-  where s.cat_id = target_cat
+  where s.dog_id = target_dog
     and s.status = 'confirmed'
     and s.like_count > 0
   order by s.like_count desc, s.created_at desc

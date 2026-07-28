@@ -1,10 +1,10 @@
--- Soi Cats: enums
+-- Soi Dogs: enums
 
 create type user_role as enum ('user', 'feeder', 'clinic_admin', 'app_admin');
 
-create type cat_status as enum ('active', 'injured', 'missing', 'deceased');
+create type dog_status as enum ('active', 'injured', 'missing', 'deceased');
 
-create type cat_age_guess as enum ('kitten', 'young', 'adult', 'senior');
+create type dog_age_guess as enum ('puppy', 'young', 'adult', 'senior');
 
 create type tnr_status as enum ('unknown', 'intact', 'ear_tipped', 'sterilised');
 

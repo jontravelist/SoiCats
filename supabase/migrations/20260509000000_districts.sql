@@ -1,7 +1,7 @@
 -- Wave 1 of v1.1: districts.
 --
 -- Adds a districts table (curated Bangkok districts + a 'Greater Bangkok'
--- catch-all), district_id columns on cats and sightings, triggers that
+-- catch-all), district_id columns on dogs and sightings, triggers that
 -- auto-assign district_id at insert/update via PostGIS ST_Contains, and a
 -- seed of approximate polygons for the 15 curated districts in BRIEF
 -- section 10.1.
@@ -31,10 +31,10 @@ create policy "districts public read"
 create policy "districts admin write"
   on public.districts for all using (public.is_admin()) with check (public.is_admin());
 
--- Add district_id to cats and sightings (nullable + indexed).
-alter table public.cats
+-- Add district_id to dogs and sightings (nullable + indexed).
+alter table public.dogs
   add column district_id uuid references public.districts (id);
-create index cats_district_idx on public.cats (district_id);
+create index dogs_district_idx on public.dogs (district_id);
 
 alter table public.sightings
   add column district_id uuid references public.districts (id);
@@ -108,7 +108,7 @@ create trigger sighting_assign_district
   before insert or update of location on public.sightings
   for each row execute function public.assign_sighting_district();
 
-create or replace function public.assign_cat_district()
+create or replace function public.assign_dog_district()
 returns trigger
 language plpgsql
 as $$
@@ -130,10 +130,10 @@ begin
 end;
 $$;
 
-drop trigger if exists cat_assign_district on public.cats;
-create trigger cat_assign_district
-  before insert or update of territory_centroid on public.cats
-  for each row execute function public.assign_cat_district();
+drop trigger if exists dog_assign_district on public.dogs;
+create trigger dog_assign_district
+  before insert or update of territory_centroid on public.dogs
+  for each row execute function public.assign_dog_district();
 
 -- Seed: Greater Bangkok catch-all (huge bounding box around the city).
 insert into public.districts (slug, name, name_th, boundary, is_curated)
@@ -173,7 +173,7 @@ update public.sightings s
    )
  where district_id is null;
 
-update public.cats c
+update public.dogs c
    set district_id = coalesce(
      public.find_district_for_point(st_x(c.territory_centroid::geometry), st_y(c.territory_centroid::geometry)),
      public.greater_bangkok_district_id()

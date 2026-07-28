@@ -1,15 +1,15 @@
--- Soi Cats: Row Level Security
+-- Soi Dogs: Row Level Security
 -- Public read for community-app tables; writes restricted to owners or admins.
 
 alter table public.users                 enable row level security;
-alter table public.cats                  enable row level security;
+alter table public.dogs                  enable row level security;
 alter table public.clinics               enable row level security;
 alter table public.sightings             enable row level security;
 alter table public.comments              enable row level security;
 alter table public.likes                 enable row level security;
-alter table public.user_favourite_cats   enable row level security;
+alter table public.user_favourite_dogs   enable row level security;
 alter table public.identification_votes  enable row level security;
-alter table public.cat_health_flags      enable row level security;
+alter table public.dog_health_flags      enable row level security;
 alter table public.feed_logs             enable row level security;
 alter table public.clinic_updates        enable row level security;
 alter table public.sticker_packs         enable row level security;
@@ -36,31 +36,31 @@ create policy "users update own profile"
 create policy "admin full users"
   on public.users for all using (public.is_admin()) with check (public.is_admin());
 
--- ─── cats ───────────────────────────────────────────────────────────────────
-create policy "cats public read"
-  on public.cats for select using (true);
+-- ─── dogs ───────────────────────────────────────────────────────────────────
+create policy "dogs public read"
+  on public.dogs for select using (true);
 
-create policy "cats insert by signed-in users"
-  on public.cats for insert
+create policy "dogs insert by signed-in users"
+  on public.dogs for insert
   with check (auth.uid() is not null);
 
--- Users can update non-welfare fields on cats they discovered.
+-- Users can update non-welfare fields on dogs they discovered.
 -- Welfare fields (tnr_status, vaccination_status, last_vaccination_at, tnr_confirmed_*)
 -- can only change via clinic_updates trigger (security definer) or admin.
-create policy "cats update by discoverer (non-welfare)"
-  on public.cats for update
+create policy "dogs update by discoverer (non-welfare)"
+  on public.dogs for update
   using (discovered_by_user_id = auth.uid())
   with check (
     discovered_by_user_id = auth.uid()
-    and tnr_status              = (select tnr_status              from public.cats c where c.id = cats.id)
-    and tnr_confirmed_at        is not distinct from (select tnr_confirmed_at        from public.cats c where c.id = cats.id)
-    and tnr_confirmed_by_clinic is not distinct from (select tnr_confirmed_by_clinic from public.cats c where c.id = cats.id)
-    and vaccination_status      = (select vaccination_status      from public.cats c where c.id = cats.id)
-    and last_vaccination_at     is not distinct from (select last_vaccination_at     from public.cats c where c.id = cats.id)
+    and tnr_status              = (select tnr_status              from public.dogs c where c.id = dogs.id)
+    and tnr_confirmed_at        is not distinct from (select tnr_confirmed_at        from public.dogs c where c.id = dogs.id)
+    and tnr_confirmed_by_clinic is not distinct from (select tnr_confirmed_by_clinic from public.dogs c where c.id = dogs.id)
+    and vaccination_status      = (select vaccination_status      from public.dogs c where c.id = dogs.id)
+    and last_vaccination_at     is not distinct from (select last_vaccination_at     from public.dogs c where c.id = dogs.id)
   );
 
-create policy "cats admin update"
-  on public.cats for update using (public.is_admin()) with check (public.is_admin());
+create policy "dogs admin update"
+  on public.dogs for update using (public.is_admin()) with check (public.is_admin());
 
 -- ─── clinics ────────────────────────────────────────────────────────────────
 create policy "clinics public read"
@@ -104,9 +104,9 @@ create policy "likes insert own"   on public.likes for insert with check (user_i
 create policy "likes delete own"   on public.likes for delete using (user_id = auth.uid());
 
 -- ─── favourites ─────────────────────────────────────────────────────────────
-create policy "favourites public read"  on public.user_favourite_cats for select using (true);
-create policy "favourites insert own"   on public.user_favourite_cats for insert with check (user_id = auth.uid());
-create policy "favourites delete own"   on public.user_favourite_cats for delete using (user_id = auth.uid());
+create policy "favourites public read"  on public.user_favourite_dogs for select using (true);
+create policy "favourites insert own"   on public.user_favourite_dogs for insert with check (user_id = auth.uid());
+create policy "favourites delete own"   on public.user_favourite_dogs for delete using (user_id = auth.uid());
 
 -- ─── identification votes ──────────────────────────────────────────────────
 create policy "id votes public read"  on public.identification_votes for select using (true);
@@ -114,9 +114,9 @@ create policy "id votes insert own"   on public.identification_votes for insert 
 create policy "id votes delete own"   on public.identification_votes for delete using (voter_id = auth.uid());
 
 -- ─── flags ──────────────────────────────────────────────────────────────────
-create policy "flags public read"  on public.cat_health_flags for select using (true);
-create policy "flags insert own"   on public.cat_health_flags for insert with check (flagged_by = auth.uid());
-create policy "flags admin update" on public.cat_health_flags for update using (public.is_admin()) with check (public.is_admin());
+create policy "flags public read"  on public.dog_health_flags for select using (true);
+create policy "flags insert own"   on public.dog_health_flags for insert with check (flagged_by = auth.uid());
+create policy "flags admin update" on public.dog_health_flags for update using (public.is_admin()) with check (public.is_admin());
 
 -- ─── feed logs ──────────────────────────────────────────────────────────────
 create policy "feed logs public read" on public.feed_logs for select using (true);

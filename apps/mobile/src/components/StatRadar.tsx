@@ -4,11 +4,11 @@ import { colors } from "@/lib/theme";
 import type { StatKey } from "@/lib/api";
 
 const STATS: { key: StatKey; label: string }[] = [
-  { key: "chonk", label: "Chonk" },
-  { key: "spice", label: "Spice" },
+  { key: "bork", label: "Bork" },
+  { key: "zoom", label: "Zoom" },
   { key: "floof", label: "Floof" },
-  { key: "slink", label: "Slink" },
-  { key: "vibes", label: "Vibes" },
+  { key: "chill", label: "Chill" },
+  { key: "guard", label: "Guard" },
 ];
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
   fillColor?: string;
 }
 
-// Hand-rolled radar chart for the five cat stats. Five axes evenly spaced;
+// Hand-rolled radar chart for the five dog stats. Five axes evenly spaced;
 // rings at 1..5 for reference; shaded polygon from the values.
 export function StatRadar({ size = 240, values, strokeColor, fillColor }: Props) {
   const cx = size / 2;

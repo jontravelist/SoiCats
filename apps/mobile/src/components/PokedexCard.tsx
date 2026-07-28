@@ -1,13 +1,13 @@
 import { Image } from "expo-image";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { paletteForCat, pokedexNumber, poseForCat } from "@/lib/catTheme";
-import { CatGlyph } from "@/components/CatGlyph";
+import { paletteForDog, pokedexNumber, poseForDog } from "@/lib/dogTheme";
+import { DogGlyph } from "@/components/DogGlyph";
 import { STAT_META } from "@/lib/stats";
 import { colors, radius, shadow, typography } from "@/lib/theme";
 import type { StatKey } from "@/lib/api";
 
 interface Props {
-  catId: string;
+  dogId: string;
   name: string;
   primaryColor: string;
   pattern: string;
@@ -17,15 +17,15 @@ interface Props {
   onPress?: () => void;
 }
 
-// Pokedex-style grid card. Solid coloured background per the cat's primary
+// Pokedex-style grid card. Solid coloured background per the dog's primary
 // colour, big white name, two type-style chips, thumbnail in the
 // bottom-right and a small N°XXX overlay top-right.
-export function PokedexCard({ catId, name, primaryColor, pattern, thumbnailUrl, specialty, specialtyScore, onPress }: Props) {
-  const p = paletteForCat(primaryColor);
+export function PokedexCard({ dogId, name, primaryColor, pattern, thumbnailUrl, specialty, specialtyScore, onPress }: Props) {
+  const p = paletteForDog(primaryColor);
   const specialtyMeta = specialty ? STAT_META[specialty] : null;
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.card, { backgroundColor: p.bg }, pressed && { opacity: 0.92 }]}>
-      <Text style={[styles.number, { color: p.textDim }]}>N°{pokedexNumber(catId)}</Text>
+      <Text style={[styles.number, { color: p.textDim }]}>N°{pokedexNumber(dogId)}</Text>
 
       <View style={[styles.typePill, { backgroundColor: p.accent, borderColor: p.bg }]}>
         <Text style={[styles.typePillText, { color: p.bg === p.accent ? p.text : p.light }]}>{pattern}</Text>
@@ -35,7 +35,7 @@ export function PokedexCard({ catId, name, primaryColor, pattern, thumbnailUrl, 
         {thumbnailUrl ? (
           <Image source={thumbnailUrl} style={styles.thumb} contentFit="cover" />
         ) : (
-          <CatGlyph color={p.accent} secondary={p.text} size={84} pose={poseForCat(catId)} />
+          <DogGlyph color={p.accent} secondary={p.text} size={84} pose={poseForDog(dogId)} />
         )}
       </View>
 

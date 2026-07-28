@@ -1,8 +1,8 @@
--- Soi Cats: sightings, comments, likes, favourites
+-- Soi Dogs: sightings, comments, likes, favourites
 
 create table public.sightings (
   id                  uuid primary key default gen_random_uuid(),
-  cat_id              uuid references public.cats (id) on delete set null,
+  dog_id              uuid references public.dogs (id) on delete set null,
   photographer_id     uuid not null references public.users (id) on delete cascade,
   photo_url           text not null,
   photo_hash          text,
@@ -17,7 +17,7 @@ create table public.sightings (
 );
 
 create index sightings_location_idx on public.sightings using gist (location);
-create index sightings_cat_created_idx on public.sightings (cat_id, created_at desc);
+create index sightings_dog_created_idx on public.sightings (dog_id, created_at desc);
 create index sightings_photographer_created_idx on public.sightings (photographer_id, created_at desc);
 create index sightings_status_idx on public.sightings (status);
 create index sightings_created_idx on public.sightings (created_at desc);
@@ -41,30 +41,30 @@ create table public.likes (
 
 create index likes_user_idx on public.likes (user_id);
 
-create table public.user_favourite_cats (
+create table public.user_favourite_dogs (
   user_id       uuid not null references public.users (id) on delete cascade,
-  cat_id        uuid not null references public.cats (id) on delete cascade,
+  dog_id        uuid not null references public.dogs (id) on delete cascade,
   created_at    timestamptz not null default now(),
-  primary key (user_id, cat_id)
+  primary key (user_id, dog_id)
 );
 
-create index favourites_cat_idx on public.user_favourite_cats (cat_id);
+create index favourites_dog_idx on public.user_favourite_dogs (dog_id);
 
 create table public.identification_votes (
   sighting_id     uuid not null references public.sightings (id) on delete cascade,
   voter_id        uuid not null references public.users (id) on delete cascade,
-  proposed_cat_id uuid references public.cats (id) on delete set null,
+  proposed_dog_id uuid references public.dogs (id) on delete set null,
   proposed_new    boolean not null default false,
   created_at      timestamptz not null default now(),
   primary key (sighting_id, voter_id),
-  check (proposed_cat_id is not null or proposed_new = true)
+  check (proposed_dog_id is not null or proposed_new = true)
 );
 
 create index id_votes_sighting_idx on public.identification_votes (sighting_id);
 
--- Recalculate territory centroid from the last 10 sightings of a cat.
+-- Recalculate territory centroid from the last 10 sightings of a dog.
 -- Called by trigger on confirmed sightings and by recalculate-territory edge function.
-create or replace function public.recalculate_territory(target_cat_id uuid)
+create or replace function public.recalculate_territory(target_dog_id uuid)
 returns void
 language plpgsql
 security definer
@@ -77,7 +77,7 @@ begin
   with recent as (
     select location, created_at
     from public.sightings
-    where cat_id = target_cat_id
+    where dog_id = target_dog_id
       and status = 'confirmed'
     order by created_at desc
     limit 10
@@ -89,10 +89,10 @@ begin
   from recent;
 
   if new_centroid is not null then
-    update public.cats
+    update public.dogs
        set territory_centroid = new_centroid,
            last_seen_at = greatest(last_seen_at, most_recent)
-     where id = target_cat_id;
+     where id = target_dog_id;
   end if;
 end;
 $$;
@@ -102,13 +102,13 @@ returns trigger
 language plpgsql
 as $$
 begin
-  if new.status = 'confirmed' and new.cat_id is not null then
-    perform public.recalculate_territory(new.cat_id);
+  if new.status = 'confirmed' and new.dog_id is not null then
+    perform public.recalculate_territory(new.dog_id);
   end if;
   return new;
 end;
 $$;
 
 create trigger sightings_recalc_territory
-  after insert or update of cat_id, status on public.sightings
+  after insert or update of dog_id, status on public.sightings
   for each row execute function public.sightings_after_insert();
